@@ -13,7 +13,7 @@
   background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
   color: $white;
   padding: $spacing-8;
-  font-family: $font-sans;
+  font-family: $font-primary;
 
   // Header
   &__header {
@@ -29,7 +29,7 @@
   }
 
   &__title {
-    @include heading-1;
+    @include responsive-heading-1;
     margin: 0;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     -webkit-background-clip: text;
@@ -44,7 +44,7 @@
   }
 
   &__round-number {
-    @include heading-4;
+    @include responsive-heading-3;
     padding: $spacing-2 $spacing-6;
     background: rgba(102, 126, 234, 0.2);
     border-radius: 2rem;
@@ -98,7 +98,7 @@
   }
 
   &__card-title {
-    @include heading-3;
+    @include responsive-heading-3;
     margin: 0 0 $spacing-4 0;
     color: #a78bfa;
   }
@@ -124,7 +124,7 @@
 
   // Example section
   &__example-title {
-    @include heading-4;
+    @include responsive-heading-3;
     margin-bottom: $spacing-4;
   }
 
@@ -163,7 +163,7 @@
   }
 
   &__solution-title {
-    @include heading-4;
+    @include responsive-heading-3;
     margin-bottom: $spacing-3;
     color: $yellow-primary;
   }
@@ -229,7 +229,7 @@
   }
 
   &__team-name {
-    @include heading-4;
+    @include responsive-heading-3;
   }
 
   &__team-points {
@@ -295,7 +295,7 @@
     text-align: center;
     padding: $spacing-12;
     color: $gray-400;
-    @include heading-4;
+    @include responsive-heading-3;
   }
 
   &__no-data-icon {

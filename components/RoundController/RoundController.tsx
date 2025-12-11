@@ -288,7 +288,7 @@ export default function RoundController({ teams, onUpdateTeams }: RoundControlle
 
       {/* Stats Footer */}
       <div className="mt-6 text-center text-gray-500">
-        <p>Esempi usati: {usedExampleIds.size}</p>
+        <p>Esempi usati: {usedExampleIds.length}</p>
       </div>
     </div>
   );

@@ -20,10 +20,13 @@
 import { Card, Typography, Row, Col } from 'antd';
 import Link from 'next/link';
 import { ArrowRightOutlined } from '@ant-design/icons';
-import type { PatternCategory, PatternTheory } from '@/lib/patternTheory';
+import type { PatternTheory } from '@/lib/patternTheory';
+import { PATTERN_CATEGORIES } from '@/lib/patternTheory';
 import './CategoryOverview.scss';
 
 const { Title, Paragraph } = Typography;
+
+type PatternCategory = typeof PATTERN_CATEGORIES[keyof typeof PATTERN_CATEGORIES];
 
 interface CategoryOverviewProps {
   category: PatternCategory;
