@@ -69,9 +69,9 @@ export default function RootLayout({
                                 colorPrimaryHover: "#d39e00", // Yellow dark on hover
                                 colorPrimaryActive: "#d39e00",
                                 // Danger button (pink/red)
-                                dangerColor: "#ff1744", // Pink accent for danger buttons
-                                colorDangerHover: "#d50000",
-                                colorDangerActive: "#d50000",
+                                colorError: "#ff1744", // Pink accent for danger buttons
+                                colorErrorHover: "#d50000",
+                                colorErrorActive: "#d50000",
                                 // Link button (yellow)
                                 colorLink: "#ffc107", // Yellow for link buttons
                                 colorLinkHover: "#d39e00", // Yellow dark on hover

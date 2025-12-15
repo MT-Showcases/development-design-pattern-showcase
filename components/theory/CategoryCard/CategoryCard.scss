@@ -112,7 +112,7 @@
             background: linear-gradient(
                 135deg,
                 $yellow-primary 0%,
-                color.adjust($yellow-primary, $lightness: -5%) 100%
+                color.adjust($yellow-primary-hex, $lightness: -5%) 100%
             );
             color: $navy-dark;
             font-weight: 800;

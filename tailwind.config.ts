@@ -34,10 +34,6 @@ const config: Config = {
     },
   },
   plugins: [],
-  // Non sovrascrivere gli stili base di Ant Design
-  corePlugins: {
-    preflight: false,
-  },
 };
 
 export default config;
