@@ -21,7 +21,7 @@
 
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Modal, Button, Space } from "antd";
 import {
     PlayCircleOutlined,
@@ -52,6 +52,10 @@ export default function CodePlayground({
     const [isRunning, setIsRunning] = useState(false);
     const editorRef = useRef<PlaygroundEditorRef>(null);
 
+    // Track active timers and intervals for cleanup
+    const activeTimers = useRef<Set<number>>(new Set());
+    const activeIntervals = useRef<Set<number>>(new Set());
+
     // Detect OS for keyboard shortcut hint
     const isMac =
         typeof window !== "undefined" &&
@@ -63,7 +67,16 @@ export default function CodePlayground({
         );
     const shortcutHint = isMobile ? "" : isMac ? "(⌘+Enter)" : "(Ctrl+Enter)";
 
+    // Cleanup all active timers and intervals
+    const cleanupTimers = () => {
+        activeTimers.current.forEach((id) => clearTimeout(id));
+        activeIntervals.current.forEach((id) => clearInterval(id));
+        activeTimers.current.clear();
+        activeIntervals.current.clear();
+    };
+
     const handleReset = () => {
+        cleanupTimers();
         setCode(initialCode);
         setLogs([]);
     };
@@ -92,11 +105,14 @@ export default function CodePlayground({
     const executeCode = (codeToExecute?: string) => {
         setIsRunning(true);
         setLogs([]); // Clear previous output
+        
+        // Cleanup previous execution timers
+        cleanupTimers();
 
         // Use provided code or current state
         const actualCode = codeToExecute || code;
 
-        // Create a safe execution environment
+        // Create a safe execution environment with async support
         try {
             // Intercept console methods
             const customConsole = {
@@ -106,21 +122,111 @@ export default function CodePlayground({
                 info: (...args: any[]) => addLog("info", ...args),
             };
 
-            // Execute code in isolated scope
-            // Using Function constructor instead of eval for better security
-            const executionFunction = new Function("console", actualCode);
-            executionFunction(customConsole);
+            // Custom setTimeout that tracks timer IDs
+            const customSetTimeout = (callback: Function, delay?: number, ...args: any[]) => {
+                const timerId = window.setTimeout(() => {
+                    try {
+                        callback(...args);
+                    } catch (error: any) {
+                        addLog("error", `Errore in setTimeout: ${error.message}`);
+                    }
+                    activeTimers.current.delete(timerId);
+                }, delay);
+                activeTimers.current.add(timerId);
+                return timerId;
+            };
 
-            // If no output, show success message
-            if (logs.length === 0) {
-                addLog("info", "Codice eseguito con successo (nessun output)");
+            // Custom setInterval that tracks interval IDs
+            const customSetInterval = (callback: Function, delay?: number, ...args: any[]) => {
+                const intervalId = window.setInterval(() => {
+                    try {
+                        callback(...args);
+                    } catch (error: any) {
+                        addLog("error", `Errore in setInterval: ${error.message}`);
+                        window.clearInterval(intervalId);
+                        activeIntervals.current.delete(intervalId);
+                    }
+                }, delay);
+                activeIntervals.current.add(intervalId);
+                return intervalId;
+            };
+
+            // Custom clearTimeout
+            const customClearTimeout = (timerId: number) => {
+                window.clearTimeout(timerId);
+                activeTimers.current.delete(timerId);
+            };
+
+            // Custom clearInterval
+            const customClearInterval = (intervalId: number) => {
+                window.clearInterval(intervalId);
+                activeIntervals.current.delete(intervalId);
+            };
+
+            // Execute code in isolated scope with async support
+            // Wrap in async function to support top-level await
+            const asyncExecutionFunction = new Function(
+                "console",
+                "setTimeout",
+                "setInterval",
+                "clearTimeout",
+                "clearInterval",
+                `
+                return (async () => {
+                    ${actualCode}
+                })();
+                `
+            );
+
+            // Execute and handle potential promises
+            const result = asyncExecutionFunction(
+                customConsole,
+                customSetTimeout,
+                customSetInterval,
+                customClearTimeout,
+                customClearInterval
+            );
+
+            // Handle async execution
+            if (result && typeof result.then === 'function') {
+                result
+                    .then(() => {
+                        if (logs.length === 0) {
+                            addLog("info", "Codice eseguito con successo (nessun output)");
+                        }
+                    })
+                    .catch((error: any) => {
+                        addLog("error", `Errore asincrono: ${error.message}`);
+                    })
+                    .finally(() => {
+                        setIsRunning(false);
+                    });
+            } else {
+                // Synchronous execution completed
+                if (logs.length === 0) {
+                    addLog("info", "Codice eseguito con successo (nessun output)");
+                }
+                setIsRunning(false);
             }
         } catch (error: any) {
             addLog("error", `Errore di esecuzione: ${error.message}`);
-        } finally {
             setIsRunning(false);
         }
     };
+
+    // Cleanup timers when modal closes
+    useEffect(() => {
+        if (!open) {
+            cleanupTimers();
+        }
+    }, [open]);
+
+    // Cleanup on component unmount
+    useEffect(() => {
+        return () => {
+            cleanupTimers();
+        };
+    }, []);
 
     return (
         <Modal
