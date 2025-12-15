@@ -1,0 +1,40 @@
+/**
+ * COMPONENT: CategoryButton
+ * SECTION: UI Components
+ *
+ * ROLE:
+ * - Complex hover and selected states for category buttons
+ * - All basic styling handled by Tailwind in TSX
+ *
+ * PATTERNS USED:
+ * - BEM naming convention
+ * - SCSS only for multi-property state changes
+ *
+ * NOTES FOR CONTRIBUTORS:
+ * - Only use SCSS for states that change multiple properties
+ * - Tailwind handles layout, spacing, colors, and simple styling
+ */
+
+@use "sass:color";
+@use "@/styles" as *;
+@use "@/styles/functions" as fn;
+
+.category-button {
+    // Complex hover state - changes multiple properties
+    &:hover {
+        background-color: color.adjust($yellow-primary-hex, $lightness: 40%);
+        border-color: $pink-accent;
+        transform: translateY(fn.rem(-2));
+    }
+
+    // Selected state - changes background, border, and icon color
+    &--selected {
+        background-color: $yellow-primary;
+        border-color: $yellow-dark;
+        color: $navy-dark;
+
+        .category-button__icon {
+            color: $navy-dark;
+        }
+    }
+}

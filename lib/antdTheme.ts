@@ -36,7 +36,7 @@ export const antdTheme: ThemeConfig = {
     
     // Font
     fontSize: 14,
-    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+    fontFamily: 'var(--font-inter), -apple-system, BlinkMacSystemFont, sans-serif',
     
     // Typography
     fontSizeHeading1: 48,

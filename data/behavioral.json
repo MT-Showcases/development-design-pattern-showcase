@@ -1,152 +1,752 @@
 [
   {
     "id": "behavioral-01",
-    "title": "Sistema di notifiche blog",
+    "title": "Sistema newsletter blog",
     "category": "behavioral",
-    "code": "class BlogPost {\n  constructor() {\n    this.subscribers = [];\n  }\n\n  subscribe(subscriber) {\n    this.subscribers.push(subscriber);\n  }\n\n  unsubscribe(subscriber) {\n    this.subscribers = this.subscribers.filter(s => s !== subscriber);\n  }\n\n  publish(article) {\n    console.log('Nuovo articolo:', article);\n    this.subscribers.forEach(sub => sub.update(article));\n  }\n}\n\nclass EmailSubscriber {\n  constructor(email) {\n    this.email = email;\n  }\n\n  update(article) {\n    console.log(`Email a ${this.email}: ${article}`);\n  }\n}\n\nclass SMSSubscriber {\n  constructor(phone) {\n    this.phone = phone;\n  }\n\n  update(article) {\n    console.log(`SMS a ${this.phone}: ${article}`);\n  }\n}\n\nconst blog = new BlogPost();\nblog.subscribe(new EmailSubscriber('user@example.com'));\nblog.subscribe(new SMSSubscriber('+39123456'));\nblog.publish('Design Patterns in JavaScript');",
-    "solutionExplanation": "Observer definisce una dipendenza uno-a-molti tra oggetti: quando un oggetto cambia stato, tutti i suoi dipendenti vengono notificati. BlogPost notifica automaticamente tutti i subscriber (email, SMS) quando viene pubblicato un nuovo articolo.",
-    "solutionPatterns": [
-      "Observer"
+    "code": "// Publisher con lista subscriber\nclass BlogPost {\n  constructor() {\n    this.subscribers = [];\n  }\n\n  subscribe(subscriber) {\n    this.subscribers.push(subscriber);\n  }\n\n  unsubscribe(subscriber) {\n    this.subscribers = this.subscribers.filter(s => s !== subscriber);\n  }\n\n  publish(article) {\n    console.log('Nuovo articolo:', article);\n    this.subscribers.forEach(sub => sub.update(article));\n  }\n}\n\n// Subscriber concreti\nclass EmailReader {\n  constructor(email) {\n    this.email = email;\n  }\n\n  update(article) {\n    console.log(`Email a ${this.email}: ${article}`);\n  }\n}\n\nclass SMSReader {\n  constructor(phone) {\n    this.phone = phone;\n  }\n\n  update(article) {\n    console.log(`SMS a ${this.phone}: ${article}`);\n  }\n}\n\nconst blog = new BlogPost();\nblog.subscribe(new EmailReader('user@example.com'));\nblog.subscribe(new SMSReader('+39123456'));\nblog.publish('Design Patterns in JavaScript');",
+    "solutionPatterns": ["Observer"],
+    "solutionExplanation": "Il <strong>Observer</strong> definisce una dipendenza uno-a-molti tra oggetti: quando un oggetto cambia stato, tutti i dipendenti vengono notificati automaticamente. BlogPost notifica tutti i subscriber (email, SMS) quando viene pubblicato un nuovo articolo, mantenendo sincronizzati più canali.",
+    "solutionSteps": [
+      {
+        "title": "Subject con lista",
+        "description": "BlogPost mantiene lista di subscriber da notificare",
+        "code": "class BlogPost {\n  constructor() {\n    this.subscribers = [];\n  }\n  subscribe(subscriber) {\n    this.subscribers.push(subscriber);\n  }\n}"
+      },
+      {
+        "title": "Notifica automatica",
+        "description": "publish() itera e chiama update() su tutti i subscriber",
+        "code": "publish(article) {\n  console.log('Nuovo articolo:', article);\n  this.subscribers.forEach(sub => sub.update(article));\n}"
+      },
+      {
+        "title": "Observer concreti",
+        "description": "Ogni subscriber implementa update() a modo suo",
+        "code": "class EmailReader {\n  update(article) {\n    console.log(`Email a ${this.email}: ${article}`);\n  }\n}"
+      }
+    ],
+    "solutionAdvantages": [
+      "Disaccoppiamento tra publisher e subscriber",
+      "Aggiunta subscriber senza modificare subject",
+      "Notifiche automatiche e sincrone"
     ]
   },
   {
     "id": "behavioral-02",
-    "title": "Sistema di pagamento e-commerce",
+    "title": "Checkout e-commerce",
     "category": "behavioral",
-    "code": "class PaymentMethod {\n  pay(amount) {}\n}\n\nclass CreditCardPayment extends PaymentMethod {\n  pay(amount) {\n    console.log(`Pagamento di €${amount} con carta di credito`);\n  }\n}\n\nclass PayPalPayment extends PaymentMethod {\n  pay(amount) {\n    console.log(`Pagamento di €${amount} con PayPal`);\n  }\n}\n\nclass BankTransferPayment extends PaymentMethod {\n  pay(amount) {\n    console.log(`Pagamento di €${amount} con bonifico`);\n  }\n}\n\nclass ShoppingCart {\n  constructor(paymentMethod) {\n    this.paymentMethod = paymentMethod;\n  }\n\n  setPaymentMethod(method) {\n    this.paymentMethod = method;\n  }\n\n  checkout(amount) {\n    this.paymentMethod.pay(amount);\n  }\n}\n\nconst cart = new ShoppingCart(new CreditCardPayment());\ncart.checkout(99.99);\ncart.setPaymentMethod(new PayPalPayment());\ncart.checkout(149.50);",
-    "solutionExplanation": "Strategy definisce una famiglia di algoritmi intercambiabili. ShoppingCart può usare diversi metodi di pagamento (carta, PayPal, bonifico) senza modificare il suo codice, permettendo di cambiare strategia di pagamento a runtime.",
-    "solutionPatterns": [
-      "Strategy"
+    "code": "// Algoritmi di pagamento intercambiabili\nclass PaymentMethod {\n  pay(amount) {}\n}\n\nclass CreditCard extends PaymentMethod {\n  pay(amount) {\n    console.log(`Pagamento €${amount} con carta`);\n  }\n}\n\nclass PayPal extends PaymentMethod {\n  pay(amount) {\n    console.log(`Pagamento €${amount} con PayPal`);\n  }\n}\n\nclass BankTransfer extends PaymentMethod {\n  pay(amount) {\n    console.log(`Pagamento €${amount} con bonifico`);\n  }\n}\n\n// Context che usa la strategy\nclass ShoppingCart {\n  constructor(paymentMethod) {\n    this.paymentMethod = paymentMethod;\n  }\n\n  setPaymentMethod(method) {\n    this.paymentMethod = method;\n  }\n\n  checkout(amount) {\n    this.paymentMethod.pay(amount);\n  }\n}\n\nconst cart = new ShoppingCart(new CreditCard());\ncart.checkout(99.99);\ncart.setPaymentMethod(new PayPal());\ncart.checkout(149.50);",
+    "solutionPatterns": ["Strategy"],
+    "solutionExplanation": "Il <strong>Strategy</strong> definisce una famiglia di algoritmi intercambiabili incapsulati in classi separate. ShoppingCart può usare diversi metodi di pagamento (carta, PayPal, bonifico) senza modificare il suo codice, permettendo di cambiare strategia a runtime.",
+    "solutionSteps": [
+      {
+        "title": "Interfaccia comune",
+        "description": "PaymentMethod è la base per tutte le strategie",
+        "code": "class PaymentMethod {\n  pay(amount) {}\n}\nclass CreditCard extends PaymentMethod {\n  pay(amount) { console.log(`Carta: €${amount}`); }\n}"
+      },
+      {
+        "title": "Context con strategy",
+        "description": "ShoppingCart riceve e usa una strategy",
+        "code": "class ShoppingCart {\n  constructor(paymentMethod) {\n    this.paymentMethod = paymentMethod;\n  }\n  checkout(amount) {\n    this.paymentMethod.pay(amount);\n  }\n}"
+      },
+      {
+        "title": "Cambio runtime",
+        "description": "setPaymentMethod() cambia strategia dinamicamente",
+        "code": "const cart = new ShoppingCart(new CreditCard());\ncart.checkout(99.99);\ncart.setPaymentMethod(new PayPal());\ncart.checkout(149.50);"
+      }
+    ],
+    "solutionAdvantages": [
+      "Algoritmi intercambiabili senza if/else",
+      "Nuovi metodi pagamento senza modifiche",
+      "Testing isolato di ogni strategia"
     ]
   },
   {
     "id": "behavioral-03",
-    "title": "Telecomando universale",
+    "title": "Smart home controller",
     "category": "behavioral",
-    "code": "class Light {\n  on() { console.log('Luce accesa'); }\n  off() { console.log('Luce spenta'); }\n}\n\nclass LightOnAction {\n  constructor(light) {\n    this.light = light;\n  }\n\n  execute() {\n    this.light.on();\n  }\n\n  undo() {\n    this.light.off();\n  }\n}\n\nclass LightOffAction {\n  constructor(light) {\n    this.light = light;\n  }\n\n  execute() {\n    this.light.off();\n  }\n\n  undo() {\n    this.light.on();\n  }\n}\n\nclass RemoteControl {\n  constructor() {\n    this.history = [];\n  }\n\n  pressButton(command) {\n    command.execute();\n    this.history.push(command);\n  }\n\n  pressUndo() {\n    const command = this.history.pop();\n    if (command) command.undo();\n  }\n}\n\nconst light = new Light();\nconst remote = new RemoteControl();\nremote.pressButton(new LightOnAction(light));\nremote.pressUndo();",
-    "solutionExplanation": "Command incapsula una richiesta come oggetto, permettendo di parametrizzare client con operazioni diverse e supportare undo. RemoteControl esegue comandi (accendi/spegni luce) e mantiene uno storico per annullare le operazioni.",
-    "solutionPatterns": [
-      "Command"
+    "code": "// Receiver (dispositivo)\nclass Light {\n  on() { console.log('💡 Luce accesa'); }\n  off() { console.log('💡 Luce spenta'); }\n}\n\n// Command per accensione\nclass TurnOnLight {\n  constructor(light) {\n    this.light = light;\n  }\n\n  execute() {\n    this.light.on();\n  }\n\n  undo() {\n    this.light.off();\n  }\n}\n\n// Command per spegnimento\nclass TurnOffLight {\n  constructor(light) {\n    this.light = light;\n  }\n\n  execute() {\n    this.light.off();\n  }\n\n  undo() {\n    this.light.on();\n  }\n}\n\n// Invoker (telecomando)\nclass RemoteControl {\n  constructor() {\n    this.history = [];\n  }\n\n  press(command) {\n    command.execute();\n    this.history.push(command);\n  }\n\n  undo() {\n    const command = this.history.pop();\n    if (command) command.undo();\n  }\n}\n\nconst light = new Light();\nconst remote = new RemoteControl();\nremote.press(new TurnOnLight(light));\nremote.undo();",
+    "solutionPatterns": ["Command"],
+    "solutionExplanation": "Il <strong>Command</strong> incapsula una richiesta come oggetto, permettendo di parametrizzare client con operazioni diverse e supportare undo/redo. RemoteControl esegue comandi (accendi/spegni luce) e mantiene uno storico per annullare le operazioni.",
+    "solutionSteps": [
+      {
+        "title": "Command con execute",
+        "description": "TurnOnLight incapsula l'azione di accensione",
+        "code": "class TurnOnLight {\n  constructor(light) { this.light = light; }\n  execute() { this.light.on(); }\n  undo() { this.light.off(); }\n}"
+      },
+      {
+        "title": "Invoker con history",
+        "description": "RemoteControl esegue e memorizza comandi",
+        "code": "class RemoteControl {\n  press(command) {\n    command.execute();\n    this.history.push(command);\n  }\n}"
+      },
+      {
+        "title": "Undo support",
+        "description": "undo() prende l'ultimo comando e lo annulla",
+        "code": "undo() {\n  const command = this.history.pop();\n  if (command) command.undo();\n}"
+      }
+    ],
+    "solutionAdvantages": [
+      "Undo/redo facile da implementare",
+      "Comandi parametrizzabili e riutilizzabili",
+      "Macro commands (batch operations)"
     ]
   },
   {
     "id": "behavioral-04",
-    "title": "Distributore automatico",
+    "title": "Vending machine workflow",
     "category": "behavioral",
-    "code": "class VendingMachine {\n  constructor() {\n    this.state = new NoMoneyState(this);\n  }\n\n  setState(state) {\n    this.state = state;\n  }\n\n  insertMoney() {\n    this.state.insertMoney();\n  }\n\n  selectProduct() {\n    this.state.selectProduct();\n  }\n\n  dispense() {\n    this.state.dispense();\n  }\n}\n\nclass NoMoneyState {\n  constructor(machine) {\n    this.machine = machine;\n  }\n\n  insertMoney() {\n    console.log('Denaro inserito');\n    this.machine.setState(new HasMoneyState(this.machine));\n  }\n\n  selectProduct() {\n    console.log('Inserire denaro prima');\n  }\n\n  dispense() {}\n}\n\nclass HasMoneyState {\n  constructor(machine) {\n    this.machine = machine;\n  }\n\n  insertMoney() {\n    console.log('Denaro già inserito');\n  }\n\n  selectProduct() {\n    console.log('Prodotto selezionato');\n    this.machine.setState(new DispensingState(this.machine));\n  }\n\n  dispense() {}\n}\n\nclass DispensingState {\n  constructor(machine) {\n    this.machine = machine;\n  }\n\n  insertMoney() {}\n  selectProduct() {}\n  \n  dispense() {\n    console.log('Erogazione prodotto');\n    this.machine.setState(new NoMoneyState(this.machine));\n  }\n}\n\nconst machine = new VendingMachine();\nmachine.insertMoney();\nmachine.selectProduct();\nmachine.dispense();",
-    "solutionExplanation": "State permette a un oggetto di cambiare comportamento quando cambia il suo stato interno. VendingMachine delega le operazioni allo stato corrente (NoMoney, HasMoney, Dispensing), cambiando comportamento automaticamente in base alla fase dell'acquisto.",
-    "solutionPatterns": [
-      "State"
+    "code": "// Context con stato\nclass VendingMachine {\n  constructor() {\n    this.state = new NoMoney(this);\n  }\n\n  setState(state) {\n    this.state = state;\n  }\n\n  insertCoin() {\n    this.state.insertCoin();\n  }\n\n  selectProduct() {\n    this.state.selectProduct();\n  }\n\n  dispense() {\n    this.state.dispense();\n  }\n}\n\n// Stati concreti\nclass NoMoney {\n  constructor(machine) {\n    this.machine = machine;\n  }\n\n  insertCoin() {\n    console.log('💰 Moneta inserita');\n    this.machine.setState(new HasMoney(this.machine));\n  }\n\n  selectProduct() {\n    console.log('❌ Inserire denaro prima');\n  }\n\n  dispense() {}\n}\n\nclass HasMoney {\n  constructor(machine) {\n    this.machine = machine;\n  }\n\n  insertCoin() {\n    console.log('💰 Denaro già inserito');\n  }\n\n  selectProduct() {\n    console.log('✅ Prodotto selezionato');\n    this.machine.setState(new Dispensing(this.machine));\n  }\n\n  dispense() {}\n}\n\nclass Dispensing {\n  constructor(machine) {\n    this.machine = machine;\n  }\n\n  insertCoin() {}\n  selectProduct() {}\n  \n  dispense() {\n    console.log('📦 Erogazione prodotto');\n    this.machine.setState(new NoMoney(this.machine));\n  }\n}\n\nconst machine = new VendingMachine();\nmachine.insertCoin();\nmachine.selectProduct();\nmachine.dispense();",
+    "solutionPatterns": ["State"],
+    "solutionExplanation": "Il <strong>State</strong> permette a un oggetto di cambiare comportamento quando cambia il suo stato interno. VendingMachine delega le operazioni allo stato corrente (NoMoney, HasMoney, Dispensing), cambiando comportamento automaticamente in base alla fase del workflow di acquisto.",
+    "solutionSteps": [
+      {
+        "title": "Context con stato",
+        "description": "VendingMachine delega allo stato corrente",
+        "code": "class VendingMachine {\n  insertCoin() {\n    this.state.insertCoin();\n  }\n}"
+      },
+      {
+        "title": "Stati con transizioni",
+        "description": "Ogni stato gestisce azioni e cambia stato",
+        "code": "class NoMoney {\n  insertCoin() {\n    console.log('Moneta inserita');\n    this.machine.setState(new HasMoney(this.machine));\n  }\n}"
+      },
+      {
+        "title": "Workflow automatico",
+        "description": "Stati si susseguono creando il workflow",
+        "code": "machine.insertCoin();  // NoMoney → HasMoney\nmachine.selectProduct(); // HasMoney → Dispensing\nmachine.dispense();      // Dispensing → NoMoney"
+      }
+    ],
+    "solutionAdvantages": [
+      "Logica stato isolata in classi separate",
+      "Transizioni esplicite e tracciabili",
+      "Nuovi stati senza modificare context"
     ]
   },
   {
     "id": "behavioral-05",
-    "title": "Preparazione bevande",
+    "title": "Preparazione bevande calde",
     "category": "behavioral",
-    "code": "class Beverage {\n  prepare() {\n    this.boilWater();\n    this.brew();\n    this.pourInCup();\n    if (this.wantsCondiments()) {\n      this.addCondiments();\n    }\n  }\n\n  boilWater() {\n    console.log('Bollire acqua');\n  }\n\n  pourInCup() {\n    console.log('Versare nella tazza');\n  }\n\n  brew() {}\n  addCondiments() {}\n  \n  wantsCondiments() {\n    return true;\n  }\n}\n\nclass Tea extends Beverage {\n  brew() {\n    console.log('Infusione tè');\n  }\n\n  addCondiments() {\n    console.log('Aggiungere limone');\n  }\n}\n\nclass Coffee extends Beverage {\n  brew() {\n    console.log('Filtrare caffè');\n  }\n\n  addCondiments() {\n    console.log('Aggiungere latte e zucchero');\n  }\n}\n\nconst tea = new Tea();\ntea.prepare();",
-    "solutionExplanation": "Template Method definisce lo scheletro di un algoritmo in una classe base, delegando alcuni passi alle sottoclassi. Beverage definisce il processo di preparazione (bollire, brew, versare, condire), mentre Tea e Coffee implementano i passi specifici.",
-    "solutionPatterns": [
-      "Template Method"
+    "code": "// Template con algoritmo fisso\nclass Beverage {\n  prepare() {\n    this.boilWater();\n    this.brew();\n    this.pourInCup();\n    if (this.wantsCondiments()) {\n      this.addCondiments();\n    }\n  }\n\n  boilWater() {\n    console.log('🔥 Bollire acqua');\n  }\n\n  pourInCup() {\n    console.log('☕ Versare nella tazza');\n  }\n\n  // Hook method (opzionale)\n  wantsCondiments() {\n    return true;\n  }\n\n  // Metodi astratti (da implementare)\n  brew() {}\n  addCondiments() {}\n}\n\n// Implementazioni concrete\nclass Tea extends Beverage {\n  brew() {\n    console.log('🍃 Infusione tè');\n  }\n\n  addCondiments() {\n    console.log('🍋 Aggiungere limone');\n  }\n}\n\nclass Coffee extends Beverage {\n  brew() {\n    console.log('☕ Filtrare caffè');\n  }\n\n  addCondiments() {\n    console.log('🥛 Aggiungere latte e zucchero');\n  }\n}\n\nconst tea = new Tea();\ntea.prepare();",
+    "solutionPatterns": ["Template Method"],
+    "solutionExplanation": "Il <strong>Template Method</strong> definisce lo scheletro di un algoritmo in una classe base, delegando alcuni passi specifici alle sottoclassi. Beverage stabilisce il processo di preparazione (bollire, brew, versare, condire), mentre Tea e Coffee implementano solo i passi variabili.",
+    "solutionSteps": [
+      {
+        "title": "Template method",
+        "description": "prepare() definisce l'algoritmo fisso",
+        "code": "prepare() {\n  this.boilWater();\n  this.brew();\n  this.pourInCup();\n  if (this.wantsCondiments()) this.addCondiments();\n}"
+      },
+      {
+        "title": "Passi comuni",
+        "description": "Metodi implementati nella classe base",
+        "code": "boilWater() {\n  console.log('Bollire acqua');\n}\npourInCup() {\n  console.log('Versare nella tazza');\n}"
+      },
+      {
+        "title": "Passi variabili",
+        "description": "Sottoclassi implementano solo i passi specifici",
+        "code": "class Tea extends Beverage {\n  brew() { console.log('Infusione tè'); }\n  addCondiments() { console.log('Limone'); }\n}"
+      }
+    ],
+    "solutionAdvantages": [
+      "Riutilizzo codice comune (boil, pour)",
+      "Algoritmo invariante garantito",
+      "Sottoclassi controllano solo passi variabili"
     ]
   },
   {
     "id": "behavioral-06",
-    "title": "Iterazione playlist musicale",
+    "title": "Playlist musicale personalizzata",
     "category": "behavioral",
-    "code": "class Song {\n  constructor(title, artist) {\n    this.title = title;\n    this.artist = artist;\n  }\n}\n\nclass Playlist {\n  constructor() {\n    this.songs = [];\n  }\n\n  addSong(song) {\n    this.songs.push(song);\n  }\n\n  createIterator() {\n    return new PlaylistIterator(this.songs);\n  }\n}\n\nclass PlaylistCursor {\n  constructor(songs) {\n    this.songs = songs;\n    this.position = 0;\n  }\n\n  hasNext() {\n    return this.position < this.songs.length;\n  }\n\n  next() {\n    return this.songs[this.position++];\n  }\n\n  reset() {\n    this.position = 0;\n  }\n}\n\nconst playlist = new Playlist();\nplaylist.addSong(new Song('Bohemian Rhapsody', 'Queen'));\nplaylist.addSong(new Song('Stairway to Heaven', 'Led Zeppelin'));\n\nconst iterator = playlist.createIterator();\nwhile (iterator.hasNext()) {\n  const song = iterator.next();\n  console.log(`${song.title} - ${song.artist}`);\n}",
-    "solutionExplanation": "Iterator fornisce un modo per accedere sequenzialmente agli elementi di una collezione senza esporre la rappresentazione sottostante. PlaylistIterator permette di scorrere le canzoni della playlist in modo uniforme, nascondendo i dettagli dell'array interno.",
-    "solutionPatterns": [
-      "Iterator"
+    "code": "// Element\nclass Song {\n  constructor(title, artist) {\n    this.title = title;\n    this.artist = artist;\n  }\n}\n\n// Aggregate\nclass Playlist {\n  constructor() {\n    this.songs = [];\n  }\n\n  addSong(song) {\n    this.songs.push(song);\n  }\n\n  createIterator() {\n    return new PlaylistIterator(this.songs);\n  }\n}\n\n// Iterator\nclass PlaylistIterator {\n  constructor(songs) {\n    this.songs = songs;\n    this.position = 0;\n  }\n\n  hasNext() {\n    return this.position < this.songs.length;\n  }\n\n  next() {\n    return this.songs[this.position++];\n  }\n\n  reset() {\n    this.position = 0;\n  }\n}\n\nconst playlist = new Playlist();\nplaylist.addSong(new Song('Bohemian Rhapsody', 'Queen'));\nplaylist.addSong(new Song('Stairway to Heaven', 'Led Zeppelin'));\n\nconst iterator = playlist.createIterator();\nwhile (iterator.hasNext()) {\n  const song = iterator.next();\n  console.log(`${song.title} - ${song.artist}`);\n}",
+    "solutionPatterns": ["Iterator"],
+    "solutionExplanation": "Il <strong>Iterator</strong> fornisce un modo per accedere sequenzialmente agli elementi di una collezione senza esporre la rappresentazione sottostante. PlaylistIterator permette di scorrere le canzoni della playlist in modo uniforme, nascondendo i dettagli dell'array interno.",
+    "solutionSteps": [
+      {
+        "title": "Aggregate",
+        "description": "Playlist crea e restituisce un iterator",
+        "code": "class Playlist {\n  createIterator() {\n    return new PlaylistIterator(this.songs);\n  }\n}"
+      },
+      {
+        "title": "Iterator con cursore",
+        "description": "PlaylistIterator mantiene posizione corrente",
+        "code": "class PlaylistIterator {\n  constructor(songs) {\n    this.songs = songs;\n    this.position = 0;\n  }\n}"
+      },
+      {
+        "title": "Traversal interface",
+        "description": "hasNext() e next() per iterazione uniforme",
+        "code": "while (iterator.hasNext()) {\n  const song = iterator.next();\n  console.log(song.title);\n}"
+      }
+    ],
+    "solutionAdvantages": [
+      "Nasconde struttura interna della collezione",
+      "Traversal uniforme per collezioni diverse",
+      "Multiple iterazioni simultanee possibili"
     ]
   },
   {
     "id": "behavioral-07",
-    "title": "Chat room mediatore",
+    "title": "Chat room aziendale",
     "category": "behavioral",
-    "code": "class ChatRoom {\n  constructor() {\n    this.users = [];\n  }\n\n  register(user) {\n    this.users.push(user);\n    user.chatRoom = this;\n  }\n\n  send(message, from, to) {\n    if (to) {\n      to.receive(message, from);\n    } else {\n      this.users.forEach(user => {\n        if (user !== from) {\n          user.receive(message, from);\n        }\n      });\n    }\n  }\n}\n\nclass User {\n  constructor(name) {\n    this.name = name;\n    this.chatRoom = null;\n  }\n\n  send(message, to) {\n    this.chatRoom.send(message, this, to);\n  }\n\n  receive(message, from) {\n    console.log(`${this.name} riceve da ${from.name}: ${message}`);\n  }\n}\n\nconst chatRoom = new ChatRoom();\nconst alice = new User('Alice');\nconst bob = new User('Bob');\nconst charlie = new User('Charlie');\n\nchatRoom.register(alice);\nchatRoom.register(bob);\nchatRoom.register(charlie);\n\nalice.send('Ciao a tutti!');\nbob.send('Ciao Alice!', alice);",
-    "solutionExplanation": "Mediator definisce un oggetto che incapsula come un insieme di oggetti interagisce. ChatRoom centralizza la comunicazione tra utenti, evitando che debbano conoscersi direttamente e riducendo l'accoppiamento tra User.",
-    "solutionPatterns": [
-      "Mediator"
+    "code": "// Mediator\nclass ChatRoom {\n  constructor() {\n    this.users = [];\n  }\n\n  register(user) {\n    this.users.push(user);\n    user.chatRoom = this;\n  }\n\n  send(message, from, to) {\n    if (to) {\n      to.receive(message, from);\n    } else {\n      this.users.forEach(user => {\n        if (user !== from) {\n          user.receive(message, from);\n        }\n      });\n    }\n  }\n}\n\n// Colleague\nclass User {\n  constructor(name) {\n    this.name = name;\n    this.chatRoom = null;\n  }\n\n  send(message, to) {\n    this.chatRoom.send(message, this, to);\n  }\n\n  receive(message, from) {\n    console.log(`${this.name} riceve da ${from.name}: ${message}`);\n  }\n}\n\nconst chatRoom = new ChatRoom();\nconst alice = new User('Alice');\nconst bob = new User('Bob');\nconst charlie = new User('Charlie');\n\nchatRoom.register(alice);\nchatRoom.register(bob);\nchatRoom.register(charlie);\n\nalice.send('Ciao a tutti!');\nbob.send('Ciao Alice!', alice);",
+    "solutionPatterns": ["Mediator"],
+    "solutionExplanation": "Il <strong>Mediator</strong> definisce un oggetto che incapsula come un insieme di oggetti interagisce. ChatRoom centralizza la comunicazione tra utenti, evitando che debbano conoscersi direttamente e riducendo l'accoppiamento tra User (da N² a N relazioni).",
+    "solutionSteps": [
+      {
+        "title": "Mediator centrale",
+        "description": "ChatRoom gestisce tutte le interazioni",
+        "code": "class ChatRoom {\n  send(message, from, to) {\n    if (to) to.receive(message, from);\n    else this.users.forEach(...);\n  }\n}"
+      },
+      {
+        "title": "Colleague con mediator",
+        "description": "User conosce solo il mediator, non altri user",
+        "code": "class User {\n  send(message, to) {\n    this.chatRoom.send(message, this, to);\n  }\n}"
+      },
+      {
+        "title": "Comunicazione indiretta",
+        "description": "User comunica tramite mediator, non direttamente",
+        "code": "alice.send('Ciao!'); // → chatRoom → bob, charlie"
+      }
+    ],
+    "solutionAdvantages": [
+      "Riduce accoppiamento da N² a N",
+      "Logica comunicazione centralizzata",
+      "Facile aggiungere nuovi partecipanti"
     ]
   },
   {
     "id": "behavioral-08",
-    "title": "Sistema di supporto tecnico",
+    "title": "Sistema ticket support",
     "category": "behavioral",
-    "code": "class SupportHandler {\n  constructor() {\n    this.nextHandler = null;\n  }\n\n  setNext(handler) {\n    this.nextHandler = handler;\n    return handler;\n  }\n\n  handle(request) {\n    if (this.nextHandler) {\n      return this.nextHandler.handle(request);\n    }\n    return 'Richiesta non gestita';\n  }\n}\n\nclass Level1Support extends SupportHandler {\n  handle(request) {\n    if (request.priority === 'low') {\n      return 'Level 1: Problema risolto';\n    }\n    return super.handle(request);\n  }\n}\n\nclass Level2Support extends SupportHandler {\n  handle(request) {\n    if (request.priority === 'medium') {\n      return 'Level 2: Problema risolto';\n    }\n    return super.handle(request);\n  }\n}\n\nclass Level3Support extends SupportHandler {\n  handle(request) {\n    if (request.priority === 'high') {\n      return 'Level 3: Problema risolto';\n    }\n    return super.handle(request);\n  }\n}\n\nconst l1 = new Level1Support();\nconst l2 = new Level2Support();\nconst l3 = new Level3Support();\n\nl1.setNext(l2).setNext(l3);\n\nconsole.log(l1.handle({ priority: 'medium' }));",
-    "solutionExplanation": "Chain of Responsibility passa una richiesta lungo una catena di handler finché uno la gestisce. Il sistema di supporto inoltra ticket dal Level 1 al 3 in base alla priorità, permettendo di aggiungere livelli senza modificare il codice esistente.",
-    "solutionPatterns": [
-      "Chain of Responsibility"
+    "code": "// Handler base\nclass SupportHandler {\n  constructor() {\n    this.nextHandler = null;\n  }\n\n  setNext(handler) {\n    this.nextHandler = handler;\n    return handler;\n  }\n\n  handle(request) {\n    if (this.nextHandler) {\n      return this.nextHandler.handle(request);\n    }\n    return 'Richiesta non gestita';\n  }\n}\n\n// Handler concreti\nclass Level1Support extends SupportHandler {\n  handle(request) {\n    if (request.priority === 'low') {\n      return '🟢 Level 1: Problema risolto';\n    }\n    return super.handle(request);\n  }\n}\n\nclass Level2Support extends SupportHandler {\n  handle(request) {\n    if (request.priority === 'medium') {\n      return '🟡 Level 2: Problema risolto';\n    }\n    return super.handle(request);\n  }\n}\n\nclass Level3Support extends SupportHandler {\n  handle(request) {\n    if (request.priority === 'high') {\n      return '🔴 Level 3: Problema risolto';\n    }\n    return super.handle(request);\n  }\n}\n\nconst l1 = new Level1Support();\nconst l2 = new Level2Support();\nconst l3 = new Level3Support();\n\nl1.setNext(l2).setNext(l3);\n\nconsole.log(l1.handle({ priority: 'medium' }));",
+    "solutionPatterns": ["Chain of Responsibility"],
+    "solutionExplanation": "Il <strong>Chain of Responsibility</strong> passa una richiesta lungo una catena di handler finché uno la gestisce. Il sistema di supporto inoltra ticket dal Level 1 al 3 in base alla priorità, permettendo di aggiungere o rimuovere livelli senza modificare il codice esistente.",
+    "solutionSteps": [
+      {
+        "title": "Handler base",
+        "description": "SupportHandler gestisce o passa al successivo",
+        "code": "class SupportHandler {\n  handle(request) {\n    if (this.nextHandler) {\n      return this.nextHandler.handle(request);\n    }\n  }\n}"
+      },
+      {
+        "title": "Handler concreto",
+        "description": "Level1 gestisce o passa a Level2",
+        "code": "class Level1Support extends SupportHandler {\n  handle(request) {\n    if (request.priority === 'low') return 'Risolto';\n    return super.handle(request);\n  }\n}"
+      },
+      {
+        "title": "Chain setup",
+        "description": "setNext() crea la catena di handler",
+        "code": "l1.setNext(l2).setNext(l3);\nl1.handle({ priority: 'medium' }); // L1 → L2 (gestisce)"
+      }
+    ],
+    "solutionAdvantages": [
+      "Disaccoppiamento sender e receiver",
+      "Aggiunta handler senza modifiche",
+      "Ordine processing flessibile"
     ]
   },
   {
     "id": "behavioral-09",
-    "title": "Meteo e dashboard",
+    "title": "Stazione meteo e widget",
     "category": "behavioral",
-    "code": "class WeatherStation {\n  constructor() {\n    this.observers = [];\n    this.temperature = 0;\n  }\n\n  addObserver(observer) {\n    this.observers.push(observer);\n  }\n\n  removeObserver(observer) {\n    this.observers = this.observers.filter(o => o !== observer);\n  }\n\n  setTemperature(temp) {\n    this.temperature = temp;\n    this.notifyObservers();\n  }\n\n  notifyObservers() {\n    this.observers.forEach(o => o.update(this.temperature));\n  }\n}\n\nclass PhoneDisplay {\n  update(temperature) {\n    console.log(`📱 Temperatura: ${temperature}°C`);\n  }\n}\n\nclass WebDisplay {\n  update(temperature) {\n    console.log(`🌐 Web dashboard: ${temperature}°C`);\n  }\n}\n\nconst station = new WeatherStation();\nstation.addObserver(new PhoneDisplay());\nstation.addObserver(new WebDisplay());\nstation.setTemperature(25);",
-    "solutionExplanation": "Observer notifica automaticamente gli oggetti dipendenti quando lo stato cambia. WeatherStation aggiorna tutti i display (phone, web) quando la temperatura cambia, mantenendo sincronizzate diverse visualizzazioni senza accoppiamento stretto.",
-    "solutionPatterns": [
-      "Observer"
+    "code": "// Subject\nclass WeatherStation {\n  constructor() {\n    this.observers = [];\n    this.temperature = 0;\n  }\n\n  attach(observer) {\n    this.observers.push(observer);\n  }\n\n  detach(observer) {\n    this.observers = this.observers.filter(o => o !== observer);\n  }\n\n  setTemperature(temp) {\n    this.temperature = temp;\n    this.notify();\n  }\n\n  notify() {\n    this.observers.forEach(o => o.update(this.temperature));\n  }\n}\n\n// Observer concreti\nclass PhoneWidget {\n  update(temperature) {\n    console.log(`📱 Phone: ${temperature}°C`);\n  }\n}\n\nclass WebDashboard {\n  update(temperature) {\n    console.log(`🌐 Web: ${temperature}°C`);\n  }\n}\n\nclass TVDisplay {\n  update(temperature) {\n    console.log(`📺 TV: ${temperature}°C`);\n  }\n}\n\nconst station = new WeatherStation();\nstation.attach(new PhoneWidget());\nstation.attach(new WebDashboard());\nstation.attach(new TVDisplay());\nstation.setTemperature(25);",
+    "solutionPatterns": ["Observer"],
+    "solutionExplanation": "Il <strong>Observer</strong> notifica automaticamente gli oggetti dipendenti quando lo stato cambia. WeatherStation aggiorna tutti i display (phone, web, TV) quando la temperatura cambia, mantenendo sincronizzate diverse visualizzazioni senza accoppiamento stretto.",
+    "solutionSteps": [
+      {
+        "title": "Subject con lista",
+        "description": "WeatherStation mantiene lista di observer",
+        "code": "class WeatherStation {\n  attach(observer) {\n    this.observers.push(observer);\n  }\n}"
+      },
+      {
+        "title": "Notifica push",
+        "description": "setTemperature() aggiorna e notifica tutti",
+        "code": "setTemperature(temp) {\n  this.temperature = temp;\n  this.notify();\n}\nnotify() {\n  this.observers.forEach(o => o.update(this.temperature));\n}"
+      },
+      {
+        "title": "Observer multipli",
+        "description": "Ogni observer riceve update indipendentemente",
+        "code": "station.attach(new PhoneWidget());\nstation.attach(new WebDashboard());\nstation.setTemperature(25); // Notifica entrambi"
+      }
+    ],
+    "solutionAdvantages": [
+      "Aggiornamenti automatici e sincronizzati",
+      "Nuovi observer senza modificare subject",
+      "Broadcast efficiente a N observer"
     ]
   },
   {
     "id": "behavioral-10",
-    "title": "Compressione file",
+    "title": "Compressore file multi-formato",
     "category": "behavioral",
-    "code": "class CompressionMethod {\n  compress(file) {}\n}\n\nclass ZipCompression extends CompressionStrategy {\n  compress(file) {\n    return `${file}.zip (ZIP compression)`;\n  }\n}\n\nclass RarCompression extends CompressionStrategy {\n  compress(file) {\n    return `${file}.rar (RAR compression)`;\n  }\n}\n\nclass GzipCompression extends CompressionStrategy {\n  compress(file) {\n    return `${file}.gz (GZIP compression)`;\n  }\n}\n\nclass FileCompressor {\n  constructor(strategy) {\n    this.strategy = strategy;\n  }\n\n  setStrategy(strategy) {\n    this.strategy = strategy;\n  }\n\n  compress(file) {\n    return this.strategy.compress(file);\n  }\n}\n\nconst compressor = new FileCompressor(new ZipCompression());\nconsole.log(compressor.compress('document'));\n\ncompressor.setStrategy(new GzipCompression());\nconsole.log(compressor.compress('archive'));",
-    "solutionExplanation": "Strategy permette di selezionare un algoritmo a runtime tra una famiglia di algoritmi intercambiabili. FileCompressor può usare diverse strategie di compressione (ZIP, RAR, GZIP) senza modificare il suo codice interno.",
-    "solutionPatterns": [
-      "Strategy"
+    "code": "// Strategy interface\nclass CompressionAlgorithm {\n  compress(file) {}\n}\n\n// Strategie concrete\nclass ZipCompression extends CompressionAlgorithm {\n  compress(file) {\n    return `${file}.zip (ZIP compression)`;\n  }\n}\n\nclass RarCompression extends CompressionAlgorithm {\n  compress(file) {\n    return `${file}.rar (RAR compression)`;\n  }\n}\n\nclass GzipCompression extends CompressionAlgorithm {\n  compress(file) {\n    return `${file}.gz (GZIP compression)`;\n  }\n}\n\n// Context\nclass FileCompressor {\n  constructor(algorithm) {\n    this.algorithm = algorithm;\n  }\n\n  setAlgorithm(algorithm) {\n    this.algorithm = algorithm;\n  }\n\n  compress(file) {\n    return this.algorithm.compress(file);\n  }\n}\n\nconst compressor = new FileCompressor(new ZipCompression());\nconsole.log(compressor.compress('document'));\n\ncompressor.setAlgorithm(new GzipCompression());\nconsole.log(compressor.compress('archive'));",
+    "solutionPatterns": ["Strategy"],
+    "solutionExplanation": "Il <strong>Strategy</strong> permette di selezionare un algoritmo a runtime tra una famiglia di algoritmi intercambiabili. FileCompressor può usare diverse strategie di compressione (ZIP, RAR, GZIP) senza modificare il suo codice interno, rendendo facile aggiungere nuovi formati.",
+    "solutionSteps": [
+      {
+        "title": "Strategy interface",
+        "description": "CompressionAlgorithm definisce contratto comune",
+        "code": "class CompressionAlgorithm {\n  compress(file) {}\n}\nclass ZipCompression extends CompressionAlgorithm {...}"
+      },
+      {
+        "title": "Context con strategy",
+        "description": "FileCompressor delega all'algoritmo",
+        "code": "class FileCompressor {\n  compress(file) {\n    return this.algorithm.compress(file);\n  }\n}"
+      },
+      {
+        "title": "Cambio dinamico",
+        "description": "setAlgorithm() cambia strategia a runtime",
+        "code": "compressor.setAlgorithm(new GzipCompression());\ncompressor.compress('file');"
+      }
+    ],
+    "solutionAdvantages": [
+      "Evita if/else per selezione algoritmo",
+      "Nuovi algoritmi senza modificare context",
+      "Testing isolato di ogni strategia"
     ]
   },
   {
     "id": "behavioral-11",
-    "title": "Editor di testo con undo",
+    "title": "Text editor con undo/redo",
     "category": "behavioral",
-    "code": "class TextEditor {\n  constructor() {\n    this.content = '';\n  }\n\n  write(text) {\n    this.content += text;\n  }\n\n  getContent() {\n    return this.content;\n  }\n\n  setContent(content) {\n    this.content = content;\n  }\n}\n\nclass WriteAction {\n  constructor(editor, text) {\n    this.editor = editor;\n    this.text = text;\n    this.previousContent = '';\n  }\n\n  execute() {\n    this.previousContent = this.editor.getContent();\n    this.editor.write(this.text);\n  }\n\n  undo() {\n    this.editor.setContent(this.previousContent);\n  }\n}\n\nclass ActionManager {\n  constructor() {\n    this.history = [];\n  }\n\n  execute(command) {\n    command.execute();\n    this.history.push(command);\n  }\n\n  undo() {\n    const command = this.history.pop();\n    if (command) command.undo();\n  }\n}\n\nconst editor = new TextEditor();\nconst manager = new CommandManager();\n\nmanager.execute(new WriteCommand(editor, 'Hello '));\nmanager.execute(new WriteCommand(editor, 'World'));\nconsole.log(editor.getContent()); // 'Hello World'\nmanager.undo();\nconsole.log(editor.getContent()); // 'Hello '",
-    "solutionExplanation": "Command incapsula operazioni come oggetti, supportando undo/redo e logging. WriteCommand registra lo stato precedente dell'editor prima di modificarlo, permettendo a CommandManager di annullare le operazioni in ordine inverso.",
-    "solutionPatterns": [
-      "Command"
+    "code": "// Receiver\nclass TextEditor {\n  constructor() {\n    this.content = '';\n  }\n\n  write(text) {\n    this.content += text;\n  }\n\n  getContent() {\n    return this.content;\n  }\n\n  setContent(content) {\n    this.content = content;\n  }\n}\n\n// Command con undo\nclass WriteCommand {\n  constructor(editor, text) {\n    this.editor = editor;\n    this.text = text;\n    this.previousContent = '';\n  }\n\n  execute() {\n    this.previousContent = this.editor.getContent();\n    this.editor.write(this.text);\n  }\n\n  undo() {\n    this.editor.setContent(this.previousContent);\n  }\n}\n\n// Invoker con history\nclass CommandHistory {\n  constructor() {\n    this.history = [];\n  }\n\n  execute(command) {\n    command.execute();\n    this.history.push(command);\n  }\n\n  undo() {\n    const command = this.history.pop();\n    if (command) command.undo();\n  }\n}\n\nconst editor = new TextEditor();\nconst history = new CommandHistory();\n\nhistory.execute(new WriteCommand(editor, 'Hello '));\nhistory.execute(new WriteCommand(editor, 'World'));\nconsole.log(editor.getContent()); // 'Hello World'\nhistory.undo();\nconsole.log(editor.getContent()); // 'Hello '",
+    "solutionPatterns": ["Command"],
+    "solutionExplanation": "Il <strong>Command</strong> incapsula operazioni come oggetti, supportando undo/redo e logging. WriteCommand registra lo stato precedente dell'editor prima di modificarlo, permettendo a CommandHistory di annullare le operazioni in ordine inverso (LIFO).",
+    "solutionSteps": [
+      {
+        "title": "Command con snapshot",
+        "description": "WriteCommand salva stato precedente in execute()",
+        "code": "execute() {\n  this.previousContent = this.editor.getContent();\n  this.editor.write(this.text);\n}"
+      },
+      {
+        "title": "Undo restore",
+        "description": "undo() ripristina lo snapshot salvato",
+        "code": "undo() {\n  this.editor.setContent(this.previousContent);\n}"
+      },
+      {
+        "title": "History stack",
+        "description": "CommandHistory gestisce stack LIFO per undo",
+        "code": "history.execute(new WriteCommand(editor, 'Hello'));\nhistory.undo(); // Pop e undo dell'ultimo comando"
+      }
+    ],
+    "solutionAdvantages": [
+      "Undo/redo multi-livello facile",
+      "Logging e audit trail integrati",
+      "Macro commands (batch undo)"
     ]
   },
   {
     "id": "behavioral-12",
-    "title": "Connessione TCP",
+    "title": "Connessione TCP con stati",
     "category": "behavioral",
-    "code": "class TCPConnection {\n  constructor() {\n    this.state = new ClosedState(this);\n  }\n\n  setState(state) {\n    this.state = state;\n  }\n\n  open() {\n    this.state.open();\n  }\n\n  close() {\n    this.state.close();\n  }\n\n  send(data) {\n    this.state.send(data);\n  }\n}\n\nclass ClosedState {\n  constructor(connection) {\n    this.connection = connection;\n  }\n\n  open() {\n    console.log('Apertura connessione...');\n    this.connection.setState(new OpenState(this.connection));\n  }\n\n  close() {\n    console.log('Già chiusa');\n  }\n\n  send(data) {\n    console.log('Errore: connessione chiusa');\n  }\n}\n\nclass OpenState {\n  constructor(connection) {\n    this.connection = connection;\n  }\n\n  open() {\n    console.log('Già aperta');\n  }\n\n  close() {\n    console.log('Chiusura connessione...');\n    this.connection.setState(new ClosedState(this.connection));\n  }\n\n  send(data) {\n    console.log('Invio:', data);\n  }\n}\n\nconst conn = new TCPConnection();\nconn.open();\nconn.send('Hello');\nconn.close();",
-    "solutionExplanation": "State altera il comportamento di un oggetto quando il suo stato interno cambia. TCPConnection delega le operazioni (open, close, send) allo stato corrente (Closed, Open), cambiando comportamento in base allo stato della connessione.",
-    "solutionPatterns": [
-      "State"
+    "code": "// Context\nclass TCPConnection {\n  constructor() {\n    this.state = new Closed(this);\n  }\n\n  setState(state) {\n    this.state = state;\n  }\n\n  open() {\n    this.state.open();\n  }\n\n  close() {\n    this.state.close();\n  }\n\n  send(data) {\n    this.state.send(data);\n  }\n}\n\n// Stati concreti\nclass Closed {\n  constructor(connection) {\n    this.connection = connection;\n  }\n\n  open() {\n    console.log('🔌 Apertura connessione...');\n    this.connection.setState(new Open(this.connection));\n  }\n\n  close() {\n    console.log('⚠️ Già chiusa');\n  }\n\n  send(data) {\n    console.log('❌ Errore: connessione chiusa');\n  }\n}\n\nclass Open {\n  constructor(connection) {\n    this.connection = connection;\n  }\n\n  open() {\n    console.log('⚠️ Già aperta');\n  }\n\n  close() {\n    console.log('🔌 Chiusura connessione...');\n    this.connection.setState(new Closed(this.connection));\n  }\n\n  send(data) {\n    console.log('📤 Invio:', data);\n  }\n}\n\nconst conn = new TCPConnection();\nconn.open();\nconn.send('Hello');\nconn.close();",
+    "solutionPatterns": ["State"],
+    "solutionExplanation": "Il <strong>State</strong> altera il comportamento di un oggetto quando il suo stato interno cambia. TCPConnection delega le operazioni (open, close, send) allo stato corrente (Closed, Open), cambiando comportamento in base allo stato della connessione e prevenendo operazioni invalide.",
+    "solutionSteps": [
+      {
+        "title": "Context delega",
+        "description": "TCPConnection delega allo stato corrente",
+        "code": "class TCPConnection {\n  send(data) {\n    this.state.send(data);\n  }\n}"
+      },
+      {
+        "title": "State con logica",
+        "description": "Ogni stato gestisce operazioni diversamente",
+        "code": "class Closed {\n  send(data) {\n    console.log('Errore: connessione chiusa');\n  }\n}\nclass Open {\n  send(data) { console.log('Invio:', data); }\n}"
+      },
+      {
+        "title": "Transizioni stato",
+        "description": "Stati cambiano in base alle operazioni",
+        "code": "conn.open(); // Closed → Open\nconn.send('data'); // OK\nconn.close(); // Open → Closed"
+      }
+    ],
+    "solutionAdvantages": [
+      "Comportamento varia con stato interno",
+      "Previene operazioni invalide",
+      "Transizioni esplicite e tracciabili"
     ]
   },
   {
     "id": "behavioral-13",
-    "title": "Report generator",
+    "title": "Report generator multi-formato",
     "category": "behavioral",
-    "code": "class ReportGenerator {\n  generate() {\n    this.collectData();\n    this.processData();\n    this.formatOutput();\n    this.saveReport();\n  }\n\n  collectData() {\n    console.log('Raccolta dati...');\n  }\n\n  processData() {}\n  formatOutput() {}\n\n  saveReport() {\n    console.log('Salvataggio report...');\n  }\n}\n\nclass PDFReport extends ReportGenerator {\n  processData() {\n    console.log('Elaborazione dati per PDF');\n  }\n\n  formatOutput() {\n    console.log('Formattazione PDF');\n  }\n}\n\nclass ExcelReport extends ReportGenerator {\n  processData() {\n    console.log('Elaborazione dati per Excel');\n  }\n\n  formatOutput() {\n    console.log('Formattazione Excel');\n  }\n}\n\nconst pdf = new PDFReport();\npdf.generate();",
-    "solutionExplanation": "Template Method definisce la struttura di un algoritmo lasciando alle sottoclassi l'implementazione di specifici passi. ReportGenerator stabilisce il processo di generazione (collect, process, format, save), mentre PDFReport ed ExcelReport personalizzano elaborazione e formattazione.",
-    "solutionPatterns": [
-      "Template Method"
+    "code": "// Template base\nclass ReportGenerator {\n  generate() {\n    this.collectData();\n    this.processData();\n    this.formatOutput();\n    this.saveReport();\n  }\n\n  collectData() {\n    console.log('📊 Raccolta dati...');\n  }\n\n  // Passi da implementare\n  processData() {}\n  formatOutput() {}\n\n  saveReport() {\n    console.log('💾 Salvataggio report...');\n  }\n}\n\n// Implementazioni concrete\nclass PDFReport extends ReportGenerator {\n  processData() {\n    console.log('🔧 Elaborazione dati per PDF');\n  }\n\n  formatOutput() {\n    console.log('📄 Formattazione PDF');\n  }\n}\n\nclass ExcelReport extends ReportGenerator {\n  processData() {\n    console.log('🔧 Elaborazione dati per Excel');\n  }\n\n  formatOutput() {\n    console.log('📊 Formattazione Excel');\n  }\n}\n\nconst pdf = new PDFReport();\npdf.generate();\n// Output:\n// 📊 Raccolta dati...\n// 🔧 Elaborazione dati per PDF\n// 📄 Formattazione PDF\n// 💾 Salvataggio report...",
+    "solutionPatterns": ["Template Method"],
+    "solutionExplanation": "Il <strong>Template Method</strong> definisce la struttura di un algoritmo lasciando alle sottoclassi l'implementazione di specifici passi. ReportGenerator stabilisce il processo di generazione (collect, process, format, save), mentre PDFReport ed ExcelReport personalizzano solo elaborazione e formattazione.",
+    "solutionSteps": [
+      {
+        "title": "Template fisso",
+        "description": "generate() definisce sequenza invariante",
+        "code": "generate() {\n  this.collectData();\n  this.processData();\n  this.formatOutput();\n  this.saveReport();\n}"
+      },
+      {
+        "title": "Passi comuni",
+        "description": "collectData e saveReport uguali per tutti",
+        "code": "collectData() {\n  console.log('Raccolta dati...');\n}\nsaveReport() {\n  console.log('Salvataggio...');\n}"
+      },
+      {
+        "title": "Passi personalizzati",
+        "description": "Sottoclassi implementano processData e formatOutput",
+        "code": "class PDFReport extends ReportGenerator {\n  processData() { console.log('Elaborazione PDF'); }\n  formatOutput() { console.log('Formattazione PDF'); }\n}"
+      }
+    ],
+    "solutionAdvantages": [
+      "Riutilizzo codice comune",
+      "Algoritmo invariante garantito",
+      "Estensione controllata (solo passi specifici)"
     ]
   },
   {
     "id": "behavioral-14",
-    "title": "Navigazione collezioni",
+    "title": "Libreria con traversal customizzati",
     "category": "behavioral",
-    "code": "class Book {\n  constructor(title, author) {\n    this.title = title;\n    this.author = author;\n  }\n}\n\nclass Library {\n  constructor() {\n    this.books = [];\n  }\n\n  addBook(book) {\n    this.books.push(book);\n  }\n\n  getIterator() {\n    return new BookIterator(this.books);\n  }\n\n  getReverseIterator() {\n    return new ReverseBookIterator(this.books);\n  }\n}\n\nclass BookCursor {\n  constructor(books) {\n    this.books = books;\n    this.index = 0;\n  }\n\n  hasNext() {\n    return this.index < this.books.length;\n  }\n\n  next() {\n    return this.books[this.index++];\n  }\n}\n\nclass ReverseBookCursor {\n  constructor(books) {\n    this.books = books;\n    this.index = books.length - 1;\n  }\n\n  hasNext() {\n    return this.index >= 0;\n  }\n\n  next() {\n    return this.books[this.index--];\n  }\n}\n\nconst library = new Library();\nlibrary.addBook(new Book('1984', 'Orwell'));\nlibrary.addBook(new Book('Dune', 'Herbert'));\n\nconst it = library.getReverseIterator();\nwhile (it.hasNext()) {\n  const book = it.next();\n  console.log(book.title);\n}",
-    "solutionExplanation": "Iterator fornisce accesso sequenziale agli elementi senza esporre la struttura interna. Library offre diversi iterator (normale e inverso) per scorrere i libri, nascondendo i dettagli implementativi e permettendo diverse modalità di attraversamento.",
-    "solutionPatterns": [
-      "Iterator"
+    "code": "// Element\nclass Book {\n  constructor(title, author) {\n    this.title = title;\n    this.author = author;\n  }\n}\n\n// Aggregate\nclass Library {\n  constructor() {\n    this.books = [];\n  }\n\n  addBook(book) {\n    this.books.push(book);\n  }\n\n  getIterator() {\n    return new ForwardIterator(this.books);\n  }\n\n  getReverseIterator() {\n    return new ReverseIterator(this.books);\n  }\n}\n\n// Iterator normale\nclass ForwardIterator {\n  constructor(books) {\n    this.books = books;\n    this.index = 0;\n  }\n\n  hasNext() {\n    return this.index < this.books.length;\n  }\n\n  next() {\n    return this.books[this.index++];\n  }\n}\n\n// Iterator inverso\nclass ReverseIterator {\n  constructor(books) {\n    this.books = books;\n    this.index = books.length - 1;\n  }\n\n  hasNext() {\n    return this.index >= 0;\n  }\n\n  next() {\n    return this.books[this.index--];\n  }\n}\n\nconst library = new Library();\nlibrary.addBook(new Book('1984', 'Orwell'));\nlibrary.addBook(new Book('Dune', 'Herbert'));\n\nconst reverseIt = library.getReverseIterator();\nwhile (reverseIt.hasNext()) {\n  console.log(reverseIt.next().title);\n}",
+    "solutionPatterns": ["Iterator"],
+    "solutionExplanation": "Il <strong>Iterator</strong> fornisce accesso sequenziale agli elementi senza esporre la struttura interna. Library offre diversi iterator (normale e inverso) per scorrere i libri, nascondendo i dettagli implementativi dell'array e permettendo diverse modalità di attraversamento.",
+    "solutionSteps": [
+      {
+        "title": "Aggregate factory",
+        "description": "Library crea iterator su richiesta",
+        "code": "class Library {\n  getIterator() {\n    return new ForwardIterator(this.books);\n  }\n  getReverseIterator() {\n    return new ReverseIterator(this.books);\n  }\n}"
+      },
+      {
+        "title": "Iterator diversi",
+        "description": "Ogni iterator ha logica di traversal diversa",
+        "code": "class ForwardIterator {\n  next() { return this.books[this.index++]; }\n}\nclass ReverseIterator {\n  next() { return this.books[this.index--]; }\n}"
+      },
+      {
+        "title": "Traversal uniforme",
+        "description": "Interfaccia hasNext/next uguale per entrambi",
+        "code": "while (iterator.hasNext()) {\n  console.log(iterator.next().title);\n}"
+      }
+    ],
+    "solutionAdvantages": [
+      "Traversal customizzati (forward, reverse, filtered)",
+      "Struttura interna nascosta",
+      "Multiple iterazioni simultanee"
     ]
   },
   {
     "id": "behavioral-15",
-    "title": "Sistema di messaggistica interna",
+    "title": "Hub messaggistica aziendale",
     "category": "behavioral",
-    "code": "class MessageBroker {\n  constructor() {\n    this.users = new Map();\n  }\n\n  registerUser(user) {\n    this.users.set(user.id, user);\n    user.setBroker(this);\n  }\n\n  sendMessage(message, from, toId) {\n    const recipient = this.users.get(toId);\n    if (recipient) {\n      recipient.receive(message, from);\n    } else {\n      console.log('Utente non trovato');\n    }\n  }\n\n  broadcast(message, from) {\n    this.users.forEach(user => {\n      if (user.id !== from.id) {\n        user.receive(message, from);\n      }\n    });\n  }\n}\n\nclass Employee {\n  constructor(id, name) {\n    this.id = id;\n    this.name = name;\n    this.broker = null;\n  }\n\n  setBroker(broker) {\n    this.broker = broker;\n  }\n\n  send(message, toId) {\n    this.broker.sendMessage(message, this, toId);\n  }\n\n  broadcastAll(message) {\n    this.broker.broadcast(message, this);\n  }\n\n  receive(message, from) {\n    console.log(`${this.name} riceve da ${from.name}: ${message}`);\n  }\n}\n\nconst broker = new MessageBroker();\nconst emp1 = new Employee(1, 'Mario');\nconst emp2 = new Employee(2, 'Luigi');\n\nbroker.registerUser(emp1);\nbroker.registerUser(emp2);\n\nemp1.send('Ciao!', 2);",
-    "solutionExplanation": "Mediator riduce le dipendenze tra oggetti comunicanti centralizzando l'interazione. MessageBroker gestisce tutti i messaggi tra Employee, evitando che i dipendenti debbano conoscersi direttamente e facilitando l'aggiunta di nuovi partecipanti.",
-    "solutionPatterns": [
-      "Mediator"
+    "code": "// Mediator\nclass MessageHub {\n  constructor() {\n    this.users = new Map();\n  }\n\n  register(user) {\n    this.users.set(user.id, user);\n    user.setHub(this);\n  }\n\n  sendMessage(message, from, toId) {\n    const recipient = this.users.get(toId);\n    if (recipient) {\n      recipient.receive(message, from);\n    } else {\n      console.log('❌ Utente non trovato');\n    }\n  }\n\n  broadcast(message, from) {\n    this.users.forEach(user => {\n      if (user.id !== from.id) {\n        user.receive(message, from);\n      }\n    });\n  }\n}\n\n// Colleague\nclass Employee {\n  constructor(id, name) {\n    this.id = id;\n    this.name = name;\n    this.hub = null;\n  }\n\n  setHub(hub) {\n    this.hub = hub;\n  }\n\n  send(message, toId) {\n    this.hub.sendMessage(message, this, toId);\n  }\n\n  broadcastAll(message) {\n    this.hub.broadcast(message, this);\n  }\n\n  receive(message, from) {\n    console.log(`${this.name} riceve da ${from.name}: ${message}`);\n  }\n}\n\nconst hub = new MessageHub();\nconst mario = new Employee(1, 'Mario');\nconst luigi = new Employee(2, 'Luigi');\n\nhub.register(mario);\nhub.register(luigi);\n\nmario.send('Ciao!', 2);",
+    "solutionPatterns": ["Mediator"],
+    "solutionExplanation": "Il <strong>Mediator</strong> riduce le dipendenze tra oggetti comunicanti centralizzando l'interazione. MessageHub gestisce tutti i messaggi tra Employee, evitando che i dipendenti debbano conoscersi direttamente (riducendo complessità da N² a N) e facilitando l'aggiunta di nuovi partecipanti.",
+    "solutionSteps": [
+      {
+        "title": "Mediator con registry",
+        "description": "MessageHub mantiene mappa di tutti gli utenti",
+        "code": "class MessageHub {\n  register(user) {\n    this.users.set(user.id, user);\n    user.setHub(this);\n  }\n}"
+      },
+      {
+        "title": "Routing centralizzato",
+        "description": "sendMessage() trova destinatario e inoltra",
+        "code": "sendMessage(message, from, toId) {\n  const recipient = this.users.get(toId);\n  if (recipient) recipient.receive(message, from);\n}"
+      },
+      {
+        "title": "Colleague disaccoppiati",
+        "description": "Employee comunica solo tramite hub",
+        "code": "class Employee {\n  send(message, toId) {\n    this.hub.sendMessage(message, this, toId);\n  }\n}"
+      }
+    ],
+    "solutionAdvantages": [
+      "Complessità ridotta da N² a N",
+      "Routing messaggi centralizzato",
+      "Nuovi partecipanti senza modifiche"
+    ]
+  },
+  {
+    "id": "behavioral-16",
+    "title": "Task queue with retry mechanism",
+    "category": "behavioral",
+    "code": "// Command + Chain of Responsibility\nclass Task {\n  constructor(name, action) {\n    this.name = name;\n    this.action = action;\n  }\n  execute() {\n    this.action();\n  }\n}\n\nclass RetryHandler {\n  constructor(maxRetries = 3) {\n    this.maxRetries = maxRetries;\n    this.next = null;\n  }\n  setNext(handler) {\n    this.next = handler;\n    return handler;\n  }\n  handle(task, attempt = 1) {\n    try {\n      task.execute();\n      console.log(`✅ Task ${task.name} succeeded`);\n    } catch (error) {\n      if (attempt < this.maxRetries) {\n        console.log(`⚠️ Retry ${attempt}/${this.maxRetries}`);\n        this.handle(task, attempt + 1);\n      } else if (this.next) {\n        this.next.handle(task);\n      } else {\n        console.log(`❌ Task ${task.name} failed`);\n      }\n    }\n  }\n}\n\nclass FallbackHandler {\n  constructor() {\n    this.next = null;\n  }\n  handle(task) {\n    console.log(`🔄 Fallback for ${task.name}`);\n  }\n}\n\nconst retry = new RetryHandler(2);\nconst fallback = new FallbackHandler();\nretry.setNext(fallback);\n\nconst task1 = new Task('SendEmail', () => { throw new Error('Network error'); });\nretry.handle(task1);",
+    "solutionPatterns": ["Command", "Chain of Responsibility"],
+    "solutionExplanation": "Combina <strong>Command</strong> (Task incapsula azione da eseguire) e <strong>Chain of Responsibility</strong> (RetryHandler e FallbackHandler formano catena di gestione errori). Separa logica task da gestione retry/fallback.",
+    "solutionSteps": [
+      {
+        "title": "Command task",
+        "description": "Task incapsula azione in execute()",
+        "code": "class Task {\n  execute() {\n    this.action();\n  }\n}\nconst task = new Task('SendEmail', () => { /* ... */ });"
+      },
+      {
+        "title": "Chain handlers",
+        "description": "RetryHandler passa a next handler se fallisce",
+        "code": "handle(task, attempt) {\n  try {\n    task.execute();\n  } catch (error) {\n    if (attempt < this.maxRetries) this.handle(task, attempt + 1);\n    else if (this.next) this.next.handle(task);\n  }\n}"
+      },
+      {
+        "title": "Chain setup",
+        "description": "Retry collegato a Fallback handler",
+        "code": "const retry = new RetryHandler(2);\nconst fallback = new FallbackHandler();\nretry.setNext(fallback);"
+      }
+    ],
+    "solutionAdvantages": [
+      "Task disaccoppiati da gestione errori",
+      "Retry automatico configurabile",
+      "Catena handler estensibile"
+    ]
+  },
+  {
+    "id": "behavioral-17",
+    "title": "Form validation pipeline",
+    "category": "behavioral",
+    "code": "// Strategy + Chain of Responsibility\nclass ValidationStrategy {\n  validate(value) {\n    return true;\n  }\n}\n\nclass EmailStrategy extends ValidationStrategy {\n  validate(value) {\n    return /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(value);\n  }\n}\n\nclass LengthStrategy extends ValidationStrategy {\n  constructor(min, max) {\n    super();\n    this.min = min;\n    this.max = max;\n  }\n  validate(value) {\n    return value.length >= this.min && value.length <= this.max;\n  }\n}\n\nclass Validator {\n  constructor(field, strategy) {\n    this.field = field;\n    this.strategy = strategy;\n    this.next = null;\n  }\n  setNext(validator) {\n    this.next = validator;\n    return validator;\n  }\n  validate(data) {\n    const value = data[this.field];\n    if (!this.strategy.validate(value)) {\n      console.log(`❌ ${this.field} validation failed`);\n      return false;\n    }\n    console.log(`✅ ${this.field} valid`);\n    return this.next ? this.next.validate(data) : true;\n  }\n}\n\nconst emailValidator = new Validator('email', new EmailStrategy());\nconst nameValidator = new Validator('name', new LengthStrategy(2, 50));\nemailValidator.setNext(nameValidator);\n\nconst formData = { email: 'user@example.com', name: 'John' };\nemailValidator.validate(formData);",
+    "solutionPatterns": ["Strategy", "Chain of Responsibility"],
+    "solutionExplanation": "Integra <strong>Strategy</strong> (EmailStrategy e LengthStrategy definiscono algoritmi di validazione intercambiabili) e <strong>Chain of Responsibility</strong> (Validator formano catena di validazione). Valida form passo dopo passo con strategie configurabili.",
+    "solutionSteps": [
+      {
+        "title": "Strategy algorithms",
+        "description": "Strategy definiscono logiche di validazione diverse",
+        "code": "class EmailStrategy {\n  validate(value) {\n    return /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(value);\n  }\n}"
+      },
+      {
+        "title": "Chain validators",
+        "description": "Validator usa strategy e passa a next se valido",
+        "code": "validate(data) {\n  if (!this.strategy.validate(data[this.field])) return false;\n  return this.next ? this.next.validate(data) : true;\n}"
+      },
+      {
+        "title": "Validation pipeline",
+        "description": "Validatori collegati in catena",
+        "code": "const emailVal = new Validator('email', new EmailStrategy());\nemailVal.setNext(new Validator('name', new LengthStrategy(2, 50)));"
+      }
+    ],
+    "solutionAdvantages": [
+      "Validatori componibili in catena",
+      "Strategie riutilizzabili per campi diversi",
+      "Pipeline estensibile con nuovi validator"
+    ]
+  },
+  {
+    "id": "behavioral-18",
+    "title": "Game state machine with events",
+    "category": "behavioral",
+    "code": "// State + Observer\nclass GameState {\n  enter(context) {}\n  handleInput(context, input) {}\n  exit(context) {}\n}\n\nclass MenuState extends GameState {\n  enter(context) {\n    console.log('📋 Entered Menu');\n    context.notify('stateChanged', 'menu');\n  }\n  handleInput(context, input) {\n    if (input === 'start') {\n      context.setState(new PlayingState());\n    }\n  }\n}\n\nclass PlayingState extends GameState {\n  enter(context) {\n    console.log('🎮 Game Started');\n    context.notify('stateChanged', 'playing');\n  }\n  handleInput(context, input) {\n    if (input === 'pause') {\n      context.setState(new PausedState());\n    }\n  }\n}\n\nclass PausedState extends GameState {\n  enter(context) {\n    console.log('⏸️ Game Paused');\n    context.notify('stateChanged', 'paused');\n  }\n  handleInput(context, input) {\n    if (input === 'resume') {\n      context.setState(new PlayingState());\n    }\n  }\n}\n\nclass Game {\n  constructor() {\n    this.state = new MenuState();\n    this.observers = [];\n  }\n  subscribe(observer) {\n    this.observers.push(observer);\n  }\n  notify(event, data) {\n    this.observers.forEach(obs => obs.update(event, data));\n  }\n  setState(newState) {\n    this.state.exit(this);\n    this.state = newState;\n    this.state.enter(this);\n  }\n  handleInput(input) {\n    this.state.handleInput(this, input);\n  }\n}\n\nconst game = new Game();\ngame.subscribe({ update: (event, data) => console.log(`🔔 ${event}: ${data}`) });\ngame.handleInput('start');\ngame.handleInput('pause');",
+    "solutionPatterns": ["State", "Observer"],
+    "solutionExplanation": "Combina <strong>State</strong> (MenuState, PlayingState, PausedState gestiscono comportamento in base a stato) e <strong>Observer</strong> (Game notifica observer ad ogni cambio stato). Gestisce transizioni complesse con notifiche automatiche.",
+    "solutionSteps": [
+      {
+        "title": "State behaviors",
+        "description": "Ogni State gestisce input in modo diverso",
+        "code": "class PlayingState extends GameState {\n  handleInput(context, input) {\n    if (input === 'pause') context.setState(new PausedState());\n  }\n}"
+      },
+      {
+        "title": "Observer notification",
+        "description": "State notifica observer quando entra",
+        "code": "enter(context) {\n  console.log('Game Started');\n  context.notify('stateChanged', 'playing');\n}"
+      },
+      {
+        "title": "State transitions",
+        "description": "Game gestisce cambio stato e notifiche",
+        "code": "setState(newState) {\n  this.state.exit(this);\n  this.state = newState;\n  this.state.enter(this); // Trigger notify\n}"
+      }
+    ],
+    "solutionAdvantages": [
+      "Comportamento varia automaticamente con stato",
+      "Observer notificati ad ogni transizione",
+      "Logica stato disaccoppiata da UI"
+    ]
+  },
+  {
+    "id": "behavioral-19",
+    "title": "Undo/Redo with history tracking",
+    "category": "behavioral",
+    "code": "// Command + Memento\nclass Command {\n  execute() {}\n  undo() {}\n}\n\nclass AddTextCommand extends Command {\n  constructor(editor, text) {\n    super();\n    this.editor = editor;\n    this.text = text;\n    this.memento = null;\n  }\n  execute() {\n    this.memento = this.editor.save();\n    this.editor.content += this.text;\n    console.log(`➕ Added: \"${this.text}\"`);\n  }\n  undo() {\n    this.editor.restore(this.memento);\n    console.log(`↩️ Undone: \"${this.text}\"`);\n  }\n}\n\nclass Editor {\n  constructor() {\n    this.content = '';\n  }\n  save() {\n    return { content: this.content };\n  }\n  restore(memento) {\n    this.content = memento.content;\n  }\n  getContent() {\n    return this.content;\n  }\n}\n\nclass History {\n  constructor() {\n    this.commands = [];\n  }\n  execute(command) {\n    command.execute();\n    this.commands.push(command);\n  }\n  undo() {\n    const command = this.commands.pop();\n    if (command) command.undo();\n  }\n}\n\nconst editor = new Editor();\nconst history = new History();\n\nhistory.execute(new AddTextCommand(editor, 'Hello '));\nhistory.execute(new AddTextCommand(editor, 'World'));\nconsole.log(editor.getContent()); // \"Hello World\"\nhistory.undo();\nconsole.log(editor.getContent()); // \"Hello \"",
+    "solutionPatterns": ["Command", "Memento"],
+    "solutionExplanation": "Integra <strong>Command</strong> (AddTextCommand incapsula azioni con execute/undo) e <strong>Memento</strong> (Editor salva/ripristina stato interno). Implementa undo/redo preservando stato precedente.",
+    "solutionSteps": [
+      {
+        "title": "Memento save",
+        "description": "Editor salva stato prima di modifiche",
+        "code": "save() {\n  return { content: this.content };\n}\nrestore(memento) {\n  this.content = memento.content;\n}"
+      },
+      {
+        "title": "Command memento",
+        "description": "Command salva memento prima di execute()",
+        "code": "execute() {\n  this.memento = this.editor.save();\n  this.editor.content += this.text;\n}\nundo() {\n  this.editor.restore(this.memento);\n}"
+      },
+      {
+        "title": "History stack",
+        "description": "History gestisce stack di comandi",
+        "code": "execute(command) {\n  command.execute();\n  this.commands.push(command);\n}\nundo() {\n  this.commands.pop().undo();\n}"
+      }
+    ],
+    "solutionAdvantages": [
+      "Undo/redo completo con stato preservato",
+      "Stack command estensibile",
+      "Editor state incapsulato in memento"
+    ]
+  },
+  {
+    "id": "behavioral-20",
+    "title": "Real-time chat with message filtering",
+    "category": "behavioral",
+    "code": "// Observer + Chain of Responsibility\nclass ChatRoom {\n  constructor() {\n    this.users = [];\n    this.filterChain = null;\n  }\n  subscribe(user) {\n    this.users.push(user);\n  }\n  setFilterChain(chain) {\n    this.filterChain = chain;\n  }\n  broadcast(message, sender) {\n    const filtered = this.filterChain ? this.filterChain.filter(message) : message;\n    if (filtered) {\n      this.users.forEach(user => {\n        if (user !== sender) {\n          user.receive(filtered, sender.name);\n        }\n      });\n    }\n  }\n}\n\nclass MessageFilter {\n  constructor() {\n    this.next = null;\n  }\n  setNext(filter) {\n    this.next = filter;\n    return filter;\n  }\n  filter(message) {\n    return this.next ? this.next.filter(message) : message;\n  }\n}\n\nclass ProfanityFilter extends MessageFilter {\n  filter(message) {\n    const cleaned = message.replace(/badword/gi, '***');\n    return super.filter(cleaned);\n  }\n}\n\nclass SpamFilter extends MessageFilter {\n  filter(message) {\n    if (message.length > 200) {\n      console.log('🚫 Spam detected');\n      return null;\n    }\n    return super.filter(message);\n  }\n}\n\nclass User {\n  constructor(name, chatRoom) {\n    this.name = name;\n    this.chatRoom = chatRoom;\n    chatRoom.subscribe(this);\n  }\n  send(message) {\n    console.log(`${this.name} sends: ${message}`);\n    this.chatRoom.broadcast(message, this);\n  }\n  receive(message, from) {\n    console.log(`${this.name} received from ${from}: ${message}`);\n  }\n}\n\nconst chat = new ChatRoom();\nconst profanity = new ProfanityFilter();\nconst spam = new SpamFilter();\nprofanity.setNext(spam);\nchat.setFilterChain(profanity);\n\nconst user1 = new User('Alice', chat);\nconst user2 = new User('Bob', chat);\nuser1.send('Hello badword!');",
+    "solutionPatterns": ["Observer", "Chain of Responsibility"],
+    "solutionExplanation": "Combina <strong>Observer</strong> (ChatRoom notifica tutti gli User iscritti) e <strong>Chain of Responsibility</strong> (ProfanityFilter e SpamFilter formano catena di filtri). Filtra messaggi prima di broadcast agli observer.",
+    "solutionSteps": [
+      {
+        "title": "Observer broadcast",
+        "description": "ChatRoom notifica tutti gli user iscritti",
+        "code": "broadcast(message, sender) {\n  this.users.forEach(user => {\n    if (user !== sender) user.receive(message, sender.name);\n  });\n}"
+      },
+      {
+        "title": "Chain filters",
+        "description": "Filtri collegati processano messaggio in sequenza",
+        "code": "class ProfanityFilter extends MessageFilter {\n  filter(message) {\n    const cleaned = message.replace(/badword/gi, '***');\n    return super.filter(cleaned); // Pass to next\n  }\n}"
+      },
+      {
+        "title": "Filter before broadcast",
+        "description": "ChatRoom applica catena filtri prima di notificare",
+        "code": "broadcast(message, sender) {\n  const filtered = this.filterChain ? this.filterChain.filter(message) : message;\n  if (filtered) this.users.forEach(...);\n}"
+      }
+    ],
+    "solutionAdvantages": [
+      "Filtri componibili e riordinabili",
+      "Broadcast automatico a tutti gli user",
+      "Validazione centralizzata messaggi"
+    ]
+  },
+  {
+    "id": "behavioral-21",
+    "title": "Report generator with templates",
+    "category": "behavioral",
+    "code": "// Template Method + Strategy\nclass ReportGenerator {\n  generate() {\n    this.fetchData();\n    this.formatData();\n    this.exportData();\n  }\n  fetchData() {\n    console.log('📊 Fetching data...');\n  }\n  formatData() {\n    throw new Error('Must implement formatData()');\n  }\n  exportData() {\n    throw new Error('Must implement exportData()');\n  }\n}\n\nclass PDFReport extends ReportGenerator {\n  constructor(formatter) {\n    super();\n    this.formatter = formatter;\n  }\n  formatData() {\n    this.formatter.format();\n  }\n  exportData() {\n    console.log('📄 Exporting to PDF');\n  }\n}\n\nclass ExcelReport extends ReportGenerator {\n  constructor(formatter) {\n    super();\n    this.formatter = formatter;\n  }\n  formatData() {\n    this.formatter.format();\n  }\n  exportData() {\n    console.log('📊 Exporting to Excel');\n  }\n}\n\nclass TableFormatter {\n  format() {\n    console.log('📋 Formatting as table');\n  }\n}\n\nclass ChartFormatter {\n  format() {\n    console.log('📈 Formatting as chart');\n  }\n}\n\nconst pdfReport = new PDFReport(new TableFormatter());\npdfReport.generate();\n\nconst excelReport = new ExcelReport(new ChartFormatter());\nexcelReport.generate();",
+    "solutionPatterns": ["Template Method", "Strategy"],
+    "solutionExplanation": "Integra <strong>Template Method</strong> (ReportGenerator definisce skeleton generate() con step fissi) e <strong>Strategy</strong> (TableFormatter e ChartFormatter algoritmi di formattazione intercambiabili). Template gestisce workflow, Strategy personalizza formattazione.",
+    "solutionSteps": [
+      {
+        "title": "Template skeleton",
+        "description": "ReportGenerator definisce sequenza operazioni fissa",
+        "code": "generate() {\n  this.fetchData();\n  this.formatData();\n  this.exportData();\n}"
+      },
+      {
+        "title": "Strategy formatting",
+        "description": "Formatter strategy definiscono algoritmi diversi",
+        "code": "class TableFormatter {\n  format() {\n    console.log('Formatting as table');\n  }\n}"
+      },
+      {
+        "title": "Template + Strategy",
+        "description": "Report usa template e delega formato a strategy",
+        "code": "class PDFReport extends ReportGenerator {\n  formatData() {\n    this.formatter.format(); // Usa strategy\n  }\n}"
+      }
+    ],
+    "solutionAdvantages": [
+      "Workflow report standardizzato",
+      "Formattazione intercambiabile per output",
+      "Nuovi formati senza modificare template"
+    ]
+  },
+  {
+    "id": "behavioral-22",
+    "title": "Notification preferences system",
+    "category": "behavioral",
+    "code": "// Observer + Strategy\nclass NotificationService {\n  constructor() {\n    this.subscribers = [];\n  }\n  subscribe(subscriber) {\n    this.subscribers.push(subscriber);\n  }\n  notify(event, data) {\n    this.subscribers.forEach(sub => sub.update(event, data));\n  }\n}\n\nclass DeliveryStrategy {\n  deliver(message) {}\n}\n\nclass EmailDelivery extends DeliveryStrategy {\n  deliver(message) {\n    console.log(`📧 Email: ${message}`);\n  }\n}\n\nclass PushDelivery extends DeliveryStrategy {\n  deliver(message) {\n    console.log(`🔔 Push: ${message}`);\n  }\n}\n\nclass SilentDelivery extends DeliveryStrategy {\n  deliver(message) {\n    console.log(`🔕 Silent mode`);\n  }\n}\n\nclass User {\n  constructor(name, strategy) {\n    this.name = name;\n    this.strategy = strategy;\n  }\n  setStrategy(strategy) {\n    this.strategy = strategy;\n  }\n  update(event, data) {\n    this.strategy.deliver(`[${event}] ${data}`);\n  }\n}\n\nconst service = new NotificationService();\nconst alice = new User('Alice', new EmailDelivery());\nconst bob = new User('Bob', new PushDelivery());\n\nservice.subscribe(alice);\nservice.subscribe(bob);\n\nservice.notify('NEW_MESSAGE', 'You have a new message');\n\nbob.setStrategy(new SilentDelivery());\nservice.notify('REMINDER', 'Meeting in 10 minutes');",
+    "solutionPatterns": ["Observer", "Strategy"],
+    "solutionExplanation": "Combina <strong>Observer</strong> (NotificationService notifica tutti gli User iscritti) e <strong>Strategy</strong> (EmailDelivery, PushDelivery, SilentDelivery definiscono modalità consegna intercambiabili). Ogni observer sceglie strategia di ricezione.",
+    "solutionSteps": [
+      {
+        "title": "Observer pattern",
+        "description": "Service notifica tutti i subscriber",
+        "code": "notify(event, data) {\n  this.subscribers.forEach(sub => sub.update(event, data));\n}"
+      },
+      {
+        "title": "Strategy delivery",
+        "description": "User delega consegna a strategy configurabile",
+        "code": "class User {\n  update(event, data) {\n    this.strategy.deliver(`[${event}] ${data}`);\n  }\n}"
+      },
+      {
+        "title": "Runtime change",
+        "description": "User può cambiare strategy dinamicamente",
+        "code": "bob.setStrategy(new SilentDelivery());\nservice.notify('REMINDER', '...'); // Bob in silent"
+      }
+    ],
+    "solutionAdvantages": [
+      "Preferenze notifica personalizzabili",
+      "Cambio modalità runtime senza disiscriversi",
+      "Nuove strategie delivery estensibili"
+    ]
+  },
+  {
+    "id": "behavioral-23",
+    "title": "Shopping cart with pricing rules",
+    "category": "behavioral",
+    "code": "// Iterator + Strategy\nclass ShoppingCart {\n  constructor() {\n    this.items = [];\n  }\n  add(item) {\n    this.items.push(item);\n  }\n  iterator() {\n    let index = 0;\n    const items = this.items;\n    return {\n      hasNext: () => index < items.length,\n      next: () => items[index++],\n      reset: () => { index = 0; }\n    };\n  }\n}\n\nclass PricingStrategy {\n  calculate(cart) {\n    return 0;\n  }\n}\n\nclass RegularPricing extends PricingStrategy {\n  calculate(cart) {\n    const iterator = cart.iterator();\n    let total = 0;\n    while (iterator.hasNext()) {\n      total += iterator.next().price;\n    }\n    return total;\n  }\n}\n\nclass DiscountPricing extends PricingStrategy {\n  constructor(discount) {\n    super();\n    this.discount = discount;\n  }\n  calculate(cart) {\n    const iterator = cart.iterator();\n    let total = 0;\n    while (iterator.hasNext()) {\n      total += iterator.next().price;\n    }\n    return total * (1 - this.discount);\n  }\n}\n\nclass Checkout {\n  constructor(strategy) {\n    this.strategy = strategy;\n  }\n  process(cart) {\n    const total = this.strategy.calculate(cart);\n    console.log(`💰 Total: €${total.toFixed(2)}`);\n    return total;\n  }\n}\n\nconst cart = new ShoppingCart();\ncart.add({ name: 'Book', price: 20 });\ncart.add({ name: 'Pen', price: 5 });\n\nconst regular = new Checkout(new RegularPricing());\nregular.process(cart);\n\nconst discounted = new Checkout(new DiscountPricing(0.2));\ndiscounted.process(cart);",
+    "solutionPatterns": ["Iterator", "Strategy"],
+    "solutionExplanation": "Integra <strong>Iterator</strong> (ShoppingCart fornisce iterator per attraversare items) e <strong>Strategy</strong> (RegularPricing e DiscountPricing algoritmi di calcolo prezzo intercambiabili). Itera items con strategie di pricing diverse.",
+    "solutionSteps": [
+      {
+        "title": "Iterator access",
+        "description": "Cart espone iterator per attraversare items",
+        "code": "iterator() {\n  let index = 0;\n  return {\n    hasNext: () => index < this.items.length,\n    next: () => this.items[index++]\n  };\n}"
+      },
+      {
+        "title": "Strategy calculation",
+        "description": "Pricing strategy usa iterator per calcolare totale",
+        "code": "calculate(cart) {\n  const iterator = cart.iterator();\n  let total = 0;\n  while (iterator.hasNext()) total += iterator.next().price;\n  return total;\n}"
+      },
+      {
+        "title": "Checkout strategy",
+        "description": "Checkout usa strategy per processare cart",
+        "code": "const checkout = new Checkout(new DiscountPricing(0.2));\ncheckout.process(cart); // Itera e sconta"
+      }
+    ],
+    "solutionAdvantages": [
+      "Iterazione items disaccoppiata da logica pricing",
+      "Strategie pricing intercambiabili",
+      "Nuove regole prezzo senza modificare cart"
+    ]
+  },
+  {
+    "id": "behavioral-24",
+    "title": "Workflow approval system",
+    "category": "behavioral",
+    "code": "// Chain of Responsibility + State\nclass ApprovalState {\n  handle(request) {}\n}\n\nclass PendingState extends ApprovalState {\n  handle(request) {\n    console.log(`⏳ Request ${request.id} pending`);\n    return 'pending';\n  }\n}\n\nclass ApprovedState extends ApprovalState {\n  handle(request) {\n    console.log(`✅ Request ${request.id} approved`);\n    return 'approved';\n  }\n}\n\nclass RejectedState extends ApprovalState {\n  handle(request) {\n    console.log(`❌ Request ${request.id} rejected`);\n    return 'rejected';\n  }\n}\n\nclass Approver {\n  constructor(name, limit) {\n    this.name = name;\n    this.limit = limit;\n    this.next = null;\n  }\n  setNext(approver) {\n    this.next = approver;\n    return approver;\n  }\n  approve(request) {\n    if (request.amount <= this.limit) {\n      console.log(`${this.name} approved €${request.amount}`);\n      request.state = new ApprovedState();\n      return request.state.handle(request);\n    } else if (this.next) {\n      console.log(`${this.name} escalating to ${this.next.name}`);\n      return this.next.approve(request);\n    } else {\n      request.state = new RejectedState();\n      return request.state.handle(request);\n    }\n  }\n}\n\nclass Request {\n  constructor(id, amount) {\n    this.id = id;\n    this.amount = amount;\n    this.state = new PendingState();\n  }\n}\n\nconst supervisor = new Approver('Supervisor', 1000);\nconst manager = new Approver('Manager', 5000);\nconst director = new Approver('Director', 20000);\nsupervisor.setNext(manager).setNext(director);\n\nconst request1 = new Request('REQ-001', 800);\nsupervisor.approve(request1);\n\nconst request2 = new Request('REQ-002', 15000);\nsupervisor.approve(request2);",
+    "solutionPatterns": ["Chain of Responsibility", "State"],
+    "solutionExplanation": "Combina <strong>Chain of Responsibility</strong> (Approver formano catena gerarchica) e <strong>State</strong> (Request cambia stato da Pending a Approved/Rejected). Escalation automatica in catena con transizioni stato.",
+    "solutionSteps": [
+      {
+        "title": "Chain hierarchy",
+        "description": "Approver collegati in catena per escalation",
+        "code": "approve(request) {\n  if (request.amount <= this.limit) /* approve */\n  else if (this.next) return this.next.approve(request);\n}"
+      },
+      {
+        "title": "State transitions",
+        "description": "Request cambia stato da Pending ad Approved/Rejected",
+        "code": "if (approved) {\n  request.state = new ApprovedState();\n  return request.state.handle(request);\n}"
+      },
+      {
+        "title": "Approval flow",
+        "description": "Catena processa request aggiornando stato",
+        "code": "const request = new Request('REQ-001', 800);\nsupervisor.approve(request); // Escalates if needed"
+      }
+    ],
+    "solutionAdvantages": [
+      "Escalation automatica per importi alti",
+      "Stato request tracciato durante workflow",
+      "Gerarchia approvatori estensibile"
+    ]
+  },
+  {
+    "id": "behavioral-25",
+    "title": "Data processing pipeline with observers",
+    "category": "behavioral",
+    "code": "// Template Method + Observer\nclass DataProcessor {\n  constructor() {\n    this.observers = [];\n  }\n  subscribe(observer) {\n    this.observers.push(observer);\n  }\n  notify(event, data) {\n    this.observers.forEach(obs => obs.update(event, data));\n  }\n  process(data) {\n    this.notify('started', data);\n    this.validate(data);\n    this.transform(data);\n    this.save(data);\n    this.notify('completed', data);\n  }\n  validate(data) {\n    throw new Error('Must implement validate()');\n  }\n  transform(data) {\n    throw new Error('Must implement transform()');\n  }\n  save(data) {\n    console.log('💾 Saving data...');\n  }\n}\n\nclass CSVProcessor extends DataProcessor {\n  validate(data) {\n    console.log('✓ Validating CSV format');\n    this.notify('validated', data);\n  }\n  transform(data) {\n    console.log('🔄 Transforming CSV to JSON');\n    this.notify('transformed', data);\n  }\n}\n\nclass XMLProcessor extends DataProcessor {\n  validate(data) {\n    console.log('✓ Validating XML schema');\n    this.notify('validated', data);\n  }\n  transform(data) {\n    console.log('🔄 Transforming XML to JSON');\n    this.notify('transformed', data);\n  }\n}\n\nconst logger = {\n  update: (event, data) => console.log(`📝 [LOG] ${event}:`, data)\n};\n\nconst csvProcessor = new CSVProcessor();\ncsvProcessor.subscribe(logger);\ncsvProcessor.process('sample.csv');\n\nconst xmlProcessor = new XMLProcessor();\nxmlProcessor.subscribe(logger);\nxmlProcessor.process('sample.xml');",
+    "solutionPatterns": ["Template Method", "Observer"],
+    "solutionExplanation": "Integra <strong>Template Method</strong> (DataProcessor definisce skeleton process() con step fissi) e <strong>Observer</strong> (processor notifica observer ad ogni step). Template gestisce workflow, observer tracciano progresso.",
+    "solutionSteps": [
+      {
+        "title": "Template workflow",
+        "description": "DataProcessor definisce sequenza operazioni fissa",
+        "code": "process(data) {\n  this.notify('started', data);\n  this.validate(data);\n  this.transform(data);\n  this.save(data);\n  this.notify('completed', data);\n}"
+      },
+      {
+        "title": "Observer notifications",
+        "description": "Processor notifica observer ad ogni step",
+        "code": "validate(data) {\n  console.log('Validating...');\n  this.notify('validated', data);\n}"
+      },
+      {
+        "title": "Pipeline tracking",
+        "description": "Observer ricevono eventi durante workflow",
+        "code": "const logger = { update: (event, data) => console.log(`[LOG] ${event}`) };\nprocessor.subscribe(logger);\nprocessor.process('data'); // Logs all steps"
+      }
+    ],
+    "solutionAdvantages": [
+      "Workflow processamento standardizzato",
+      "Observer tracciano progresso in tempo reale",
+      "Pipeline estensibile con nuovi formati"
     ]
   }
 ]

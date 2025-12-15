@@ -30,7 +30,9 @@ import {
   CodeOutlined,
   RocketOutlined,
   WarningOutlined,
-  LinkOutlined
+  LinkOutlined,
+  CloseCircleOutlined,
+  AimOutlined
 } from '@ant-design/icons';
 import Link from 'next/link';
 import CodeBlock from '../../CodeBlock/CodeBlock';
@@ -40,6 +42,20 @@ import './PatternLayout.scss';
 interface PatternLayoutProps {
   pattern: PatternTheory;
 }
+
+// Helper function to get icon for example type
+const getExampleIcon = (type: 'problem' | 'solution' | 'example') => {
+  switch (type) {
+    case 'problem':
+      return <CloseCircleOutlined className="pattern-layout__example-icon pattern-layout__example-icon--problem" />;
+    case 'solution':
+      return <CheckCircleOutlined className="pattern-layout__example-icon pattern-layout__example-icon--solution" />;
+    case 'example':
+      return <AimOutlined className="pattern-layout__example-icon pattern-layout__example-icon--example" />;
+    default:
+      return <CodeOutlined className="pattern-layout__example-icon" />;
+  }
+};
 
 export default function PatternLayout({ pattern }: PatternLayoutProps) {
   return (
@@ -103,7 +119,7 @@ export default function PatternLayout({ pattern }: PatternLayoutProps) {
               ),
               children: (
                 <div>
-                  <p className="pattern-layout__collapse-content mb-4">
+                  <p className="pattern-layout__collapse-content">
                     {pattern.structure}
                   </p>
                   <div className="pattern-layout__collapse-participants">
@@ -136,7 +152,10 @@ export default function PatternLayout({ pattern }: PatternLayoutProps) {
           <Space orientation="vertical" size="large" className="w-full">
             {pattern.codeExamples.map((example, index) => (
               <div key={index} className="pattern-layout__card-example">
-                <h4 className="pattern-layout__card-example-title">{example.title}</h4>
+                <h4 className="pattern-layout__card-example-title">
+                  {getExampleIcon(example.type)}
+                  {example.title}
+                </h4>
                 <p className="pattern-layout__card-example-description">
                   {example.description}
                 </p>

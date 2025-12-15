@@ -26,7 +26,8 @@ import { useState, useEffect } from "react";
 import type { Category, PatternExample, Team } from "@/lib/types";
 import { getRandomExampleByPatternCount } from "@/lib/examples";
 import ExampleViewer from "../ExampleViewer/ExampleViewer";
-import { Card, Button } from "antd";
+import CategoryButton from "../CategoryButton/CategoryButton";
+import { Card, Button, Space } from "antd";
 import {
     TrophyOutlined,
     EyeOutlined,
@@ -115,31 +116,34 @@ export default function RoundController({ teams, onUpdateTeams }: RoundControlle
     };
 
     return (
-        <div className="round-controller">
+        <div className="min-h-screen bg-navy-dark mb-24 md:mb-0">
             {/* Scoreboard Card */}
-            <Card className="round-controller__scoreboard">
-                <div className="round-controller__scoreboard-header">
-                    <TrophyOutlined className="round-controller__scoreboard-icon" />
-                    <h2 className="round-controller__scoreboard-title">Classifica</h2>
+            <Card className="bg-beige-card rounded-lg p-6 md:p-4 mb-8 md:mb-6 border-2 border-navy-light">
+                <div className="flex items-center gap-2 mb-6">
+                    <TrophyOutlined className="text-2xl text-yellow-primary" />
+                    <h2 className="m-0 text-navy-dark text-2xl font-bold">Classifica</h2>
                 </div>
-                <div className="round-controller__team-scores">
+                <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-4 md:grid-cols-1 md:gap-3">
                     {[...teams]
                         .sort((a, b) => b.score - a.score)
                         .map((team, index) => (
-                            <div key={team.id} className="round-controller__team-score">
-                                <div className="round-controller__team-score-info">
-                                    <span className="round-controller__team-rank">
+                            <div
+                                key={team.id}
+                                className="flex items-center gap-3 p-4 bg-white rounded-lg border-2 border-navy-light transition-all hover:border-pink-accent hover:-translate-y-0.5"
+                            >
+                                <div className="flex items-center gap-2 flex-1">
+                                    <span className="text-yellow-primary min-w-[35px] font-bold">
                                         #{index + 1}
                                     </span>
                                     <div
-                                        className="round-controller__team-color"
+                                        className="w-4 h-4 rounded-full border-2 border-navy-light"
                                         style={{ backgroundColor: team.color }}
                                     />
-                                    <span className="round-controller__team-name">
+                                    <span className="font-semibold text-navy-dark">
                                         {team.name}
                                     </span>
                                 </div>
-                                <span className="round-controller__team-points">
+                                <span className="text-yellow-primary font-bold whitespace-nowrap">
                                     {team.score} {team.score === 1 ? "punto" : "punti"}
                                 </span>
                             </div>
@@ -148,10 +152,13 @@ export default function RoundController({ teams, onUpdateTeams }: RoundControlle
             </Card>
 
             {/* Header with Round Number and Match Viewer */}
-            <div className="round-controller__header">
-                <h2 className="round-controller__round-title">Round {roundNumber}</h2>
+            <div className="flex justify-between items-center py-6 flex-col md:gap-4">
+                <h2 className="m-0 text-yellow-primary text-3xl mb-3 font-bold">
+                    Round {roundNumber}
+                </h2>
                 <Button
-                    className="round-controller__viewer-button"
+                    type="default"
+                    size="large"
                     icon={<EyeOutlined />}
                     onClick={() =>
                         window.open(
@@ -160,71 +167,53 @@ export default function RoundController({ teams, onUpdateTeams }: RoundControlle
                             "width=1400,height=900"
                         )
                     }
+                    className="!no-underline"
                 >
                     Match Viewer
                 </Button>
             </div>
 
             {!currentExample ? (
-                <Card className="round-controller__category-selection">
-                    <div className="round-controller__selection-content">
+                <Card className="bg-beige-card rounded-lg p-8 md:p-6 border-2 border-navy-light">
+                    <Space orientation="vertical" size="large" className="w-full">
                         {/* Category Selection */}
                         <div>
-                            <h3 className="round-controller__selection-title">
+                            <h3 className="text-navy-dark mb-4 text-xl font-semibold">
                                 Scegli la categoria:
                             </h3>
-                            <div className="round-controller__category-buttons">
-                                <button
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <CategoryButton
+                                    icon={<ToolOutlined />}
+                                    label="Creazionali"
+                                    selected={selectedCategory === "creational"}
                                     onClick={() => handleCategorySelect("creational")}
-                                    className={`round-controller__category-button ${
-                                        selectedCategory === "creational"
-                                            ? "round-controller__category-button--selected"
-                                            : ""
-                                    }`}
-                                >
-                                    <ToolOutlined className="round-controller__category-icon" />
-                                    <span>Creazionali</span>
-                                </button>
-                                <button
+                                />
+                                <CategoryButton
+                                    icon={<BlockOutlined />}
+                                    label="Strutturali"
+                                    selected={selectedCategory === "structural"}
                                     onClick={() => handleCategorySelect("structural")}
-                                    className={`round-controller__category-button ${
-                                        selectedCategory === "structural"
-                                            ? "round-controller__category-button--selected"
-                                            : ""
-                                    }`}
-                                >
-                                    <BlockOutlined className="round-controller__category-icon" />
-                                    <span>Strutturali</span>
-                                </button>
-                                <button
+                                />
+                                <CategoryButton
+                                    icon={<ThunderboltOutlined />}
+                                    label="Comportamentali"
+                                    selected={selectedCategory === "behavioral"}
                                     onClick={() => handleCategorySelect("behavioral")}
-                                    className={`round-controller__category-button ${
-                                        selectedCategory === "behavioral"
-                                            ? "round-controller__category-button--selected"
-                                            : ""
-                                    }`}
-                                >
-                                    <ThunderboltOutlined className="round-controller__category-icon" />
-                                    <span>Comportamentali</span>
-                                </button>
-                                <button
+                                />
+                                <CategoryButton
+                                    icon={<AppstoreOutlined />}
+                                    label="Tutte le categorie"
+                                    selected={selectedCategory === "all"}
                                     onClick={() => handleCategorySelect("all")}
-                                    className={`round-controller__category-button round-controller__category-button--all ${
-                                        selectedCategory === "all"
-                                            ? "round-controller__category-button--selected"
-                                            : ""
-                                    }`}
-                                >
-                                    <AppstoreOutlined className="round-controller__category-icon" />
-                                    <span>Tutte le categorie</span>
-                                </button>
+                                    fullWidth
+                                />
                             </div>
                         </div>
 
                         {/* Pattern Count Selection */}
                         {selectedCategory && (
                             <div>
-                                <h3 className="round-controller__selection-title">
+                                <h3 className="text-navy-dark mb-4 text-xl font-semibold">
                                     Quanti pattern deve contenere l'esempio?
                                 </h3>
                                 <div className="round-controller__pattern-count-buttons">
@@ -284,12 +273,12 @@ export default function RoundController({ teams, onUpdateTeams }: RoundControlle
                                 size="large"
                                 onClick={handleShowExample}
                                 block
-                                className="round-controller__show-example-button"
+                                className="px-12 py-4 font-semibold text-navy-dark bg-yellow-primary hover:bg-yellow-dark border-none rounded-lg"
                             >
                                 Mostra esempio
                             </Button>
                         )}
-                    </div>
+                    </Space>
                 </Card>
             ) : (
                 <>
@@ -300,53 +289,50 @@ export default function RoundController({ teams, onUpdateTeams }: RoundControlle
                     />
 
                     {solutionRevealed && (
-                        <Card className="round-controller__award-points">
-                            <h3 className="round-controller__award-title">
-                                Assegna Punto
-                            </h3>
-                            <p
-                                style={{
-                                    textAlign: "center",
-                                    marginBottom: "24px",
-                                    color: "#475569",
-                                }}
-                            >
-                                Quale squadra ha risposto correttamente?
-                            </p>
-                            <div className="round-controller__award-buttons">
-                                {teams.map((team) => (
-                                    <button
-                                        key={team.id}
-                                        onClick={() => handleAwardPoint(team.id)}
-                                        className="round-controller__award-button"
-                                        style={{ borderColor: team.color }}
+                        <div className="mt-8">
+                            <Card className="bg-beige-card">
+                                <h3 className="m-0 mb-6 text-center text-navy-dark text-2xl font-bold">
+                                    Assegna Punto
+                                </h3>
+                                <p className="text-center mb-6 text-gray-600">
+                                    Quale squadra ha risposto correttamente?
+                                </p>
+                                <div className="grid grid-cols-[repeat(auto-fit,minmax(180px,1fr))] gap-4 md:grid-cols-1">
+                                    {teams.map((team) => (
+                                        <button
+                                            key={team.id}
+                                            onClick={() => handleAwardPoint(team.id)}
+                                            className="flex items-center gap-2 px-5 py-4 bg-white border-[3px] rounded-lg font-semibold cursor-pointer transition-all text-navy-dark hover:-translate-y-0.5 hover:bg-beige-light"
+                                            style={{ borderColor: team.color }}
+                                        >
+                                            <div
+                                                className="w-[18px] h-[18px] rounded-full border-2 border-navy-light"
+                                                style={{ backgroundColor: team.color }}
+                                            />
+                                            <span>{team.name}</span>
+                                            <span className="text-gray-600 ml-auto">
+                                                ({team.score})
+                                            </span>
+                                        </button>
+                                    ))}
+                                    <Button
+                                        type="primary"
+                                        size="large"
+                                        onClick={handleNextRound}
+                                        className="col-span-full"
                                     >
-                                        <div
-                                            className="round-controller__award-button-color"
-                                            style={{ backgroundColor: team.color }}
-                                        />
-                                        <span>{team.name}</span>
-                                        <span className="round-controller__award-button-score">
-                                            ({team.score})
-                                        </span>
-                                    </button>
-                                ))}
-                                <Button
-                                    size="large"
-                                    onClick={handleNextRound}
-                                    className="round-controller__skip-button"
-                                >
-                                    Nessuna risposta corretta →
-                                </Button>
-                            </div>
-                        </Card>
+                                        Nessuna risposta corretta →
+                                    </Button>
+                                </div>
+                            </Card>
+                        </div>
                     )}
                 </>
             )}
 
             {/* Stats Footer */}
-            <div className="round-controller__stats">
-                <p>Esempi usati: {usedExampleIds.length}</p>
+            <div className="mt-8 text-center text-white">
+                <p className="my-1">Esempi usati: {usedExampleIds.length}</p>
             </div>
         </div>
     );

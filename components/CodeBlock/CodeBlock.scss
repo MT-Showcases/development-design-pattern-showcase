@@ -28,7 +28,7 @@
 
     &__header {
         position: sticky;
-        top: fn.rem(104); // Navbar (64px) + Breadcrumb (56px)
+        top: var(--sticky-top-offset); // Dynamic: 48px (navbar only) or 104px (navbar + breadcrumb)
         z-index: $z-30;
         display: flex;
         justify-content: space-between;
@@ -47,49 +47,6 @@
         font-weight: 600;
         font-size: fn.rem(12);
         letter-spacing: fn.rem(1);
-    }
-
-    &__chatgpt-button {
-        color: $info !important;
-        border: fn.rem(1) solid $info;
-        padding: $spacing-2 $spacing-4;
-        height: auto;
-        
-        &:hover {
-            background-color: $info !important;
-            color: $white !important;
-            border-color: $info !important;
-        }
-    }
-
-    &__playground-button {
-        color: $success !important;
-        border: fn.rem(1) solid $success;
-        padding: $spacing-2 $spacing-4;
-        height: auto;
-        
-        &:hover {
-            background-color: $success !important;
-            color: $white !important;
-            border-color: $success !important;
-        }
-    }
-
-    &__copy-button {
-        background-color: $yellow-primary;
-        color: $navy-dark;
-        border: none;
-        padding: $spacing-2 $spacing-4;
-        height: auto;
-        
-        &:hover {
-            background-color: color.adjust($yellow-primary, $lightness: -10%);
-        }
-        
-        &--copied {
-            background-color: $success;
-            color: $white;
-        }
     }
 
     &__editor {

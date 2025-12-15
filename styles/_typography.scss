@@ -64,8 +64,7 @@
 @use './functions' as fn;
 
 // === FONT FAMILIES (mirror Ant Design theme) ===
-$font-primary: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-  'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+$font-primary: var(--font-inter), -apple-system, BlinkMacSystemFont, sans-serif;
 
 $font-mono: 'Courier New', Courier, 'SF Mono', Monaco, 'Cascadia Code', 
   'Roboto Mono', monospace;

@@ -1,152 +1,757 @@
 [
-  {
-    "id": "structural-01",
-    "title": "Convertitore unità di misura",
-    "category": "structural",
-    "code": "class EuropeanSocket {\n  plugIn() {\n    return '220V corrente europea';\n  }\n}\n\nclass AmericanDevice {\n  connect(voltage) {\n    if (voltage === '110V') {\n      return 'Dispositivo connesso';\n    }\n    throw new Error('Voltaggio non compatibile');\n  }\n}\n\nclass PowerConverter {\n  constructor(socket) {\n    this.socket = socket;\n  }\n\n  connect() {\n    const power = this.socket.plugIn();\n    // Converte 220V a 110V\n    return '110V corrente convertita';\n  }\n}\n\nconst socket = new EuropeanSocket();\nconst adapter = new PowerAdapter(socket);\nconst device = new AmericanDevice();\ndevice.connect(adapter.connect());",
-    "solutionExplanation": "Adapter converte l'interfaccia di una classe in un'altra interfaccia che il client si aspetta. PowerAdapter permette a dispositivi americani (110V) di funzionare con prese europee (220V), facendo da tramite tra interfacce incompatibili.",
-    "solutionPatterns": [
-      "Adapter"
-    ]
-  },
-  {
-    "id": "structural-02",
-    "title": "Gestione file system",
-    "category": "structural",
-    "code": "class FileSystemItem {\n  constructor(name) {\n    this.name = name;\n  }\n  \n  getSize() {}\n}\n\nclass File extends FileSystemItem {\n  constructor(name, size) {\n    super(name);\n    this.size = size;\n  }\n\n  getSize() {\n    return this.size;\n  }\n}\n\nclass Folder extends FileSystemItem {\n  constructor(name) {\n    super(name);\n    this.children = [];\n  }\n\n  add(item) {\n    this.children.push(item);\n  }\n\n  getSize() {\n    return this.children.reduce((total, child) => \n      total + child.getSize(), 0\n    );\n  }\n}\n\nconst root = new Folder('root');\nconst docs = new Folder('docs');\ndocs.add(new File('report.pdf', 1024));\ndocs.add(new File('note.txt', 256));\nroot.add(docs);\nconsole.log(root.getSize()); // 1280",
-    "solutionExplanation": "Composite permette di trattare oggetti singoli e composizioni di oggetti in modo uniforme. Folder e File condividono la stessa interfaccia (getSize), permettendo di calcolare ricorsivamente le dimensioni di gerarchie complesse di file e cartelle.",
-    "solutionPatterns": [
-      "Composite"
-    ]
-  },
-  {
-    "id": "structural-03",
-    "title": "Sistema home banking",
-    "category": "structural",
-    "code": "class AccountService {\n  getBalance(accountId) {\n    return 1000;\n  }\n}\n\nclass TransactionService {\n  getHistory(accountId) {\n    return ['tx1', 'tx2'];\n  }\n}\n\nclass NotificationService {\n  sendAlert(message) {\n    console.log('Alert:', message);\n  }\n}\n\nclass BankingService {\n  constructor() {\n    this.accounts = new AccountService();\n    this.transactions = new TransactionService();\n    this.notifications = new NotificationService();\n  }\n\n  getAccountSummary(accountId) {\n    const balance = this.accounts.getBalance(accountId);\n    const history = this.transactions.getHistory(accountId);\n    return { balance, history };\n  }\n\n  withdraw(accountId, amount) {\n    const balance = this.accounts.getBalance(accountId);\n    if (balance >= amount) {\n      this.notifications.sendAlert('Prelievo effettuato');\n      return true;\n    }\n    return false;\n  }\n}\n\nconst bank = new BankingFacade();\nbank.withdraw('ACC001', 100);",
-    "solutionExplanation": "Facade fornisce un'interfaccia unificata a un insieme di interfacce in un sottosistema. BankingFacade semplifica l'interazione con servizi bancari complessi (conti, transazioni, notifiche) offrendo metodi di alto livello facili da usare.",
-    "solutionPatterns": [
-      "Facade"
-    ]
-  },
-  {
-    "id": "structural-04",
-    "title": "Caricamento immagini lazy",
-    "category": "structural",
-    "code": "class RealImage {\n  constructor(filename) {\n    this.filename = filename;\n    this.loadFromDisk();\n  }\n\n  loadFromDisk() {\n    console.log('Caricamento', this.filename, 'da disco...');\n  }\n\n  display() {\n    console.log('Visualizzazione', this.filename);\n  }\n}\n\nclass ImagePlaceholder {\n  constructor(filename) {\n    this.filename = filename;\n    this.realImage = null;\n  }\n\n  display() {\n    if (!this.realImage) {\n      this.realImage = new RealImage(this.filename);\n    }\n    this.realImage.display();\n  }\n}\n\nconst image = new ImageProxy('photo.jpg');\n// Nessun caricamento fino a qui\nimage.display(); // Carica e visualizza\nimage.display(); // Solo visualizza",
-    "solutionExplanation": "Proxy fornisce un surrogato o segnaposto per controllare l'accesso a un oggetto. ImageProxy ritarda il caricamento dell'immagine dal disco fino a quando non è realmente necessaria (lazy loading), migliorando le performance dell'applicazione.",
-    "solutionPatterns": [
-      "Proxy"
-    ]
-  },
-  {
-    "id": "structural-05",
-    "title": "Caffetteria con extra",
-    "category": "structural",
-    "code": "class Coffee {\n  cost() {\n    return 2;\n  }\n  \n  description() {\n    return 'Caffè';\n  }\n}\n\nclass MilkWrapper {\n  constructor(coffee) {\n    this.coffee = coffee;\n  }\n\n  cost() {\n    return this.coffee.cost() + 0.5;\n  }\n\n  description() {\n    return this.coffee.description() + ' + Latte';\n  }\n}\n\nclass SugarWrapper {\n  constructor(coffee) {\n    this.coffee = coffee;\n  }\n\n  cost() {\n    return this.coffee.cost() + 0.2;\n  }\n\n  description() {\n    return this.coffee.description() + ' + Zucchero';\n  }\n}\n\nlet myCoffee = new Coffee();\nmyCoffee = new MilkDecorator(myCoffee);\nmyCoffee = new SugarDecorator(myCoffee);\nconsole.log(myCoffee.description(), '€' + myCoffee.cost());",
-    "solutionExplanation": "Decorator aggiunge dinamicamente responsabilità a un oggetto. I decoratori MilkDecorator e SugarDecorator avvolgono l'oggetto Coffee aggiungendo funzionalità (ingredienti extra) senza modificare la classe originale, permettendo combinazioni flessibili.",
-    "solutionPatterns": [
-      "Decorator"
-    ]
-  },
-  {
-    "id": "structural-06",
-    "title": "Lettore MP3 e formati audio",
-    "category": "structural",
-    "code": "class MP3Player {\n  playMP3(filename) {\n    console.log('Playing MP3:', filename);\n  }\n}\n\nclass VLCPlayer {\n  playVLC(filename) {\n    console.log('Playing VLC:', filename);\n  }\n}\n\nclass AudioConverter {\n  constructor(audioType) {\n    if (audioType === 'vlc') {\n      this.player = new VLCPlayer();\n    }\n  }\n\n  play(audioType, filename) {\n    if (audioType === 'vlc') {\n      this.player.playVLC(filename);\n    }\n  }\n}\n\nclass UniversalPlayer {\n  play(audioType, filename) {\n    if (audioType === 'mp3') {\n      const mp3 = new MP3Player();\n      mp3.playMP3(filename);\n    } else {\n      const adapter = new AudioAdapter(audioType);\n      adapter.play(audioType, filename);\n    }\n  }\n}\n\nconst player = new UniversalPlayer();\nplayer.play('mp3', 'song.mp3');\nplayer.play('vlc', 'movie.vlc');",
-    "solutionExplanation": "Adapter converte interfacce incompatibili per farle collaborare. AudioAdapter permette a UniversalPlayer di riprodurre formati audio diversi (VLC) oltre a quelli nativi (MP3), adattando l'interfaccia di VLCPlayer.",
-    "solutionPatterns": [
-      "Adapter"
-    ]
-  },
-  {
-    "id": "structural-07",
-    "title": "Organizzazione aziendale",
-    "category": "structural",
-    "code": "class Employee {\n  constructor(name, position) {\n    this.name = name;\n    this.position = position;\n  }\n\n  getSalary() {}\n}\n\nclass Developer extends Employee {\n  constructor(name) {\n    super(name, 'Developer');\n    this.salary = 50000;\n  }\n\n  getSalary() {\n    return this.salary;\n  }\n}\n\nclass Manager extends Employee {\n  constructor(name) {\n    super(name, 'Manager');\n    this.salary = 70000;\n    this.subordinates = [];\n  }\n\n  add(employee) {\n    this.subordinates.push(employee);\n  }\n\n  getSalary() {\n    let total = this.salary;\n    for (let emp of this.subordinates) {\n      total += emp.getSalary();\n    }\n    return total;\n  }\n}\n\nconst cto = new Manager('Alice');\ncto.add(new Developer('Bob'));\ncto.add(new Developer('Carol'));\nconsole.log('Budget totale:', cto.getSalary());",
-    "solutionExplanation": "Composite organizza oggetti in strutture ad albero per rappresentare gerarchie. Manager e Developer hanno la stessa interfaccia (getSalary), permettendo di calcolare budget per singoli dipendenti o interi dipartimenti in modo uniforme.",
-    "solutionPatterns": [
-      "Composite"
-    ]
-  },
-  {
-    "id": "structural-08",
-    "title": "Smart TV con telecomando",
-    "category": "structural",
-    "code": "class SmartTV {\n  powerOn() { console.log('TV accesa'); }\n  setChannel(ch) { console.log('Canale:', ch); }\n  setVolume(vol) { console.log('Volume:', vol); }\n}\n\nclass SoundSystem {\n  powerOn() { console.log('Audio acceso'); }\n  setVolume(vol) { console.log('Volume audio:', vol); }\n}\n\nclass StreamingBox {\n  powerOn() { console.log('Streaming acceso'); }\n  openApp(app) { console.log('App:', app); }\n}\n\nclass HomeTheaterService {\n  constructor() {\n    this.tv = new SmartTV();\n    this.audio = new SoundSystem();\n    this.streaming = new StreamingBox();\n  }\n\n  watchMovie(app) {\n    this.tv.powerOn();\n    this.audio.powerOn();\n    this.streaming.powerOn();\n    this.streaming.openApp(app);\n    this.audio.setVolume(20);\n  }\n\n  shutdown() {\n    console.log('Spegnimento sistema...');\n  }\n}\n\nconst homeTheater = new HomeTheaterFacade();\nhomeTheater.watchMovie('Netflix');",
-    "solutionExplanation": "Facade semplifica un sottosistema complesso fornendo un'interfaccia di alto livello. HomeTheaterFacade nasconde la complessità di gestire TV, audio e streaming separatamente, offrendo operazioni semplici come watchMovie().",
-    "solutionPatterns": [
-      "Facade"
-    ]
-  },
-  {
-    "id": "structural-09",
-    "title": "Server proxy per API",
-    "category": "structural",
-    "code": "class APIServer {\n  request(endpoint) {\n    console.log('Richiesta API a:', endpoint);\n    return { data: 'Dati dal server' };\n  }\n}\n\nclass CachingPlaceholder {\n  constructor() {\n    this.server = new APIServer();\n    this.cache = new Map();\n  }\n\n  request(endpoint) {\n    if (this.cache.has(endpoint)) {\n      console.log('Risposta da cache');\n      return this.cache.get(endpoint);\n    }\n    \n    const response = this.server.request(endpoint);\n    this.cache.set(endpoint, response);\n    return response;\n  }\n}\n\nconst proxy = new CachingProxy();\nproxy.request('/users'); // Chiama server\nproxy.request('/users'); // Usa cache",
-    "solutionExplanation": "Proxy controlla l'accesso a un oggetto aggiungendo funzionalità. CachingProxy intercetta le richieste API e mantiene una cache, riducendo chiamate al server e migliorando le performance senza modificare APIServer.",
-    "solutionPatterns": [
-      "Proxy"
-    ]
-  },
-  {
-    "id": "structural-10",
-    "title": "Notifiche con priorità",
-    "category": "structural",
-    "code": "class Notification {\n  send(message) {\n    console.log('Notifica:', message);\n  }\n}\n\nclass UrgentWrapper {\n  constructor(notification) {\n    this.notification = notification;\n  }\n\n  send(message) {\n    this.notification.send('🚨 URGENTE: ' + message);\n  }\n}\n\nclass EncryptedWrapper {\n  constructor(notification) {\n    this.notification = notification;\n  }\n\n  send(message) {\n    const encrypted = btoa(message);\n    this.notification.send('🔒 ' + encrypted);\n  }\n}\n\nlet notif = new Notification();\nnotif = new UrgentDecorator(notif);\nnotif = new EncryptedDecorator(notif);\nnotif.send('Messaggio importante');",
-    "solutionExplanation": "Decorator aggiunge comportamenti a oggetti dinamicamente. UrgentDecorator e EncryptedDecorator avvolgono Notification aggiungendo funzionalità (urgenza, crittografia) in modo componibile e flessibile senza modificare la classe base.",
-    "solutionPatterns": [
-      "Decorator"
-    ]
-  },
-  {
-    "id": "structural-11",
-    "title": "Disegno forme grafiche",
-    "category": "structural",
-    "code": "class Renderer {\n  renderCircle(x, y, radius) {}\n  renderSquare(x, y, side) {}\n}\n\nclass VectorRenderer extends Renderer {\n  renderCircle(x, y, radius) {\n    console.log(`Vector circle at (${x},${y}) radius ${radius}`);\n  }\n}\n\nclass RasterRenderer extends Renderer {\n  renderSquare(x, y, side) {\n    console.log(`Raster square at (${x},${y}) side ${side}`);\n  }\n}\n\nclass Shape {\n  constructor(renderer) {\n    this.renderer = renderer;\n  }\n}\n\nclass Circle extends Shape {\n  constructor(renderer, x, y, radius) {\n    super(renderer);\n    this.x = x;\n    this.y = y;\n    this.radius = radius;\n  }\n\n  draw() {\n    this.renderer.renderCircle(this.x, this.y, this.radius);\n  }\n}\n\nconst circle = new Circle(new VectorRenderer(), 10, 10, 5);\ncircle.draw();",
-    "solutionExplanation": "Bridge separa un'astrazione dalla sua implementazione permettendo di variarle indipendentemente. Shape e Renderer possono evolversi separatamente: possiamo avere nuove forme o nuovi renderer senza modificare l'altro lato.",
-    "solutionPatterns": [
-      "Bridge"
-    ]
-  },
-  {
-    "id": "structural-12",
-    "title": "Gestione icone applicazioni",
-    "category": "structural",
-    "code": "class IconImage {\n  constructor(type) {\n    this.type = type;\n    console.log(`Caricamento immagine icona: ${type}`);\n  }\n}\n\nclass Icon {\n  constructor(type, x, y) {\n    this.image = IconImage.getImage(type);\n    this.x = x;\n    this.y = y;\n  }\n\n  draw() {\n    console.log(`Disegno ${this.image.type} a (${this.x},${this.y})`);\n  }\n}\n\nIconImage.cache = new Map();\n\nIconImage.getImage = function(type) {\n  if (!IconImage.cache.has(type)) {\n    IconImage.cache.set(type, new IconImage(type));\n  }\n  return IconImage.cache.get(type);\n};\n\nconst icons = [\n  new Icon('folder', 10, 10),\n  new Icon('folder', 50, 10),\n  new Icon('file', 90, 10)\n];",
-    "solutionExplanation": "Flyweight riduce l'uso di memoria condividendo dati comuni tra oggetti simili. IconImage viene condivisa tra tutte le icone dello stesso tipo, memorizzando solo posizione in ogni Icon e riducendo drasticamente la memoria usata.",
-    "solutionPatterns": [
-      "Flyweight"
-    ]
-  },
-  {
-    "id": "structural-13",
-    "title": "Logger con timestamp",
-    "category": "structural",
-    "code": "class SimpleLogger {\n  log(message) {\n    console.log(message);\n  }\n}\n\nclass TimestampWrapper {\n  constructor(logger) {\n    this.logger = logger;\n  }\n\n  log(message) {\n    const timestamp = new Date().toISOString();\n    this.logger.log(`[${timestamp}] ${message}`);\n  }\n}\n\nclass LevelWrapper {\n  constructor(logger, level) {\n    this.logger = logger;\n    this.level = level;\n  }\n\n  log(message) {\n    this.logger.log(`[${this.level}] ${message}`);\n  }\n}\n\nlet logger = new SimpleLogger();\nlogger = new TimestampDecorator(logger);\nlogger = new LevelDecorator(logger, 'INFO');\nlogger.log('Sistema avviato');",
-    "solutionExplanation": "Decorator estende la funzionalità di un oggetto senza modificarlo. TimestampDecorator e LevelDecorator aggiungono timestamp e livello di log in modo componibile, permettendo di personalizzare il logger con diverse combinazioni di funzionalità.",
-    "solutionPatterns": [
-      "Decorator"
-    ]
-  },
-  {
-    "id": "structural-14",
-    "title": "Menu ristorante nidificato",
-    "category": "structural",
-    "code": "class MenuComponent {\n  constructor(name) {\n    this.name = name;\n  }\n\n  getPrice() {}\n  print() {}\n}\n\nclass MenuItem extends MenuComponent {\n  constructor(name, price) {\n    super(name);\n    this.price = price;\n  }\n\n  getPrice() {\n    return this.price;\n  }\n\n  print() {\n    console.log(`${this.name}: €${this.price}`);\n  }\n}\n\nclass MenuCategory extends MenuComponent {\n  constructor(name) {\n    super(name);\n    this.items = [];\n  }\n\n  add(item) {\n    this.items.push(item);\n  }\n\n  getPrice() {\n    return this.items.reduce((sum, item) => sum + item.getPrice(), 0);\n  }\n\n  print() {\n    console.log(`\\n=== ${this.name} ===`);\n    this.items.forEach(item => item.print());\n  }\n}\n\nconst menu = new MenuCategory('Menu completo');\nconst appetizers = new MenuCategory('Antipasti');\nappetizers.add(new MenuItem('Bruschetta', 5));\nappetizers.add(new MenuItem('Caprese', 7));\nmenu.add(appetizers);\nmenu.print();",
-    "solutionExplanation": "Composite permette di trattare uniformemente oggetti singoli e composizioni. MenuItem e MenuCategory implementano la stessa interfaccia, permettendo di creare menu gerarchici (categorie e sottocategorie) e calcolare prezzi totali ricorsivamente.",
-    "solutionPatterns": [
-      "Composite"
-    ]
-  },
-  {
-    "id": "structural-15",
-    "title": "Protezione accesso documenti",
-    "category": "structural",
-    "code": "class SecureDocument {\n  constructor(content) {\n    this.content = content;\n  }\n\n  read() {\n    return this.content;\n  }\n}\n\nclass DocumentPlaceholder {\n  constructor(content, userRole) {\n    this.document = new SecureDocument(content);\n    this.userRole = userRole;\n  }\n\n  read() {\n    if (this.userRole === 'admin' || this.userRole === 'editor') {\n      return this.document.read();\n    }\n    return 'Accesso negato: permessi insufficienti';\n  }\n}\n\nconst doc1 = new DocumentProxy('Dati riservati', 'admin');\nconsole.log(doc1.read()); // Mostra contenuto\n\nconst doc2 = new DocumentProxy('Dati riservati', 'guest');\nconsole.log(doc2.read()); // Accesso negato",
-    "solutionExplanation": "Proxy controlla l'accesso a un oggetto aggiungendo logica di sicurezza. DocumentProxy verifica i permessi dell'utente prima di permettere l'accesso al documento, implementando un controllo degli accessi senza modificare SecureDocument.",
-    "solutionPatterns": [
-      "Proxy"
-    ]
-  }
+    {
+        "id": "structural-01",
+        "title": "API di pagamento esterna",
+        "category": "structural",
+        "code": "// Sistema legacy con interfaccia diversa\nclass StripeAPI {\n  makePayment(amount, currency) {\n    return { success: true, charged: `${amount} ${currency}` };\n  }\n}\n\n// Nostra interfaccia standard\nclass PaymentGateway {\n  processPayment(euros) {\n    console.log(`Pagamento di €${euros}`);\n  }\n}\n\n// Wrapper che adatta Stripe alla nostra interfaccia\nclass StripeGateway extends PaymentGateway {\n  constructor() {\n    super();\n    this.stripe = new StripeAPI();\n  }\n\n  processPayment(euros) {\n    const result = this.stripe.makePayment(euros, 'EUR');\n    console.log('Stripe:', result.charged);\n  }\n}\n\nconst payment = new StripeGateway();\npayment.processPayment(99.99);",
+        "solutionPatterns": ["Adapter"],
+        "solutionExplanation": "Il <strong>Adapter</strong> converte l'interfaccia di una classe esistente in quella che il client si aspetta. StripeGateway adatta l'API di Stripe (makePayment) alla nostra interfaccia standard (processPayment), permettendo di integrare servizi esterni senza modificare il codice client.",
+        "solutionSteps": [
+            {
+                "title": "Interfaccia incompatibile",
+                "description": "Stripe ha un metodo diverso (makePayment) dal nostro standard",
+                "code": "class StripeAPI {\n  makePayment(amount, currency) {\n    return { success: true, charged: `${amount} ${currency}` };\n  }\n}"
+            },
+            {
+                "title": "Wrapper adapter",
+                "description": "Wrapper che estende la nostra interfaccia standard",
+                "code": "class StripeGateway extends PaymentGateway {\n  constructor() {\n    super();\n    this.stripe = new StripeAPI();\n  }\n}"
+            },
+            {
+                "title": "Adattamento chiamata",
+                "description": "Traduce processPayment() in makePayment()",
+                "code": "processPayment(euros) {\n  const result = this.stripe.makePayment(euros, 'EUR');\n  console.log('Stripe:', result.charged);\n}"
+            }
+        ],
+        "solutionAdvantages": [
+            "Integra API esterne senza modificare il client",
+            "Facilita cambio provider di pagamento",
+            "Interfaccia uniforme per servizi diversi"
+        ]
+    },
+    {
+        "id": "structural-02",
+        "title": "Gestione file e cartelle",
+        "category": "structural",
+        "code": "class FileSystemItem {\n  constructor(name) {\n    this.name = name;\n  }\n  \n  getSize() {}\n}\n\nclass File extends FileSystemItem {\n  constructor(name, size) {\n    super(name);\n    this.size = size;\n  }\n\n  getSize() {\n    return this.size;\n  }\n}\n\nclass Folder extends FileSystemItem {\n  constructor(name) {\n    super(name);\n    this.children = [];\n  }\n\n  add(item) {\n    this.children.push(item);\n  }\n\n  getSize() {\n    return this.children.reduce((total, child) => \n      total + child.getSize(), 0\n    );\n  }\n}\n\nconst root = new Folder('root');\nconst docs = new Folder('docs');\ndocs.add(new File('report.pdf', 1024));\ndocs.add(new File('note.txt', 256));\nroot.add(docs);\nconsole.log(root.getSize()); // 1280",
+        "solutionPatterns": ["Composite"],
+        "solutionExplanation": "Il <strong>Composite</strong> permette di trattare oggetti singoli e composizioni in modo uniforme. Folder e File condividono la stessa interfaccia (getSize), permettendo di calcolare ricorsivamente le dimensioni di gerarchie complesse senza distinguere tra file e cartelle.",
+        "solutionSteps": [
+            {
+                "title": "Interfaccia comune",
+                "description": "File e Folder estendono la stessa classe base",
+                "code": "class FileSystemItem {\n  constructor(name) {\n    this.name = name;\n  }\n  getSize() {}\n}"
+            },
+            {
+                "title": "Foglia (File)",
+                "description": "File implementa getSize ritornando la propria dimensione",
+                "code": "class File extends FileSystemItem {\n  getSize() {\n    return this.size;\n  }\n}"
+            },
+            {
+                "title": "Composito (Folder)",
+                "description": "Folder calcola getSize sommando i figli ricorsivamente",
+                "code": "class Folder extends FileSystemItem {\n  getSize() {\n    return this.children.reduce((total, child) => \n      total + child.getSize(), 0\n    );\n  }\n}"
+            },
+            {
+                "title": "Uso uniforme",
+                "description": "Client chiama getSize senza sapere se è File o Folder",
+                "code": "const root = new Folder('root');\nroot.add(docs);\nconsole.log(root.getSize());"
+            }
+        ],
+        "solutionAdvantages": [
+            "Tratta singoli e gruppi uniformemente",
+            "Gerarchie complesse facilmente gestibili",
+            "Operazioni ricorsive semplificate"
+        ]
+    },
+    {
+        "id": "structural-03",
+        "title": "Sistema bancario online",
+        "category": "structural",
+        "code": "// Servizi complessi separati\nclass AccountService {\n  getBalance(accountId) {\n    return 1000;\n  }\n}\n\nclass TransactionService {\n  getHistory(accountId) {\n    return ['tx1', 'tx2'];\n  }\n}\n\nclass NotificationService {\n  sendAlert(message) {\n    console.log('Alert:', message);\n  }\n}\n\n// Interfaccia semplificata\nclass BankingService {\n  constructor() {\n    this.accounts = new AccountService();\n    this.transactions = new TransactionService();\n    this.notifications = new NotificationService();\n  }\n\n  withdraw(accountId, amount) {\n    const balance = this.accounts.getBalance(accountId);\n    if (balance >= amount) {\n      this.notifications.sendAlert('Prelievo effettuato');\n      return true;\n    }\n    return false;\n  }\n}\n\nconst bank = new BankingService();\nbank.withdraw('ACC001', 100);",
+        "solutionPatterns": ["Facade"],
+        "solutionExplanation": "Il <strong>Facade</strong> fornisce un'interfaccia unificata a un insieme di interfacce in un sottosistema complesso. BankingService nasconde la complessità di gestire conti, transazioni e notifiche separatamente, offrendo metodi semplici come withdraw() che orchestrano più servizi.",
+        "solutionSteps": [
+            {
+                "title": "Sottosistemi complessi",
+                "description": "Tre servizi separati con logiche indipendenti",
+                "code": "class AccountService { getBalance(accountId) {...} }\nclass TransactionService { getHistory(accountId) {...} }\nclass NotificationService { sendAlert(message) {...} }"
+            },
+            {
+                "title": "Facade unificata",
+                "description": "BankingService coordina i tre sottosistemi",
+                "code": "class BankingService {\n  constructor() {\n    this.accounts = new AccountService();\n    this.transactions = new TransactionService();\n    this.notifications = new NotificationService();\n  }\n}"
+            },
+            {
+                "title": "Operazione semplificata",
+                "description": "Un metodo nasconde la complessità interna",
+                "code": "withdraw(accountId, amount) {\n  const balance = this.accounts.getBalance(accountId);\n  if (balance >= amount) {\n    this.notifications.sendAlert('Prelievo effettuato');\n    return true;\n  }\n}"
+            }
+        ],
+        "solutionAdvantages": [
+            "Interfaccia semplice per sottosistemi complessi",
+            "Riduce dipendenze del client",
+            "Facilita manutenzione e testing"
+        ]
+    },
+    {
+        "id": "structural-04",
+        "title": "Galleria immagini pesanti",
+        "category": "structural",
+        "code": "// Immagine reale pesante\nclass HighResImage {\n  constructor(filename) {\n    this.filename = filename;\n    this.loadFromDisk();\n  }\n\n  loadFromDisk() {\n    console.log(`Caricamento ${this.filename} da disco...`);\n  }\n\n  display() {\n    console.log(`Visualizzazione ${this.filename}`);\n  }\n}\n\n// Placeholder che carica solo quando serve\nclass ImagePlaceholder {\n  constructor(filename) {\n    this.filename = filename;\n    this.realImage = null;\n  }\n\n  display() {\n    if (!this.realImage) {\n      this.realImage = new HighResImage(this.filename);\n    }\n    this.realImage.display();\n  }\n}\n\nconst image = new ImagePlaceholder('photo.jpg');\n// Nessun caricamento fino a qui\nimage.display(); // Ora carica e visualizza\nimage.display(); // Solo visualizza",
+        "solutionPatterns": ["Proxy"],
+        "solutionExplanation": "Il <strong>Proxy</strong> fornisce un surrogato che controlla l'accesso a un oggetto. ImagePlaceholder ritarda il caricamento dell'immagine pesante dal disco fino a quando non è realmente necessaria (lazy loading), migliorando le performance iniziali dell'applicazione.",
+        "solutionSteps": [
+            {
+                "title": "Oggetto pesante",
+                "description": "HighResImage carica subito dal disco nel costruttore",
+                "code": "class HighResImage {\n  constructor(filename) {\n    this.filename = filename;\n    this.loadFromDisk();\n  }\n}"
+            },
+            {
+                "title": "Proxy leggero",
+                "description": "ImagePlaceholder non carica finché non serve",
+                "code": "class ImagePlaceholder {\n  constructor(filename) {\n    this.filename = filename;\n    this.realImage = null;\n  }\n}"
+            },
+            {
+                "title": "Lazy loading",
+                "description": "Crea l'oggetto pesante solo alla prima chiamata display()",
+                "code": "display() {\n  if (!this.realImage) {\n    this.realImage = new HighResImage(this.filename);\n  }\n  this.realImage.display();\n}"
+            }
+        ],
+        "solutionAdvantages": [
+            "Startup più veloce (lazy loading)",
+            "Memoria ottimizzata (carica solo se serve)",
+            "Trasparente per il client"
+        ]
+    },
+    {
+        "id": "structural-05",
+        "title": "Caffetteria personalizzabile",
+        "category": "structural",
+        "code": "// Caffè base\nclass Coffee {\n  cost() {\n    return 2;\n  }\n  \n  description() {\n    return 'Caffè';\n  }\n}\n\n// Wrapper per latte\nclass MilkWrapper {\n  constructor(coffee) {\n    this.coffee = coffee;\n  }\n\n  cost() {\n    return this.coffee.cost() + 0.5;\n  }\n\n  description() {\n    return this.coffee.description() + ' + Latte';\n  }\n}\n\n// Wrapper per zucchero\nclass SugarWrapper {\n  constructor(coffee) {\n    this.coffee = coffee;\n  }\n\n  cost() {\n    return this.coffee.cost() + 0.2;\n  }\n\n  description() {\n    return this.coffee.description() + ' + Zucchero';\n  }\n}\n\nlet myCoffee = new Coffee();\nmyCoffee = new MilkWrapper(myCoffee);\nmyCoffee = new SugarWrapper(myCoffee);\nconsole.log(myCoffee.description(), '€' + myCoffee.cost());",
+        "solutionPatterns": ["Decorator"],
+        "solutionExplanation": "Il <strong>Decorator</strong> aggiunge dinamicamente responsabilità a un oggetto. I wrapper MilkWrapper e SugarWrapper avvolgono Coffee aggiungendo ingredienti extra senza modificare la classe originale, permettendo combinazioni flessibili e illimitate.",
+        "solutionSteps": [
+            {
+                "title": "Componente base",
+                "description": "Coffee ha metodi cost() e description()",
+                "code": "class Coffee {\n  cost() { return 2; }\n  description() { return 'Caffè'; }\n}"
+            },
+            {
+                "title": "Wrapper decorator",
+                "description": "MilkWrapper avvolge Coffee e aggiunge costo",
+                "code": "class MilkWrapper {\n  constructor(coffee) { this.coffee = coffee; }\n  cost() { return this.coffee.cost() + 0.5; }\n  description() { return this.coffee.description() + ' + Latte'; }\n}"
+            },
+            {
+                "title": "Composizione dinamica",
+                "description": "Wrapper si impilano aggiungendo funzionalità",
+                "code": "let myCoffee = new Coffee();\nmyCoffee = new MilkWrapper(myCoffee);\nmyCoffee = new SugarWrapper(myCoffee);"
+            }
+        ],
+        "solutionAdvantages": [
+            "Combinazioni illimitate senza subclassing",
+            "Aggiunge funzionalità a runtime",
+            "Single Responsibility rispettato"
+        ]
+    },
+    {
+        "id": "structural-06",
+        "title": "Lettore audio universale",
+        "category": "structural",
+        "code": "// Player nativo MP3\nclass MP3Player {\n  playMP3(filename) {\n    console.log('Playing MP3:', filename);\n  }\n}\n\n// Player esterno VLC\nclass VLCPlayer {\n  playVLC(filename) {\n    console.log('Playing VLC:', filename);\n  }\n}\n\n// Wrapper per VLC\nclass VLCPlayerWrapper {\n  constructor() {\n    this.player = new VLCPlayer();\n  }\n\n  playMP3(filename) {\n    this.player.playVLC(filename);\n  }\n}\n\n// Player universale\nclass UniversalPlayer {\n  play(audioType, filename) {\n    if (audioType === 'mp3') {\n      const mp3 = new MP3Player();\n      mp3.playMP3(filename);\n    } else if (audioType === 'vlc') {\n      const wrapper = new VLCPlayerWrapper();\n      wrapper.playMP3(filename);\n    }\n  }\n}\n\nconst player = new UniversalPlayer();\nplayer.play('vlc', 'movie.vlc');",
+        "solutionPatterns": ["Adapter"],
+        "solutionExplanation": "Il <strong>Adapter</strong> converte interfacce incompatibili per farle collaborare. VLCPlayerWrapper adatta l'interfaccia di VLCPlayer (playVLC) a quella standard (playMP3), permettendo a UniversalPlayer di supportare formati audio diversi con un'interfaccia uniforme.",
+        "solutionSteps": [
+            {
+                "title": "Interfaccia target",
+                "description": "MP3Player usa il metodo playMP3()",
+                "code": "class MP3Player {\n  playMP3(filename) {\n    console.log('Playing MP3:', filename);\n  }\n}"
+            },
+            {
+                "title": "Classe incompatibile",
+                "description": "VLCPlayer usa playVLC() invece di playMP3()",
+                "code": "class VLCPlayer {\n  playVLC(filename) {\n    console.log('Playing VLC:', filename);\n  }\n}"
+            },
+            {
+                "title": "Wrapper adapter",
+                "description": "VLCPlayerWrapper traduce playMP3 in playVLC",
+                "code": "class VLCPlayerWrapper {\n  playMP3(filename) {\n    this.player.playVLC(filename);\n  }\n}"
+            }
+        ],
+        "solutionAdvantages": [
+            "Supporto multi-formato trasparente",
+            "Integra librerie esterne facilmente",
+            "Client usa interfaccia uniforme"
+        ]
+    },
+    {
+        "id": "structural-07",
+        "title": "Organigramma aziendale",
+        "category": "structural",
+        "code": "// Base employee\nclass Employee {\n  constructor(name, position) {\n    this.name = name;\n    this.position = position;\n  }\n\n  getSalary() {}\n}\n\n// Singolo sviluppatore\nclass Developer extends Employee {\n  constructor(name) {\n    super(name, 'Developer');\n    this.salary = 50000;\n  }\n\n  getSalary() {\n    return this.salary;\n  }\n}\n\n// Manager con team\nclass Manager extends Employee {\n  constructor(name) {\n    super(name, 'Manager');\n    this.salary = 70000;\n    this.team = [];\n  }\n\n  add(employee) {\n    this.team.push(employee);\n  }\n\n  getSalary() {\n    let total = this.salary;\n    for (let emp of this.team) {\n      total += emp.getSalary();\n    }\n    return total;\n  }\n}\n\nconst cto = new Manager('Alice');\ncto.add(new Developer('Bob'));\ncto.add(new Developer('Carol'));\nconsole.log('Budget:', cto.getSalary());",
+        "solutionPatterns": ["Composite"],
+        "solutionExplanation": "Il <strong>Composite</strong> organizza oggetti in strutture ad albero per rappresentare gerarchie. Manager e Developer hanno la stessa interfaccia (getSalary), permettendo di calcolare budget per singoli dipendenti o interi dipartimenti in modo ricorsivo e uniforme.",
+        "solutionSteps": [
+            {
+                "title": "Interfaccia comune",
+                "description": "Employee è la base per tutti i dipendenti",
+                "code": "class Employee {\n  constructor(name, position) {...}\n  getSalary() {}\n}"
+            },
+            {
+                "title": "Foglia (Developer)",
+                "description": "Developer ritorna il proprio salario",
+                "code": "class Developer extends Employee {\n  getSalary() {\n    return this.salary;\n  }\n}"
+            },
+            {
+                "title": "Composito (Manager)",
+                "description": "Manager somma il proprio salario e quello del team",
+                "code": "class Manager extends Employee {\n  getSalary() {\n    let total = this.salary;\n    for (let emp of this.team) {\n      total += emp.getSalary();\n    }\n    return total;\n  }\n}"
+            }
+        ],
+        "solutionAdvantages": [
+            "Gerarchie aziendali facilmente gestibili",
+            "Calcoli ricorsivi su alberi organizzativi",
+            "Aggiunta nuovi livelli senza modifiche"
+        ]
+    },
+    {
+        "id": "structural-08",
+        "title": "Home theater controller",
+        "category": "structural",
+        "code": "// Componenti separati complessi\nclass SmartTV {\n  powerOn() { console.log('TV accesa'); }\n  setChannel(ch) { console.log('Canale:', ch); }\n}\n\nclass SoundSystem {\n  powerOn() { console.log('Audio acceso'); }\n  setVolume(vol) { console.log('Volume:', vol); }\n}\n\nclass StreamingBox {\n  powerOn() { console.log('Streaming acceso'); }\n  openApp(app) { console.log('App:', app); }\n}\n\n// Controllo unificato\nclass HomeTheaterController {\n  constructor() {\n    this.tv = new SmartTV();\n    this.audio = new SoundSystem();\n    this.streaming = new StreamingBox();\n  }\n\n  watchMovie(app) {\n    this.tv.powerOn();\n    this.audio.powerOn();\n    this.audio.setVolume(20);\n    this.streaming.powerOn();\n    this.streaming.openApp(app);\n    console.log('Sistema pronto!');\n  }\n}\n\nconst homeTheater = new HomeTheaterController();\nhomeTheater.watchMovie('Netflix');",
+        "solutionPatterns": ["Facade"],
+        "solutionExplanation": "Il <strong>Facade</strong> semplifica un sottosistema complesso fornendo un'interfaccia di alto livello. HomeTheaterController nasconde la complessità di gestire TV, audio e streaming separatamente, offrendo un'operazione semplice come watchMovie() che orchestra tutti i componenti.",
+        "solutionSteps": [
+            {
+                "title": "Sottosistemi complessi",
+                "description": "Tre dispositivi con interfacce diverse",
+                "code": "class SmartTV { powerOn() {...} setChannel(ch) {...} }\nclass SoundSystem { powerOn() {...} setVolume(vol) {...} }\nclass StreamingBox { powerOn() {...} openApp(app) {...} }"
+            },
+            {
+                "title": "Facade coordinator",
+                "description": "Controller inizializza tutti i sottosistemi",
+                "code": "class HomeTheaterController {\n  constructor() {\n    this.tv = new SmartTV();\n    this.audio = new SoundSystem();\n    this.streaming = new StreamingBox();\n  }\n}"
+            },
+            {
+                "title": "Operazione semplificata",
+                "description": "watchMovie() orchestra tutti i componenti in sequenza",
+                "code": "watchMovie(app) {\n  this.tv.powerOn();\n  this.audio.powerOn();\n  this.audio.setVolume(20);\n  this.streaming.openApp(app);\n}"
+            }
+        ],
+        "solutionAdvantages": [
+            "Un comando per operazioni complesse",
+            "Nasconde complessità hardware",
+            "Workflow predefiniti riutilizzabili"
+        ]
+    },
+    {
+        "id": "structural-09",
+        "title": "Cache per API REST",
+        "category": "structural",
+        "code": "// Server API reale\nclass APIServer {\n  request(endpoint) {\n    console.log('HTTP request to:', endpoint);\n    return { data: `Dati da ${endpoint}` };\n  }\n}\n\n// Proxy con cache\nclass CachedAPI {\n  constructor() {\n    this.server = new APIServer();\n    this.cache = new Map();\n  }\n\n  request(endpoint) {\n    if (this.cache.has(endpoint)) {\n      console.log('Cache hit:', endpoint);\n      return this.cache.get(endpoint);\n    }\n    \n    console.log('Cache miss, fetching...');\n    const response = this.server.request(endpoint);\n    this.cache.set(endpoint, response);\n    return response;\n  }\n}\n\nconst api = new CachedAPI();\napi.request('/users'); // Fetch from server\napi.request('/users'); // Serve from cache",
+        "solutionPatterns": ["Proxy"],
+        "solutionExplanation": "Il <strong>Proxy</strong> controlla l'accesso a un oggetto aggiungendo funzionalità extra. CachedAPI intercetta le richieste HTTP e mantiene una cache in memoria, riducendo chiamate al server e migliorando le performance senza modificare APIServer.",
+        "solutionSteps": [
+            {
+                "title": "Subject reale",
+                "description": "APIServer fa richieste HTTP costose",
+                "code": "class APIServer {\n  request(endpoint) {\n    console.log('HTTP request to:', endpoint);\n    return { data: `Dati da ${endpoint}` };\n  }\n}"
+            },
+            {
+                "title": "Proxy con cache",
+                "description": "CachedAPI wrappa APIServer con una Map",
+                "code": "class CachedAPI {\n  constructor() {\n    this.server = new APIServer();\n    this.cache = new Map();\n  }\n}"
+            },
+            {
+                "title": "Controllo accesso",
+                "description": "Verifica cache prima di chiamare il server",
+                "code": "request(endpoint) {\n  if (this.cache.has(endpoint)) {\n    return this.cache.get(endpoint);\n  }\n  const response = this.server.request(endpoint);\n  this.cache.set(endpoint, response);\n}"
+            }
+        ],
+        "solutionAdvantages": [
+            "Riduce latency e traffico di rete",
+            "Trasparente per il client",
+            "Cache strategy centralizzata"
+        ]
+    },
+    {
+        "id": "structural-10",
+        "title": "Sistema di notifiche avanzato",
+        "category": "structural",
+        "code": "// Notifica base\nclass Notification {\n  send(message) {\n    console.log('Notifica:', message);\n  }\n}\n\n// Wrapper per urgenza\nclass UrgentWrapper {\n  constructor(notification) {\n    this.notification = notification;\n  }\n\n  send(message) {\n    this.notification.send('🚨 URGENTE: ' + message);\n  }\n}\n\n// Wrapper per crittografia\nclass EncryptedWrapper {\n  constructor(notification) {\n    this.notification = notification;\n  }\n\n  send(message) {\n    const encrypted = btoa(message);\n    this.notification.send('🔒 ' + encrypted);\n  }\n}\n\nlet notif = new Notification();\nnotif = new UrgentWrapper(notif);\nnotif = new EncryptedWrapper(notif);\nnotif.send('Messaggio importante');",
+        "solutionPatterns": ["Decorator"],
+        "solutionExplanation": "Il <strong>Decorator</strong> aggiunge comportamenti a oggetti dinamicamente. UrgentWrapper e EncryptedWrapper avvolgono Notification aggiungendo funzionalità (urgenza, crittografia) in modo componibile e flessibile, senza modificare la classe base né creare sottoclassi.",
+        "solutionSteps": [
+            {
+                "title": "Componente base",
+                "description": "Notification ha il metodo send() semplice",
+                "code": "class Notification {\n  send(message) {\n    console.log('Notifica:', message);\n  }\n}"
+            },
+            {
+                "title": "Decorator urgenza",
+                "description": "UrgentWrapper aggiunge prefisso urgenza",
+                "code": "class UrgentWrapper {\n  constructor(notification) { this.notification = notification; }\n  send(message) {\n    this.notification.send('🚨 URGENTE: ' + message);\n  }\n}"
+            },
+            {
+                "title": "Stacking decorators",
+                "description": "Wrapper si combinano aggiungendo più funzionalità",
+                "code": "let notif = new Notification();\nnotif = new UrgentWrapper(notif);\nnotif = new EncryptedWrapper(notif);"
+            }
+        ],
+        "solutionAdvantages": [
+            "Funzionalità componibili a runtime",
+            "Evita esplosione di sottoclassi",
+            "Ogni decorator ha singola responsabilità"
+        ]
+    },
+    {
+        "id": "structural-11",
+        "title": "Rendering forme grafiche",
+        "category": "structural",
+        "code": "// Implementazioni rendering\nclass VectorRenderer {\n  renderCircle(x, y, radius) {\n    console.log(`Vector circle at (${x},${y}) r=${radius}`);\n  }\n}\n\nclass RasterRenderer {\n  renderCircle(x, y, radius) {\n    console.log(`Raster circle at (${x},${y}) r=${radius}`);\n  }\n}\n\n// Astrazione forma\nclass Shape {\n  constructor(renderer) {\n    this.renderer = renderer;\n  }\n}\n\nclass Circle extends Shape {\n  constructor(renderer, x, y, radius) {\n    super(renderer);\n    this.x = x;\n    this.y = y;\n    this.radius = radius;\n  }\n\n  draw() {\n    this.renderer.renderCircle(this.x, this.y, this.radius);\n  }\n}\n\nconst vectorCircle = new Circle(new VectorRenderer(), 10, 10, 5);\nvectorCircle.draw();\n\nconst rasterCircle = new Circle(new RasterRenderer(), 20, 20, 8);\nrasterCircle.draw();",
+        "solutionPatterns": ["Bridge"],
+        "solutionExplanation": "Il <strong>Bridge</strong> separa un'astrazione dalla sua implementazione permettendo di variarle indipendentemente. Circle (astrazione) e VectorRenderer/RasterRenderer (implementazione) possono evolversi separatamente: possiamo avere nuove forme o nuovi motori di rendering senza modificare l'altro lato.",
+        "solutionSteps": [
+            {
+                "title": "Implementazioni separate",
+                "description": "Due motori di rendering con stessa interfaccia",
+                "code": "class VectorRenderer {\n  renderCircle(x, y, radius) {...}\n}\nclass RasterRenderer {\n  renderCircle(x, y, radius) {...}\n}"
+            },
+            {
+                "title": "Astrazione con bridge",
+                "description": "Shape riceve il renderer come dependency",
+                "code": "class Shape {\n  constructor(renderer) {\n    this.renderer = renderer;\n  }\n}"
+            },
+            {
+                "title": "Delegazione al bridge",
+                "description": "Circle delega al renderer ricevuto",
+                "code": "class Circle extends Shape {\n  draw() {\n    this.renderer.renderCircle(this.x, this.y, this.radius);\n  }\n}"
+            }
+        ],
+        "solutionAdvantages": [
+            "Astrazione e implementazione indipendenti",
+            "Nuovi renderer senza modificare forme",
+            "Runtime binding tra astrazione e implementazione"
+        ]
+    },
+    {
+        "id": "structural-12",
+        "title": "Desktop con icone",
+        "category": "structural",
+        "code": "// Immagine condivisa (Flyweight)\nclass IconImage {\n  constructor(type) {\n    this.type = type;\n    console.log(`Caricata immagine: ${type}`);\n  }\n}\n\n// Icon con posizione unica\nclass Icon {\n  constructor(type, x, y) {\n    this.image = IconImage.getImage(type);\n    this.x = x;\n    this.y = y;\n  }\n\n  draw() {\n    console.log(`${this.image.type} a (${this.x},${this.y})`);\n  }\n}\n\n// Factory con cache\nIconImage.cache = new Map();\n\nIconImage.getImage = function(type) {\n  if (!IconImage.cache.has(type)) {\n    IconImage.cache.set(type, new IconImage(type));\n  }\n  return IconImage.cache.get(type);\n};\n\nconst icons = [\n  new Icon('folder', 10, 10),\n  new Icon('folder', 50, 10),\n  new Icon('file', 90, 10)\n];\n// Solo 2 immagini caricate!",
+        "solutionPatterns": ["Flyweight"],
+        "solutionExplanation": "Il <strong>Flyweight</strong> riduce l'uso di memoria condividendo dati comuni (intrinseci) tra molti oggetti simili. IconImage viene condivisa tra tutte le icone dello stesso tipo, mentre ogni Icon memorizza solo la posizione (dati estrinseci), riducendo drasticamente la memoria usata.",
+        "solutionSteps": [
+            {
+                "title": "Stato condiviso (intrinsic)",
+                "description": "IconImage contiene dati pesanti condivisi",
+                "code": "class IconImage {\n  constructor(type) {\n    this.type = type;\n    console.log(`Caricata immagine: ${type}`);\n  }\n}"
+            },
+            {
+                "title": "Stato unico (extrinsic)",
+                "description": "Icon memorizza solo posizione (leggera)",
+                "code": "class Icon {\n  constructor(type, x, y) {\n    this.image = IconImage.getImage(type);\n    this.x = x;\n    this.y = y;\n  }\n}"
+            },
+            {
+                "title": "Factory con cache",
+                "description": "getImage() riusa IconImage esistenti",
+                "code": "IconImage.getImage = function(type) {\n  if (!IconImage.cache.has(type)) {\n    IconImage.cache.set(type, new IconImage(type));\n  }\n  return IconImage.cache.get(type);\n}"
+            }
+        ],
+        "solutionAdvantages": [
+            "Memoria drasticamente ridotta",
+            "Performance migliori con molti oggetti",
+            "Ideale per rendering e gaming"
+        ]
+    },
+    {
+        "id": "structural-13",
+        "title": "Logger con metadati",
+        "category": "structural",
+        "code": "// Logger semplice\nclass SimpleLogger {\n  log(message) {\n    console.log(message);\n  }\n}\n\n// Wrapper per timestamp\nclass TimestampWrapper {\n  constructor(logger) {\n    this.logger = logger;\n  }\n\n  log(message) {\n    const timestamp = new Date().toISOString();\n    this.logger.log(`[${timestamp}] ${message}`);\n  }\n}\n\n// Wrapper per livello\nclass LevelWrapper {\n  constructor(logger, level) {\n    this.logger = logger;\n    this.level = level;\n  }\n\n  log(message) {\n    this.logger.log(`[${this.level}] ${message}`);\n  }\n}\n\nlet logger = new SimpleLogger();\nlogger = new TimestampWrapper(logger);\nlogger = new LevelWrapper(logger, 'INFO');\nlogger.log('Sistema avviato');\n// Output: [INFO] [2025-12-15T...] Sistema avviato",
+        "solutionPatterns": ["Decorator"],
+        "solutionExplanation": "Il <strong>Decorator</strong> estende la funzionalità di un oggetto senza modificarlo. TimestampWrapper e LevelWrapper aggiungono metadati al log in modo componibile, permettendo di personalizzare il logger con diverse combinazioni di funzionalità senza creare sottoclassi.",
+        "solutionSteps": [
+            {
+                "title": "Logger base",
+                "description": "SimpleLogger stampa solo il messaggio",
+                "code": "class SimpleLogger {\n  log(message) {\n    console.log(message);\n  }\n}"
+            },
+            {
+                "title": "Decorator timestamp",
+                "description": "TimestampWrapper aggiunge data/ora",
+                "code": "class TimestampWrapper {\n  log(message) {\n    const timestamp = new Date().toISOString();\n    this.logger.log(`[${timestamp}] ${message}`);\n  }\n}"
+            },
+            {
+                "title": "Composizione wrapper",
+                "description": "Decorator si impilano aggiungendo funzionalità",
+                "code": "let logger = new SimpleLogger();\nlogger = new TimestampWrapper(logger);\nlogger = new LevelWrapper(logger, 'INFO');"
+            }
+        ],
+        "solutionAdvantages": [
+            "Logger personalizzabili senza subclassing",
+            "Funzionalità componibili a runtime",
+            "Ogni decorator ha singola responsabilità"
+        ]
+    },
+    {
+        "id": "structural-14",
+        "title": "Menu ristorante gerarchico",
+        "category": "structural",
+        "code": "// Base component\nclass MenuComponent {\n  constructor(name) {\n    this.name = name;\n  }\n\n  getPrice() {}\n  print() {}\n}\n\n// Singolo piatto (leaf)\nclass MenuItem extends MenuComponent {\n  constructor(name, price) {\n    super(name);\n    this.price = price;\n  }\n\n  getPrice() {\n    return this.price;\n  }\n\n  print() {\n    console.log(`${this.name}: €${this.price}`);\n  }\n}\n\n// Categoria menu (composite)\nclass MenuCategory extends MenuComponent {\n  constructor(name) {\n    super(name);\n    this.items = [];\n  }\n\n  add(item) {\n    this.items.push(item);\n  }\n\n  getPrice() {\n    return this.items.reduce((sum, item) => sum + item.getPrice(), 0);\n  }\n\n  print() {\n    console.log(`\\n=== ${this.name} ===`);\n    this.items.forEach(item => item.print());\n  }\n}\n\nconst menu = new MenuCategory('Menu completo');\nconst antipasti = new MenuCategory('Antipasti');\nantipasti.add(new MenuItem('Bruschetta', 5));\nmenu.add(antipasti);\nmenu.print();",
+        "solutionPatterns": ["Composite"],
+        "solutionExplanation": "Il <strong>Composite</strong> permette di trattare uniformemente oggetti singoli e composizioni. MenuItem e MenuCategory implementano la stessa interfaccia, permettendo di creare menu gerarchici (categorie con sottocategorie e piatti) e calcolare prezzi totali ricorsivamente.",
+        "solutionSteps": [
+            {
+                "title": "Interfaccia comune",
+                "description": "MenuComponent è la base per item e categorie",
+                "code": "class MenuComponent {\n  constructor(name) { this.name = name; }\n  getPrice() {}\n  print() {}\n}"
+            },
+            {
+                "title": "Foglia (MenuItem)",
+                "description": "MenuItem ritorna il proprio prezzo",
+                "code": "class MenuItem extends MenuComponent {\n  getPrice() { return this.price; }\n  print() { console.log(`${this.name}: €${this.price}`); }\n}"
+            },
+            {
+                "title": "Composito (Category)",
+                "description": "MenuCategory somma prezzi dei figli ricorsivamente",
+                "code": "class MenuCategory extends MenuComponent {\n  getPrice() {\n    return this.items.reduce((sum, item) => sum + item.getPrice(), 0);\n  }\n}"
+            }
+        ],
+        "solutionAdvantages": [
+            "Menu gerarchici facilmente gestibili",
+            "Calcoli ricorsivi su categorie annidate",
+            "Aggiunta item/categorie senza modifiche"
+        ]
+    },
+    {
+        "id": "structural-15",
+        "title": "Documenti con controllo accessi",
+        "category": "structural",
+        "code": "// Documento reale\nclass SecureDocument {\n  constructor(content) {\n    this.content = content;\n  }\n\n  read() {\n    return this.content;\n  }\n}\n\n// Proxy con controllo accessi\nclass DocumentGuard {\n  constructor(content, userRole) {\n    this.document = new SecureDocument(content);\n    this.userRole = userRole;\n  }\n\n  read() {\n    if (this.userRole === 'admin' || this.userRole === 'editor') {\n      console.log('Accesso consentito');\n      return this.document.read();\n    }\n    console.log('Accesso negato');\n    return 'Permessi insufficienti';\n  }\n}\n\nconst doc1 = new DocumentGuard('Dati riservati', 'admin');\nconsole.log(doc1.read()); // Mostra contenuto\n\nconst doc2 = new DocumentGuard('Dati riservati', 'guest');\nconsole.log(doc2.read()); // Accesso negato",
+        "solutionPatterns": ["Proxy"],
+        "solutionExplanation": "Il <strong>Proxy</strong> controlla l'accesso a un oggetto aggiungendo logica di protezione. DocumentGuard verifica i permessi dell'utente prima di permettere l'accesso al documento, implementando un sistema di controllo degli accessi senza modificare SecureDocument.",
+        "solutionSteps": [
+            {
+                "title": "Subject protetto",
+                "description": "SecureDocument contiene dati sensibili",
+                "code": "class SecureDocument {\n  constructor(content) { this.content = content; }\n  read() { return this.content; }\n}"
+            },
+            {
+                "title": "Proxy protettivo",
+                "description": "DocumentGuard wrappa il documento con controllo ruoli",
+                "code": "class DocumentGuard {\n  constructor(content, userRole) {\n    this.document = new SecureDocument(content);\n    this.userRole = userRole;\n  }\n}"
+            },
+            {
+                "title": "Verifica accesso",
+                "description": "read() controlla il ruolo prima di delegare",
+                "code": "read() {\n  if (this.userRole === 'admin' || this.userRole === 'editor') {\n    return this.document.read();\n  }\n  return 'Permessi insufficienti';\n}"
+            }
+        ],
+        "solutionAdvantages": [
+            "Sicurezza centralizzata e trasparente",
+            "Controllo accessi senza modificare Subject",
+            "Audit e logging facilmente integrabili"
+        ]
+    },
+    {
+        "id": "structural-16",
+        "title": "Image gallery with lazy loading",
+        "category": "structural",
+        "code": "// Proxy + Composite\nclass Image {\n  constructor(src) {\n    this.src = src;\n  }\n\n  render() {\n    return `<img src=\"${this.src}\" />`;\n  }\n}\n\nclass ImageProxy {\n  constructor(src) {\n    this.src = src;\n    this.image = null;\n    this.loaded = false;\n  }\n\n  render() {\n    if (!this.loaded) {\n      console.log(`⏳ Loading ${this.src}...`);\n      this.image = new Image(this.src);\n      this.loaded = true;\n    }\n    return this.image.render();\n  }\n}\n\nclass Gallery {\n  constructor() {\n    this.images = [];\n  }\n\n  add(imageProxy) {\n    this.images.push(imageProxy);\n  }\n\n  render() {\n    return `<div class=\"gallery\">${this.images.map(img => img.render()).join('')}</div>`;\n  }\n}\n\nconst gallery = new Gallery();\ngallery.add(new ImageProxy('photo1.jpg'));\ngallery.add(new ImageProxy('photo2.jpg'));\ngallery.add(new ImageProxy('photo3.jpg'));\nconsole.log(gallery.render());",
+        "solutionPatterns": ["Proxy", "Composite"],
+        "solutionExplanation": "Combina <strong>Proxy</strong> (ImageProxy ritarda caricamento immagini fino al render) e <strong>Composite</strong> (Gallery gestisce collezione di immagini come singola unità). Ottimizza performance con lazy loading e gestione gerarchica.",
+        "solutionSteps": [
+            {
+                "title": "Proxy lazy load",
+                "description": "ImageProxy carica immagine solo al primo render()",
+                "code": "class ImageProxy {\n  render() {\n    if (!this.loaded) {\n      this.image = new Image(this.src);\n      this.loaded = true;\n    }\n    return this.image.render();\n  }\n}"
+            },
+            {
+                "title": "Composite collection",
+                "description": "Gallery raccoglie proxy e renderizza come gruppo",
+                "code": "class Gallery {\n  render() {\n    return this.images.map(img => img.render()).join('');\n  }\n}"
+            },
+            {
+                "title": "Lazy rendering",
+                "description": "Immagini caricate solo quando gallery viene renderizzata",
+                "code": "gallery.add(new ImageProxy('photo1.jpg'));\ngallery.render(); // Carica tutte le immagini"
+            }
+        ],
+        "solutionAdvantages": [
+            "Caricamento immagini on-demand",
+            "Gestione collezione semplificata",
+            "Performance migliorate con lazy loading"
+        ]
+    },
+    {
+        "id": "structural-17",
+        "title": "HTTP request interceptor",
+        "category": "structural",
+        "code": "// Proxy + Decorator\nclass HttpClient {\n  constructor(baseURL) {\n    this.baseURL = baseURL;\n  }\n\n  request(endpoint) {\n    console.log(`📡 Request: ${this.baseURL}${endpoint}`);\n    return { data: 'Response data' };\n  }\n}\n\nclass CachingProxy {\n  constructor(client) {\n    this.client = client;\n    this.cache = new Map();\n  }\n\n  request(endpoint) {\n    if (this.cache.has(endpoint)) {\n      console.log('💾 Cache hit');\n      return this.cache.get(endpoint);\n    }\n    const response = this.client.request(endpoint);\n    this.cache.set(endpoint, response);\n    return response;\n  }\n}\n\nclass LoggingDecorator {\n  constructor(client) {\n    this.client = client;\n  }\n\n  request(endpoint) {\n    console.log(`📝 [LOG] Request to ${endpoint}`);\n    const response = this.client.request(endpoint);\n    console.log(`📝 [LOG] Response received`);\n    return response;\n  }\n}\n\nconst baseClient = new HttpClient('https://api.example.com');\nconst cachedClient = new CachingProxy(baseClient);\nconst loggedClient = new LoggingDecorator(cachedClient);\n\nloggedClient.request('/users');\nloggedClient.request('/users'); // Cache hit",
+        "solutionPatterns": ["Proxy", "Decorator"],
+        "solutionExplanation": "Integra <strong>Proxy</strong> (CachingProxy intercetta richieste aggiungendo cache) e <strong>Decorator</strong> (LoggingDecorator aggiunge logging senza modificare client). Crea pipeline di interceptor componibili per HTTP client.",
+        "solutionSteps": [
+            {
+                "title": "Proxy caching",
+                "description": "CachingProxy controlla cache prima di chiamare client",
+                "code": "request(endpoint) {\n  if (this.cache.has(endpoint)) return this.cache.get(endpoint);\n  const response = this.client.request(endpoint);\n  this.cache.set(endpoint, response);\n}"
+            },
+            {
+                "title": "Decorator logging",
+                "description": "LoggingDecorator wrappa e aggiunge log",
+                "code": "request(endpoint) {\n  console.log(`[LOG] Request to ${endpoint}`);\n  const response = this.client.request(endpoint);\n  console.log(`[LOG] Response received`);\n  return response;\n}"
+            },
+            {
+                "title": "Composizione",
+                "description": "Decorator e Proxy si compongono in catena",
+                "code": "const cached = new CachingProxy(baseClient);\nconst logged = new LoggingDecorator(cached);\nlogged.request('/users');"
+            }
+        ],
+        "solutionAdvantages": [
+            "Cache trasparente per performance",
+            "Logging componibile e rimuovibile",
+            "Interceptor stackabili"
+        ]
+    },
+    {
+        "id": "structural-18",
+        "title": "UI component tree renderer",
+        "category": "structural",
+        "code": "// Composite + Decorator\nclass Component {\n  render() {\n    return '';\n  }\n}\n\nclass Text extends Component {\n  constructor(content) {\n    super();\n    this.content = content;\n  }\n  render() {\n    return this.content;\n  }\n}\n\nclass Container extends Component {\n  constructor() {\n    super();\n    this.children = [];\n  }\n  add(component) {\n    this.children.push(component);\n  }\n  render() {\n    return `<div>${this.children.map(c => c.render()).join('')}</div>`;\n  }\n}\n\nclass BorderDecorator extends Component {\n  constructor(component, color) {\n    super();\n    this.component = component;\n    this.color = color;\n  }\n  render() {\n    return `<div style=\"border: 2px solid ${this.color}\">${this.component.render()}</div>`;\n  }\n}\n\nconst page = new Container();\nconst header = new BorderDecorator(new Text('Header'), 'blue');\nconst content = new BorderDecorator(new Container(), 'gray');\npage.add(header);\npage.add(content);\nconsole.log(page.render());",
+        "solutionPatterns": ["Composite", "Decorator"],
+        "solutionExplanation": "Combina <strong>Composite</strong> (Container gestisce albero di componenti) e <strong>Decorator</strong> (BorderDecorator aggiunge bordi senza modificare componenti). Crea UI tree flessibile con decorazioni dinamiche.",
+        "solutionSteps": [
+            {
+                "title": "Composite tree",
+                "description": "Container raccoglie figli e renderizza ricorsivamente",
+                "code": "class Container extends Component {\n  render() {\n    return `<div>${this.children.map(c => c.render()).join('')}</div>`;\n  }\n}"
+            },
+            {
+                "title": "Decorator wrapping",
+                "description": "BorderDecorator wrappa componente aggiungendo bordo",
+                "code": "class BorderDecorator extends Component {\n  render() {\n    return `<div style=\"border: 2px solid ${this.color}\">${this.component.render()}</div>`;\n  }\n}"
+            },
+            {
+                "title": "Tree decorato",
+                "description": "Decorator e Composite si combinano nell'albero",
+                "code": "const header = new BorderDecorator(new Text('Header'), 'blue');\npage.add(header);"
+            }
+        ],
+        "solutionAdvantages": [
+            "Albero componenti flessibile",
+            "Decorazioni applicabili a qualsiasi nodo",
+            "Rendering ricorsivo automatico"
+        ]
+    },
+    {
+        "id": "structural-19",
+        "title": "Payment gateway abstraction",
+        "category": "structural",
+        "code": "// Adapter + Facade\nclass StripeAPI {\n  processPayment(cardNumber, amount) {\n    console.log(`Stripe: Charging ${amount} to card ${cardNumber}`);\n    return { success: true, transactionId: 'stripe_123' };\n  }\n}\n\nclass PayPalSDK {\n  executePayment(email, total) {\n    console.log(`PayPal: Charging ${total} to ${email}`);\n    return { status: 'completed', id: 'pp_456' };\n  }\n}\n\nclass StripeAdapter {\n  constructor() {\n    this.stripe = new StripeAPI();\n  }\n  pay(amount, credentials) {\n    const result = this.stripe.processPayment(credentials, amount);\n    return { success: result.success, id: result.transactionId };\n  }\n}\n\nclass PayPalAdapter {\n  constructor() {\n    this.paypal = new PayPalSDK();\n  }\n  pay(amount, credentials) {\n    const result = this.paypal.executePayment(credentials, amount);\n    return { success: result.status === 'completed', id: result.id };\n  }\n}\n\nclass PaymentFacade {\n  constructor() {\n    this.providers = {\n      stripe: new StripeAdapter(),\n      paypal: new PayPalAdapter()\n    };\n  }\n\n  processPayment(provider, amount, credentials) {\n    return this.providers[provider].pay(amount, credentials);\n  }\n}\n\nconst payment = new PaymentFacade();\npayment.processPayment('stripe', 99.99, '4242-4242-4242-4242');\npayment.processPayment('paypal', 49.99, 'user@example.com');",
+        "solutionPatterns": ["Adapter", "Facade"],
+        "solutionExplanation": "Integra <strong>Adapter</strong> (StripeAdapter e PayPalAdapter normalizzano API diverse) e <strong>Facade</strong> (PaymentFacade fornisce interfaccia semplificata per tutti i provider). Nasconde complessità multi-provider dietro API uniforme.",
+        "solutionSteps": [
+            {
+                "title": "Adapter normalizzazione",
+                "description": "Adapter convertono API diverse a interfaccia comune",
+                "code": "class StripeAdapter {\n  pay(amount, credentials) {\n    const result = this.stripe.processPayment(credentials, amount);\n    return { success: result.success, id: result.transactionId };\n  }\n}"
+            },
+            {
+                "title": "Facade unificata",
+                "description": "PaymentFacade gestisce tutti gli adapter",
+                "code": "class PaymentFacade {\n  processPayment(provider, amount, credentials) {\n    return this.providers[provider].pay(amount, credentials);\n  }\n}"
+            },
+            {
+                "title": "Interfaccia semplice",
+                "description": "Client usa facade senza conoscere adapter",
+                "code": "const payment = new PaymentFacade();\npayment.processPayment('stripe', 99.99, 'card');"
+            }
+        ],
+        "solutionAdvantages": [
+            "Interfaccia uniforme per tutti i provider",
+            "Switch provider trasparente",
+            "Complessità nascosta al client"
+        ]
+    },
+    {
+        "id": "structural-20",
+        "title": "File system with compression",
+        "category": "structural",
+        "code": "// Composite + Decorator\nclass FileSystemNode {\n  getSize() {\n    return 0;\n  }\n}\n\nclass File extends FileSystemNode {\n  constructor(name, size) {\n    super();\n    this.name = name;\n    this.size = size;\n  }\n  getSize() {\n    return this.size;\n  }\n}\n\nclass Folder extends FileSystemNode {\n  constructor(name) {\n    super();\n    this.name = name;\n    this.children = [];\n  }\n  add(node) {\n    this.children.push(node);\n  }\n  getSize() {\n    return this.children.reduce((sum, child) => sum + child.getSize(), 0);\n  }\n}\n\nclass CompressedDecorator extends FileSystemNode {\n  constructor(node, ratio = 0.5) {\n    super();\n    this.node = node;\n    this.ratio = ratio;\n  }\n  getSize() {\n    return Math.round(this.node.getSize() * this.ratio);\n  }\n}\n\nconst root = new Folder('root');\nconst docs = new Folder('documents');\ndocs.add(new File('report.pdf', 1000));\ndocs.add(new File('notes.txt', 500));\n\nconst compressed = new CompressedDecorator(docs, 0.3);\nroot.add(compressed);\n\nconsole.log(`Original size: ${docs.getSize()}`);\nconsole.log(`Compressed size: ${compressed.getSize()}`);",
+        "solutionPatterns": ["Composite", "Decorator"],
+        "solutionExplanation": "Combina <strong>Composite</strong> (Folder gestisce albero di file/cartelle) e <strong>Decorator</strong> (CompressedDecorator riduce dimensione simulando compressione). Calcola dimensioni ricorsivamente con compressione opzionale.",
+        "solutionSteps": [
+            {
+                "title": "Composite hierarchy",
+                "description": "Folder contiene file e sotto-cartelle",
+                "code": "class Folder extends FileSystemNode {\n  getSize() {\n    return this.children.reduce((sum, child) => sum + child.getSize(), 0);\n  }\n}"
+            },
+            {
+                "title": "Decorator compression",
+                "description": "CompressedDecorator riduce dimensione con ratio",
+                "code": "class CompressedDecorator extends FileSystemNode {\n  getSize() {\n    return Math.round(this.node.getSize() * this.ratio);\n  }\n}"
+            },
+            {
+                "title": "Compressed folder",
+                "description": "Decorator applicato a intera cartella",
+                "code": "const compressed = new CompressedDecorator(docs, 0.3);\nroot.add(compressed); // 70% riduzione"
+            }
+        ],
+        "solutionAdvantages": [
+            "Calcolo dimensioni ricorsivo",
+            "Compressione applicabile a nodi singoli o alberi",
+            "Ratio configurabile per decorator"
+        ]
+    },
+    {
+        "id": "structural-21",
+        "title": "Database query optimizer",
+        "category": "structural",
+        "code": "// Proxy + Decorator\nclass Database {\n  query(sql) {\n    console.log(`📊 Executing: ${sql}`);\n    return { rows: [{ id: 1, name: 'Data' }] };\n  }\n}\n\nclass CachingProxy {\n  constructor(db) {\n    this.db = db;\n    this.cache = new Map();\n  }\n  query(sql) {\n    if (this.cache.has(sql)) {\n      console.log('💾 Cache hit');\n      return this.cache.get(sql);\n    }\n    const result = this.db.query(sql);\n    this.cache.set(sql, result);\n    return result;\n  }\n}\n\nclass OptimizationDecorator {\n  constructor(db) {\n    this.db = db;\n  }\n  query(sql) {\n    const optimized = sql.replace(/SELECT \\*/g, 'SELECT id, name');\n    console.log(`⚡ Optimized query`);\n    return this.db.query(optimized);\n  }\n}\n\nclass LoggingDecorator {\n  constructor(db) {\n    this.db = db;\n  }\n  query(sql) {\n    const start = Date.now();\n    const result = this.db.query(sql);\n    console.log(`⏱️ Query took ${Date.now() - start}ms`);\n    return result;\n  }\n}\n\nconst db = new Database();\nconst cached = new CachingProxy(db);\nconst optimized = new OptimizationDecorator(cached);\nconst logged = new LoggingDecorator(optimized);\n\nlogged.query('SELECT * FROM users');\nlogged.query('SELECT * FROM users'); // Cache hit",
+        "solutionPatterns": ["Proxy", "Decorator"],
+        "solutionExplanation": "Integra <strong>Proxy</strong> (CachingProxy intercetta query per cache) e <strong>Decorator</strong> (OptimizationDecorator e LoggingDecorator aggiungono funzionalità). Crea pipeline di ottimizzazioni componibili per query DB.",
+        "solutionSteps": [
+            {
+                "title": "Proxy caching",
+                "description": "CachingProxy intercetta e memorizza risultati",
+                "code": "query(sql) {\n  if (this.cache.has(sql)) return this.cache.get(sql);\n  const result = this.db.query(sql);\n  this.cache.set(sql, result);\n}"
+            },
+            {
+                "title": "Decorator chain",
+                "description": "Decorator multipli si wrappano a cascata",
+                "code": "const cached = new CachingProxy(db);\nconst optimized = new OptimizationDecorator(cached);\nconst logged = new LoggingDecorator(optimized);"
+            },
+            {
+                "title": "Query pipeline",
+                "description": "Query fluisce attraverso log → optimize → cache → DB",
+                "code": "logged.query('SELECT * FROM users');\n// Log → Optimize → Cache → DB"
+            }
+        ],
+        "solutionAdvantages": [
+            "Pipeline query configurabile",
+            "Cache + ottimizzazione + logging combinati",
+            "Decorator stackabili in qualsiasi ordine"
+        ]
+    },
+    {
+        "id": "structural-22",
+        "title": "Media player with effects",
+        "category": "structural",
+        "code": "// Adapter + Decorator\nclass MP3Player {\n  playMP3(filename) {\n    console.log(`🎵 Playing MP3: ${filename}`);\n  }\n}\n\nclass VideoPlayer {\n  playVideo(filename) {\n    console.log(`🎬 Playing video: ${filename}`);\n  }\n}\n\nclass VideoAdapter {\n  constructor() {\n    this.player = new VideoPlayer();\n  }\n  play(filename) {\n    this.player.playVideo(filename);\n  }\n}\n\nclass VolumeDecorator {\n  constructor(player, volume) {\n    this.player = player;\n    this.volume = volume;\n  }\n  play(filename) {\n    console.log(`🔊 Volume: ${this.volume}%`);\n    this.player.play(filename);\n  }\n}\n\nclass EqualizerDecorator {\n  constructor(player, preset) {\n    this.player = player;\n    this.preset = preset;\n  }\n  play(filename) {\n    console.log(`🎚️ Equalizer: ${this.preset}`);\n    this.player.play(filename);\n  }\n}\n\nconst videoAdapter = new VideoAdapter();\nconst withVolume = new VolumeDecorator(videoAdapter, 80);\nconst withEQ = new EqualizerDecorator(withVolume, 'Rock');\n\nwithEQ.play('concert.mp4');",
+        "solutionPatterns": ["Adapter", "Decorator"],
+        "solutionExplanation": "Combina <strong>Adapter</strong> (VideoAdapter normalizza VideoPlayer a interfaccia comune) e <strong>Decorator</strong> (VolumeDecorator ed EqualizerDecorator aggiungono effetti audio). Crea catena di effetti applicabili a player diversi.",
+        "solutionSteps": [
+            {
+                "title": "Adapter interfaccia",
+                "description": "VideoAdapter espone metodo play() uniforme",
+                "code": "class VideoAdapter {\n  play(filename) {\n    this.player.playVideo(filename);\n  }\n}"
+            },
+            {
+                "title": "Decorator effects",
+                "description": "Decorator aggiungono effetti wrappando player",
+                "code": "class VolumeDecorator {\n  play(filename) {\n    console.log(`Volume: ${this.volume}%`);\n    this.player.play(filename);\n  }\n}"
+            },
+            {
+                "title": "Effects chain",
+                "description": "Decorator si compongono per effetti multipli",
+                "code": "const withVolume = new VolumeDecorator(adapter, 80);\nconst withEQ = new EqualizerDecorator(withVolume, 'Rock');"
+            }
+        ],
+        "solutionAdvantages": [
+            "Player diversi con interfaccia uniforme",
+            "Effetti componibili e rimuovibili",
+            "Pipeline audio configurabile"
+        ]
+    },
+    {
+        "id": "structural-23",
+        "title": "Notification system with routing",
+        "category": "structural",
+        "code": "// Facade + Composite\nclass EmailService {\n  send(to, message) {\n    console.log(`📧 Email to ${to}: ${message}`);\n  }\n}\n\nclass SMSService {\n  send(phone, message) {\n    console.log(`📱 SMS to ${phone}: ${message}`);\n  }\n}\n\nclass PushService {\n  send(token, message) {\n    console.log(`🔔 Push to ${token}: ${message}`);\n  }\n}\n\nclass NotificationChannel {\n  send(recipient, message) {}\n}\n\nclass EmailChannel extends NotificationChannel {\n  constructor() {\n    super();\n    this.service = new EmailService();\n  }\n  send(recipient, message) {\n    this.service.send(recipient, message);\n  }\n}\n\nclass MultiChannel extends NotificationChannel {\n  constructor() {\n    super();\n    this.channels = [];\n  }\n  add(channel) {\n    this.channels.push(channel);\n  }\n  send(recipient, message) {\n    this.channels.forEach(ch => ch.send(recipient, message));\n  }\n}\n\nclass NotificationFacade {\n  constructor() {\n    this.emailCh = new EmailChannel();\n    this.multiCh = new MultiChannel();\n  }\n\n  sendUrgent(recipient, message) {\n    this.multiCh.send(recipient, message);\n  }\n\n  sendNormal(recipient, message) {\n    this.emailCh.send(recipient, message);\n  }\n}\n\nconst notifications = new NotificationFacade();\nnotifications.sendNormal('user@example.com', 'Welcome!');\nnotifications.sendUrgent('user@example.com', 'Alert!');",
+        "solutionPatterns": ["Facade", "Composite"],
+        "solutionExplanation": "Integra <strong>Facade</strong> (NotificationFacade semplifica accesso a servizi email/SMS/push) e <strong>Composite</strong> (MultiChannel gestisce multipli canali come uno solo). Nasconde complessità routing con interfaccia semplice.",
+        "solutionSteps": [
+            {
+                "title": "Composite channels",
+                "description": "MultiChannel invia a tutti i canali registrati",
+                "code": "class MultiChannel {\n  send(recipient, message) {\n    this.channels.forEach(ch => ch.send(recipient, message));\n  }\n}"
+            },
+            {
+                "title": "Facade routing",
+                "description": "NotificationFacade sceglie canale in base a tipo",
+                "code": "sendUrgent(recipient, message) {\n  this.multiCh.send(recipient, message);\n}\nsendNormal(recipient, message) {\n  this.emailCh.send(recipient, message);\n}"
+            },
+            {
+                "title": "Interfaccia semplice",
+                "description": "Client chiama facade senza gestire servizi",
+                "code": "const notifications = new NotificationFacade();\nnotifications.sendUrgent('user', 'Alert!');"
+            }
+        ],
+        "solutionAdvantages": [
+            "Routing notifiche centralizzato",
+            "Multi-canale per messaggi urgenti",
+            "Complessità servizi nascosta"
+        ]
+    },
+    {
+        "id": "structural-24",
+        "title": "Smart home device controller",
+        "category": "structural",
+        "code": "// Adapter + Facade\nclass PhilipsHueAPI {\n  setLightBrightness(deviceId, level) {\n    console.log(`💡 Hue: Setting ${deviceId} to ${level}%`);\n  }\n}\n\nclass NestThermostatAPI {\n  adjustTemperature(deviceId, celsius) {\n    console.log(`🌡️ Nest: Setting ${deviceId} to ${celsius}°C`);\n  }\n}\n\nclass HueAdapter {\n  constructor() {\n    this.api = new PhilipsHueAPI();\n  }\n  control(deviceId, value) {\n    this.api.setLightBrightness(deviceId, value);\n  }\n}\n\nclass NestAdapter {\n  constructor() {\n    this.api = new NestThermostatAPI();\n  }\n  control(deviceId, value) {\n    this.api.adjustTemperature(deviceId, value);\n  }\n}\n\nclass SmartHomeFacade {\n  constructor() {\n    this.lights = new HueAdapter();\n    this.thermostat = new NestAdapter();\n  }\n\n  setLightLevel(deviceId, level) {\n    this.lights.control(deviceId, level);\n  }\n\n  setTemperature(deviceId, temp) {\n    this.thermostat.control(deviceId, temp);\n  }\n\n  activateNightMode() {\n    this.lights.control('living-room', 20);\n    this.thermostat.control('main', 18);\n  }\n}\n\nconst home = new SmartHomeFacade();\nhome.activateNightMode();",
+        "solutionPatterns": ["Adapter", "Facade"],
+        "solutionExplanation": "Combina <strong>Adapter</strong> (HueAdapter e NestAdapter normalizzano API diverse) e <strong>Facade</strong> (SmartHomeFacade fornisce interfaccia unificata per controllo casa). Nasconde complessità multi-brand dietro comandi semplici.",
+        "solutionSteps": [
+            {
+                "title": "Adapter unificazione",
+                "description": "Adapter espongono metodo control() comune",
+                "code": "class HueAdapter {\n  control(deviceId, value) {\n    this.api.setLightBrightness(deviceId, value);\n  }\n}"
+            },
+            {
+                "title": "Facade orchestrazione",
+                "description": "SmartHomeFacade coordina più adapter",
+                "code": "class SmartHomeFacade {\n  activateNightMode() {\n    this.lights.control('living-room', 20);\n    this.thermostat.control('main', 18);\n  }\n}"
+            },
+            {
+                "title": "Comandi alto livello",
+                "description": "Facade espone scenari pre-configurati",
+                "code": "const home = new SmartHomeFacade();\nhome.activateNightMode(); // Controlla luci + termo"
+            }
+        ],
+        "solutionAdvantages": [
+            "Dispositivi multi-brand unificati",
+            "Scenari pre-configurati semplici",
+            "API vendor nascosta"
+        ]
+    },
+    {
+        "id": "structural-25",
+        "title": "Streaming service with quality selector",
+        "category": "structural",
+        "code": "// Proxy + Decorator\nclass VideoStream {\n  constructor(url) {\n    this.url = url;\n  }\n  play() {\n    console.log(`▶️ Streaming: ${this.url}`);\n  }\n}\n\nclass LazyLoadProxy {\n  constructor(url) {\n    this.url = url;\n    this.stream = null;\n  }\n  play() {\n    if (!this.stream) {\n      console.log('⏳ Buffering...');\n      this.stream = new VideoStream(this.url);\n    }\n    this.stream.play();\n  }\n}\n\nclass QualityDecorator {\n  constructor(stream, quality) {\n    this.stream = stream;\n    this.quality = quality;\n  }\n  play() {\n    console.log(`📺 Quality: ${this.quality}p`);\n    this.stream.play();\n  }\n}\n\nclass SubtitleDecorator {\n  constructor(stream, language) {\n    this.stream = stream;\n    this.language = language;\n  }\n  play() {\n    console.log(`💬 Subtitles: ${this.language}`);\n    this.stream.play();\n  }\n}\n\nconst videoProxy = new LazyLoadProxy('https://cdn.example.com/movie.mp4');\nconst hd = new QualityDecorator(videoProxy, 1080);\nconst withSubs = new SubtitleDecorator(hd, 'EN');\n\nwithSubs.play();",
+        "solutionPatterns": ["Proxy", "Decorator"],
+        "solutionExplanation": "Integra <strong>Proxy</strong> (LazyLoadProxy ritarda caricamento stream fino a play()) e <strong>Decorator</strong> (QualityDecorator e SubtitleDecorator aggiungono opzioni). Ottimizza bandwidth con lazy loading e opzioni componibili.",
+        "solutionSteps": [
+            {
+                "title": "Proxy lazy load",
+                "description": "LazyLoadProxy crea stream solo al primo play()",
+                "code": "play() {\n  if (!this.stream) {\n    console.log('Buffering...');\n    this.stream = new VideoStream(this.url);\n  }\n  this.stream.play();\n}"
+            },
+            {
+                "title": "Decorator options",
+                "description": "Decorator aggiungono qualità e sottotitoli",
+                "code": "const hd = new QualityDecorator(proxy, 1080);\nconst withSubs = new SubtitleDecorator(hd, 'EN');"
+            },
+            {
+                "title": "Options chain",
+                "description": "Decorator si compongono per opzioni multiple",
+                "code": "withSubs.play();\n// Subs → Quality → Lazy Load → Stream"
+            }
+        ],
+        "solutionAdvantages": [
+            "Caricamento on-demand per bandwidth",
+            "Opzioni video componibili",
+            "Qualità e sottotitoli configurabili"
+        ]
+    }
 ]

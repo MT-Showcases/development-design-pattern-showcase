@@ -44,7 +44,8 @@ Learning design patterns should be:
 │       ├── project-structure.md     # Directory organization
 │       ├── styling-conventions.md   # SCSS/Tailwind guidelines
 │       ├── commenting-standards.md  # File headers & patterns
-│       └── reusable-components.md   # Component docs
+│       ├── reusable-components.md   # Component docs
+│       └── example-creation-guidelines.md  # Pattern example rules
 ├── app/                             # Next.js App Router
 │   ├── layout.tsx                   # Root layout
 │   ├── page.tsx                     # Home page (game setup)
@@ -308,9 +309,256 @@ function updateTeamPoints(team: any, points): any {
 
 ## 🎨 Styling Conventions
 
-### Ant Design + Tailwind Hybrid
+### **3-Layer Styling Architecture**
 
-We use **Ant Design** for complex components (forms, modals, tables) and **Tailwind** for layout and utilities.
+This project uses a **hybrid approach** combining three complementary styling systems:
+
+```
+┌─────────────────────────────────────────────────┐
+│  Layer 1: Ant Design (Complex UI Components)   │  ← Forms, Modals, Tables, Drawers
+├─────────────────────────────────────────────────┤
+│  Layer 2: Tailwind CSS v4 (Utilities & Layout) │  ← 80% of daily styling
+├─────────────────────────────────────────────────┤
+│  Layer 3: SCSS + BEM (Custom Components)       │  ← 20% special cases
+└─────────────────────────────────────────────────┘
+```
+
+---
+
+### **When to Use Each Layer**
+
+#### ✅ **Layer 1: Ant Design** (First Choice for Complex UI)
+
+Use for rich, interactive components that require complex state management:
+
+```tsx
+// ✅ GOOD: Use Ant Design for forms, modals, tables
+import { Form, Input, Modal, Table, Drawer, Menu } from 'antd';
+
+<Form>
+  <Form.Item name="teamName" rules={[{ required: true }]}>
+    <Input placeholder="Enter team name" />
+  </Form.Item>
+</Form>
+
+<Modal title="Confirm" onOk={handleOk}>
+  Are you sure?
+</Modal>
+```
+
+**Customization via ConfigProvider** (already configured in `app/layout.tsx`):
+- Theme tokens (colors, spacing, border radius)
+- Component-specific overrides
+- Global style modifications
+
+---
+
+#### ✅ **Layer 2: Tailwind CSS v4** (Second Choice for Utilities)
+
+Use for **layout, spacing, typography, and simple styling**:
+
+**Common Use Cases**:
+```tsx
+// ✅ Spacing & Layout
+<div className="p-6 m-4 space-y-4 flex items-center justify-between">
+
+// ✅ Typography
+<h1 className="text-2xl font-bold text-navy-dark">Title</h1>
+<p className="text-base leading-relaxed text-gray-700">Description</p>
+
+// ✅ Responsive Design
+<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+
+// ✅ Simple States
+<button className="bg-yellow-primary hover:bg-yellow-dark px-4 py-2 rounded">
+  Click me
+</button>
+
+// ✅ Flexbox & Grid
+<div className="flex flex-col md:flex-row gap-6 items-start">
+
+// ✅ Width & Height
+<div className="w-full max-w-4xl h-screen min-h-[400px]">
+```
+
+**Tailwind v4 Custom Colors** (from `tailwind.config.ts`):
+```tsx
+// Navy palette
+className="bg-navy-dark text-white"      // #0a1929
+className="bg-navy-medium"               // #1a2942
+className="bg-navy-light"                // #2a3952
+
+// Yellow palette
+className="bg-yellow-primary text-navy-dark"  // #ffc107
+className="bg-yellow-dark"                    // #d39e00
+className="bg-yellow-light"                   // #ffcd39
+
+// Beige palette
+className="bg-beige-card"                // #f5e6d3
+className="bg-beige-dark"                // #e6d7c4
+className="bg-beige-light"               // #fff5e6
+
+// Pink accent
+className="bg-pink-accent text-white"    // #ff1744
+```
+
+**❌ IMPORTANT**: Tailwind v4 has **different syntax** from v3:
+- ✅ `space-y-4` still works
+- ✅ `w-full`, `h-full` still work
+- ✅ Most utilities unchanged
+- ⚠️ Check [Tailwind v4 docs](https://tailwindcss.com/docs) for edge cases
+
+---
+
+#### ✅ **Layer 3: SCSS + BEM** (Third Choice for Custom Styling)
+
+Use **only** when Tailwind utilities aren't sufficient:
+
+**Valid Use Cases**:
+1. **Complex hover/focus states** with multiple properties
+2. **Custom animations** and transitions
+3. **Component-specific patterns** that don't fit utilities
+4. **Overriding Ant Design** styles (use `!important`)
+
+```scss
+// components/GameBoard/GameBoard.scss
+@use '@/styles' as *;
+@use '@/styles/functions' as fn;
+
+.game-board {
+  &__container {
+    // Complex layout that changes multiple properties
+    @include card-base;
+    transition: all 0.3s ease;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: $shadow-lg;
+      border-color: $yellow-primary;
+    }
+  }
+
+  &__score-animation {
+    // Custom animation
+    @keyframes scoreIncrease {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.2); color: $yellow-primary; }
+      100% { transform: scale(1); }
+    }
+    animation: scoreIncrease 0.5s ease;
+  }
+
+  &__ant-override {
+    // Override Ant Design Typography
+    .ant-typography {
+      color: $yellow-primary !important;
+      font-weight: 800 !important;
+    }
+  }
+}
+```
+
+**❌ DON'T** create SCSS classes for simple utilities:
+```scss
+// ❌ BAD: Use Tailwind instead
+.game-board {
+  &__padding {
+    padding: fn.rem(24);  // Use className="p-6" instead
+  }
+  
+  &__flex {
+    display: flex;  // Use className="flex" instead
+  }
+}
+```
+
+---
+
+### **Decision Tree: Which Layer to Use?**
+
+```
+┌─ Need a Form/Modal/Table/Complex Component?
+│  └─ YES → Use Ant Design (Layer 1)
+│
+├─ Need spacing/layout/typography/simple styling?
+│  └─ YES → Use Tailwind (Layer 2)
+│     └─ Tailwind insufficient?
+│        └─ YES → Use SCSS + BEM (Layer 3)
+│
+└─ Need custom animation/complex hover/Ant Design override?
+   └─ YES → Use SCSS + BEM (Layer 3)
+```
+
+---
+
+### **Hybrid Examples (Best Practice)**
+
+Combine layers for maximum efficiency:
+
+```tsx
+// ✅ EXCELLENT: Ant Design + Tailwind + SCSS
+<Card 
+  className="p-6 shadow-lg hover:shadow-xl transition-shadow game-card"
+  title={<h3 className="text-xl font-bold text-navy-dark">Round 1</h3>}
+>
+  <Space direction="vertical" size="large" className="w-full">
+    <div className="flex items-center justify-between">
+      <Tag color="blue" className="text-sm font-semibold">Team A</Tag>
+      <span className="text-2xl font-bold text-yellow-primary">42</span>
+    </div>
+  </Space>
+</Card>
+
+// SCSS for custom hover state
+.game-card {
+  &:hover {
+    transform: translateY(-4px);
+    border-color: $yellow-primary;
+  }
+}
+```
+
+---
+
+### **Styling Rules Summary**
+
+| Scenario | Use | Example |
+|----------|-----|---------|
+| Complex UI (forms, modals) | **Ant Design** | `<Form>`, `<Modal>`, `<Table>` |
+| Layout (flex, grid) | **Tailwind** | `className="flex gap-4"` |
+| Spacing (padding, margin) | **Tailwind** | `className="p-6 m-4"` |
+| Typography | **Tailwind** | `className="text-2xl font-bold"` |
+| Colors | **Tailwind** | `className="bg-navy-dark text-yellow-primary"` |
+| Responsive | **Tailwind** | `className="md:grid-cols-2 lg:p-8"` |
+| Simple hover | **Tailwind** | `className="hover:bg-yellow-dark"` |
+| Complex hover | **SCSS + BEM** | `.card:hover { ... }` |
+| Animations | **SCSS + BEM** | `@keyframes slideIn { ... }` |
+| Override Ant Design | **SCSS + BEM** | `.ant-typography { ... !important }` |
+
+---
+
+### **CRITICAL: NO Inline Styles**
+
+❌ **NEVER** use inline styles:
+```tsx
+// ❌ WRONG
+<div style={{ padding: '24px', backgroundColor: '#0a1929' }}>
+```
+
+✅ **CORRECT** - Use Tailwind or SCSS:
+```tsx
+// ✅ Tailwind
+<div className="p-6 bg-navy-dark">
+
+// ✅ OR SCSS (if complex)
+<div className="custom-container">
+```
+
+---
+
+## 🎨 Ant Design + Tailwind Hybrid
+
+### Ant Design Theme Customization
 
 ```tsx
 // ✅ GOOD: Ant Design for complex UI
@@ -476,24 +724,40 @@ interface PatternExample {
   code: string;                  // JavaScript/TypeScript code
   solutionExplanation: string;   // 3-4 sentences explaining the pattern
   solutionPatterns: string[];    // Pattern names (for solution reveal)
+  solutionSteps: SolutionStep[]; // Step-by-step breakdown
+  solutionAdvantages: string[];  // Key benefits
+}
+
+interface SolutionStep {
+  title: string;                 // Step title (2-4 words)
+  description: string;           // What this step does (1 sentence)
+  code: string;                  // Code snippet for this specific step
 }
 ```
 
 ### Example Guidelines
 
+**📖 For complete guidelines, see**: [Example Creation Guidelines](copilot-instructions/example-creation-guidelines.md)
+
 ✅ **DO**:
-- Write realistic, production-like code
+- Write realistic, production-like code (15-30 lines)
 - Use clear variable/class names (no generic `foo`, `bar`)
-- Provide 3-4 sentence explanations
+- Provide 3-4 sentence explanations with `<strong>` pattern name
+- Include 3-4 solution steps with code snippets
+- List 3-4 practical advantages
 - **Avoid pattern hints in class names** (e.g., `UserCache` not `SingletonCache`)
+- Use modern JavaScript (ES6+: const/let, classes, arrow functions)
+- Include usage examples, not just definitions
 
 ❌ **DON'T**:
 - Include pattern names in code (spoils the quiz)
 - Write trivial or academic examples
-- Skip explanations
+- Skip explanations or steps
+- Use `var`, `function()`, or old JavaScript syntax
+- Write code longer than 30 lines
 
 ```javascript
-// ✅ GOOD: No pattern hints
+// ✅ GOOD: No pattern hints, realistic code, includes usage
 class ConnectionPool {
   constructor() {
     if (ConnectionPool.instance) {
@@ -502,10 +766,22 @@ class ConnectionPool {
     this.connections = [];
     ConnectionPool.instance = this;
   }
+  
+  getConnection() {
+    return this.connections[0];
+  }
 }
+
+// Usage example
+const pool1 = new ConnectionPool();
+const pool2 = new ConnectionPool();
+console.log(pool1 === pool2); // true
 
 // ❌ BAD: Pattern name visible
 class SingletonConnectionPool { /* ... */ }
+
+// ❌ BAD: No usage example
+class ConnectionPool { /* ... only definition */ }
 ```
 
 ---

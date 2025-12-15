@@ -23,11 +23,12 @@ import { useState, useEffect } from "react";
 import TeamSetup from "@/components/TeamSetup/TeamSetup";
 import RoundController from "@/components/RoundController/RoundController";
 import type { Team } from "@/lib/types";
-import { Modal } from "antd";
-import { ExclamationCircleOutlined } from "@ant-design/icons";
+import { App, Button } from "antd";
+import { ExclamationCircleOutlined, ReloadOutlined } from "@ant-design/icons";
 import './page.scss';
 
 export default function Home() {
+  const { modal } = App.useApp();
   const [teams, setTeams] = useState<Team[] | null>(null);
 
   // Carica le squadre da localStorage al mount
@@ -56,13 +57,14 @@ export default function Home() {
   };
 
   const handleReset = () => {
-    Modal.confirm({
-      title: "Ricomincia da capo",
+    modal.confirm({
+      title: "Nuova Partita",
       icon: <ExclamationCircleOutlined />,
-      content: "Sei sicuro di voler ricominciare da capo? Tutti i progressi andranno persi.",
-      okText: "Sì, ricomincia",
+      content: "Vuoi iniziare una nuova partita? Tutti i progressi attuali andranno persi.",
+      okText: "Sì, inizia nuova partita",
       cancelText: "Annulla",
       okType: "danger",
+      centered: true,
       onOk() {
         setTeams(null);
         localStorage.removeItem("teams");
@@ -80,9 +82,15 @@ export default function Home() {
       ) : (
         <>
           <RoundController teams={teams} onUpdateTeams={handleUpdateTeams} />
-          <button onClick={handleReset} className="home__reset-button">
-            Ricomincia da capo
-          </button>
+          <Button
+            danger
+            size="large"
+            icon={<ReloadOutlined />}
+            onClick={handleReset}
+            className="home__reset-button"
+          >
+            Nuova Partita
+          </Button>
         </>
       )}
     </main>

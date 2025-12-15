@@ -21,11 +21,31 @@ import { Breadcrumb as AntBreadcrumb } from 'antd';
 import { HomeOutlined } from '@ant-design/icons';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useEffect } from 'react';
 import { PATTERN_CATEGORIES } from '@/lib/patternTheory';
 import './Breadcrumb.scss';
 
 export default function Breadcrumb() {
   const pathname = usePathname();
+  const isTheorySection = pathname.startsWith('/theory');
+
+  // Add/remove 'has-breadcrumb' class to document element
+  useEffect(() => {
+    if (isTheorySection) {
+      document.documentElement.classList.add('has-breadcrumb');
+    } else {
+      document.documentElement.classList.remove('has-breadcrumb');
+    }
+
+    return () => {
+      document.documentElement.classList.remove('has-breadcrumb');
+    };
+  }, [isTheorySection]);
+
+  // Don't show breadcrumb if not in theory section
+  if (!isTheorySection) {
+    return null;
+  }
 
   const generateBreadcrumbs = () => {
     const segments = pathname.split('/').filter(Boolean);

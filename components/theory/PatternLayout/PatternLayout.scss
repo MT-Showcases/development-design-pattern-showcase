@@ -89,6 +89,7 @@
         }
 
         &-content {
+            margin-bottom: $spacing-4;
             color: $white;
             font-size: $font-base;
             line-height: 1.8;
@@ -144,6 +145,9 @@
                 color: $navy-dark;
                 font-size: $font-xl;
                 margin-bottom: $spacing-2;
+                display: flex;
+                align-items: center;
+                gap: $spacing-2;
             }
 
             &-description {
@@ -156,6 +160,23 @@
                 border-color: $navy-dark;
                 margin: $spacing-6 0;
             }
+        }
+    }
+
+    // Example type icons
+    &__example-icon {
+        font-size: $font-xl;
+        
+        &--problem {
+            color: $error;
+        }
+        
+        &--solution {
+            color: $success;
+        }
+        
+        &--example {
+            color: $info;
         }
     }
 
@@ -244,9 +265,9 @@
             transition: all 0.3s ease;
 
             &:hover {
-                background-color: color.adjust($pink-accent, $lightness: -10%);
+                background-color: color.adjust($pink-accent-hex, $lightness: -10%);
                 transform: translateY(-2px);
-                box-shadow: 0 4px 8px rgba($pink-accent, 0.3);
+                box-shadow: 0 4px 8px rgba($pink-accent-hex, 0.3);
             }
         }
     }

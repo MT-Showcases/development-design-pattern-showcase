@@ -21,244 +21,307 @@
 
 "use client";
 
-import { useEffect, useState } from 'react';
-import { useAppSelector, useAppDispatch } from '@/lib/store/hooks';
-import { hydrate } from '@/lib/store/gameSlice';
-import { 
-  RocketOutlined, 
-  CodeOutlined, 
-  BulbOutlined, 
-  TrophyOutlined, 
-  BarChartOutlined, 
-  HistoryOutlined, 
-  AimOutlined,
-  ClockCircleOutlined,
-  PauseCircleOutlined 
-} from '@ant-design/icons';
-import './page.scss';
+import { useEffect, useState } from "react";
+import { useAppSelector, useAppDispatch } from "@/lib/store/hooks";
+import { hydrate } from "@/lib/store/gameSlice";
+import {
+    RocketOutlined,
+    CodeOutlined,
+    BulbOutlined,
+    TrophyOutlined,
+    BarChartOutlined,
+    HistoryOutlined,
+    AimOutlined,
+    ClockCircleOutlined,
+    PauseCircleOutlined,
+} from "@ant-design/icons";
+import "./page.scss";
 
 export default function MatchViewer() {
-  const dispatch = useAppDispatch();
-  const {
-    teams,
-    roundNumber,
-    currentExample,
-    solutionRevealed,
-    answerHistory,
-    roundStartTime,
-    isPaused,
-  } = useAppSelector((state) => state.game);
+    const dispatch = useAppDispatch();
+    const {
+        teams,
+        roundNumber,
+        currentExample,
+        solutionRevealed,
+        answerHistory,
+        roundStartTime,
+        isPaused,
+    } = useAppSelector((state) => state.game);
 
-  const [elapsedTime, setElapsedTime] = useState(0);
+    const [elapsedTime, setElapsedTime] = useState(0);
 
-  // Sincronizza con localStorage quando la finestra è in focus
-  useEffect(() => {
-    const syncFromLocalStorage = () => {
-      const savedState = localStorage.getItem('gameState');
-      if (savedState) {
-        try {
-          const state = JSON.parse(savedState);
-          dispatch(hydrate(state));
-        } catch (e) {
-          console.error('Errore nel parsing dello state:', e);
-        }
-      }
-    };
+    // Sincronizza con localStorage quando la finestra è in focus
+    useEffect(() => {
+        const syncFromLocalStorage = () => {
+            const savedState = localStorage.getItem("gameState");
+            if (savedState) {
+                try {
+                    const state = JSON.parse(savedState);
+                    dispatch(hydrate(state));
+                } catch (e) {
+                    console.error("Errore nel parsing dello state:", e);
+                }
+            }
+        };
 
-    // Sincronizza all'avvio
-    syncFromLocalStorage();
-
-    // Ascolta i cambiamenti da altre finestre
-    const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === 'gameState') {
+        // Sincronizza all'avvio
         syncFromLocalStorage();
-      }
+
+        // Ascolta i cambiamenti da altre finestre
+        const handleStorageChange = (e: StorageEvent) => {
+            if (e.key === "gameState") {
+                syncFromLocalStorage();
+            }
+        };
+
+        window.addEventListener("storage", handleStorageChange);
+        window.addEventListener("gameStateChanged", syncFromLocalStorage);
+
+        // Polling fallback per sicurezza (ogni 500ms)
+        const pollingInterval = setInterval(syncFromLocalStorage, 500);
+
+        return () => {
+            window.removeEventListener("storage", handleStorageChange);
+            window.removeEventListener("gameStateChanged", syncFromLocalStorage);
+            clearInterval(pollingInterval);
+        };
+    }, [dispatch]);
+
+    // Timer
+    useEffect(() => {
+        if (!roundStartTime || isPaused) return;
+
+        const interval = setInterval(() => {
+            setElapsedTime(Math.floor((Date.now() - roundStartTime) / 1000));
+        }, 1000);
+
+        return () => clearInterval(interval);
+    }, [roundStartTime, isPaused]);
+
+    // Reset timer quando cambia esempio
+    useEffect(() => {
+        if (roundStartTime) {
+            setElapsedTime(0);
+        }
+    }, [roundStartTime]);
+
+    const formatTime = (seconds: number) => {
+        const mins = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
     };
 
-    window.addEventListener('storage', handleStorageChange);
-    window.addEventListener('gameStateChanged', syncFromLocalStorage);
+    const sortedTeams = [...teams].sort((a, b) => b.score - a.score);
 
-    // Polling fallback per sicurezza (ogni 500ms)
-    const pollingInterval = setInterval(syncFromLocalStorage, 500);
-
-    return () => {
-      window.removeEventListener('storage', handleStorageChange);
-      window.removeEventListener('gameStateChanged', syncFromLocalStorage);
-      clearInterval(pollingInterval);
-    };
-  }, [dispatch]);
-
-  // Timer
-  useEffect(() => {
-    if (!roundStartTime || isPaused) return;
-
-    const interval = setInterval(() => {
-      setElapsedTime(Math.floor((Date.now() - roundStartTime) / 1000));
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, [roundStartTime, isPaused]);
-
-  // Reset timer quando cambia esempio
-  useEffect(() => {
-    if (roundStartTime) {
-      setElapsedTime(0);
-    }
-  }, [roundStartTime]);
-
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-  };
-
-  const sortedTeams = [...teams].sort((a, b) => b.score - a.score);
-
-  return (
-    <div className="match-viewer">
-      {/* Header */}
-      <div className="match-viewer__header">
-        <h1 className="match-viewer__title"><RocketOutlined /> Match Viewer</h1>
-        <div className="match-viewer__round-info">
-          <div className="match-viewer__round-number">Round {roundNumber}</div>
-          {roundStartTime && (
-            <div className={isPaused ? 'match-viewer__timer match-viewer__timer--paused' : 'match-viewer__timer'}>
-              {isPaused ? <PauseCircleOutlined /> : <ClockCircleOutlined />} {formatTime(elapsedTime)}
-            </div>
-          )}
-        </div>
-      </div>
-
-      {currentExample ? (
-        <div className="match-viewer__grid-layout">
-          {/* Main Content */}
-          <div className="match-viewer__main-content">
-            {/* Codice Esempio */}
-            <div className="match-viewer__card">
-              <h2 className="match-viewer__card-title"><CodeOutlined /> Codice Esempio</h2>
-              <div className="match-viewer__example-title">{currentExample.title}</div>
-              <span className={`match-viewer__category-badge match-viewer__category-badge--${currentExample.category}`}>
-                {currentExample.category}
-              </span>
-              <div className="match-viewer__code-block">
-                <pre>{currentExample.code}</pre>
-              </div>
-            </div>
-
-            {/* Soluzione - Sempre visibile nel Match Viewer */}
-            <div className="match-viewer__card">
-              <div className="match-viewer__solution-section">
-                <h3 className="match-viewer__solution-title"><BulbOutlined /> Soluzione</h3>
-                <div className="match-viewer__pattern-list">
-                  {currentExample.solutionPatterns.map((pattern, index) => (
-                    <span key={index} className="match-viewer__pattern-tag">
-                      {pattern}
-                    </span>
-                  ))}
-                </div>
-                <p className="match-viewer__explanation">
-                  {currentExample.solutionExplanation}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Sidebar */}
-          <div className="match-viewer__sidebar">
-            {/* Classifica */}
-            <div className="match-viewer__card">
-              <h2 className="match-viewer__card-title"><TrophyOutlined /> Classifica</h2>
-              <div className="match-viewer__scoreboard">
-                {sortedTeams.map((team, index) => (
-                  <div key={team.id} className="match-viewer__team-score">
-                    <div className="match-viewer__team-rank">#{index + 1}</div>
-                    <div className="match-viewer__team-info">
-                      <div
-                        className="match-viewer__team-color"
-                        style={{ backgroundColor: team.color }}
-                      />
-                      <span className="match-viewer__team-name">{team.name}</span>
+    return (
+        <div className="min-h-screen bg-navy-dark text-white">
+            {/* Header */}
+            <div className="bg-navy-medium rounded-2xl p-6 md:p-8 mb-8 border-2 border-yellow-primary flex flex-col md:flex-row justify-between items-center gap-4">
+                <h1 className="text-3xl md:text-5xl font-bold text-yellow-primary m-0 flex items-center gap-3">
+                    <RocketOutlined className="text-4xl md:text-5xl" /> Match Viewer
+                </h1>
+                <div className="flex gap-4 md:gap-8 items-center">
+                    <div className="text-xl md:text-2xl px-6 py-2 bg-yellow-primary text-navy-dark rounded-full font-bold">
+                        Round {roundNumber}
                     </div>
-                    <div className="match-viewer__team-points">{team.score}</div>
-                  </div>
-                ))}
-              </div>
+                    {roundStartTime && (
+                        <div
+                            className={`text-2xl md:text-4xl font-bold font-mono min-w-[120px] text-center flex items-center justify-center gap-2 ${
+                                isPaused ? "text-yellow-primary" : "text-green-500"
+                            }`}
+                        >
+                            {isPaused ? <PauseCircleOutlined /> : <ClockCircleOutlined />}{" "}
+                            {formatTime(elapsedTime)}
+                        </div>
+                    )}
+                </div>
             </div>
 
-            {/* Statistiche */}
-            <div className="match-viewer__card">
-              <h2 className="match-viewer__card-title"><BarChartOutlined /> Statistiche</h2>
-              <div className="match-viewer__stats">
-                <div className="match-viewer__stat-item">
-                  <div className="match-viewer__stat-value">{answerHistory.length}</div>
-                  <div className="match-viewer__stat-label">Round completati</div>
-                </div>
-                <div className="match-viewer__stat-item">
-                  <div className="match-viewer__stat-value">
-                    {answerHistory.length > 0
-                      ? Math.floor(
-                          answerHistory.reduce((sum, h) => sum + h.timeElapsed, 0) /
-                            answerHistory.length
-                        )
-                      : 0}
-                    s
-                  </div>
-                  <div className="match-viewer__stat-label">Tempo medio</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      ) : (
-        <div className="match-viewer__no-data">
-          <div className="match-viewer__no-data-icon"><AimOutlined /></div>
-          <p>In attesa del prossimo esempio...</p>
-        </div>
-      )}
+            {currentExample ? (
+                <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-8 mb-8">
+                    {/* Main Content */}
+                    <div className="space-y-6">
+                        {/* Codice Esempio */}
+                        <div className="bg-beige-card rounded-xl p-6 border-2 border-navy-light">
+                            <h2 className="text-xl font-semibold text-navy-dark m-0 mb-4 flex items-center gap-2">
+                                <CodeOutlined /> Codice Esempio
+                            </h2>
+                            <div className="text-2xl font-bold text-navy-dark mb-2">
+                                {currentExample.title}
+                            </div>
+                            <span
+                                className={`inline-block px-3 py-1 rounded-lg text-sm font-semibold mb-4 match-viewer__category-badge--${currentExample.category}`}
+                            >
+                                {currentExample.category}
+                            </span>
+                            <div className="bg-navy-dark rounded-lg p-4 overflow-x-auto">
+                                <pre className="text-white text-sm font-mono m-0">
+                                    {currentExample.code}
+                                </pre>
+                            </div>
+                        </div>
 
-      {/* Storico */}
-      <div className="match-viewer__card">
-        <h2 className="match-viewer__card-title"><HistoryOutlined /> Storico Risposte</h2>
-        {answerHistory.length > 0 ? (
-          <div className="match-viewer__history-list">
-            {[...answerHistory].reverse().map((item, index) => (
-              <div
-                key={index}
-                className="match-viewer__history-item"
-                style={{ borderLeftColor: item.winnerTeam?.color || '#666' }}
-              >
-                <div className="match-viewer__history-header">
-                  <span className="match-viewer__history-round">Round {item.roundNumber}</span>
-                  <span className="match-viewer__history-time">
-                    {formatTime(item.timeElapsed)}
-                  </span>
+                        {/* Soluzione - Sempre visibile nel Match Viewer */}
+                        <div className="bg-beige-card rounded-xl p-6 border-2 border-navy-light">
+                            <h3 className="text-xl font-semibold text-navy-dark m-0 mb-4 flex items-center gap-2">
+                                <BulbOutlined /> Soluzione
+                            </h3>
+                            <div className="flex flex-wrap gap-2 mb-4">
+                                {currentExample.solutionPatterns.map((pattern, index) => (
+                                    <span
+                                        key={index}
+                                        className="bg-pink-accent text-white px-3 py-1 rounded text-sm font-semibold"
+                                    >
+                                        {pattern}
+                                    </span>
+                                ))}
+                            </div>
+                            <p
+                                className="text-navy-dark text-base leading-relaxed m-0"
+                                dangerouslySetInnerHTML={{
+                                    __html: currentExample.solutionExplanation,
+                                }}
+                            />
+                        </div>
+                    </div>
+
+                    {/* Sidebar */}
+                    <div className="space-y-6">
+                        {/* Classifica */}
+                        <div className="bg-beige-card rounded-xl p-6 border-2 border-navy-light">
+                            <h2 className="text-xl font-semibold text-navy-dark m-0 mb-4 flex items-center gap-2">
+                                <TrophyOutlined /> Classifica
+                            </h2>
+                            <div className="space-y-3">
+                                {sortedTeams.map((team, index) => (
+                                    <div
+                                        key={team.id}
+                                        className="flex items-center gap-3 p-3 bg-white rounded-lg border-2 border-navy-light"
+                                    >
+                                        <div className="text-yellow-primary min-w-[35px] font-bold text-lg">
+                                            #{index + 1}
+                                        </div>
+                                        <div className="flex items-center gap-2 flex-1">
+                                            <div
+                                                className="w-4 h-4 rounded-full border-2 border-navy-light"
+                                                style={{ backgroundColor: team.color }}
+                                            />
+                                            <span className="font-semibold text-navy-dark">
+                                                {team.name}
+                                            </span>
+                                        </div>
+                                        <div className="text-yellow-primary font-bold text-xl">
+                                            {team.score}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Statistiche */}
+                        <div className="bg-beige-card rounded-xl p-6 border-2 border-navy-light">
+                            <h2 className="text-xl font-semibold text-navy-dark m-0 mb-4 flex items-center gap-2">
+                                <BarChartOutlined /> Statistiche
+                            </h2>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="text-center p-4 bg-white rounded-lg">
+                                    <div className="text-3xl font-bold text-yellow-primary">
+                                        {answerHistory.length}
+                                    </div>
+                                    <div className="text-sm text-gray-600 mt-1">
+                                        Round completati
+                                    </div>
+                                </div>
+                                <div className="text-center p-4 bg-white rounded-lg">
+                                    <div className="text-3xl font-bold text-yellow-primary">
+                                        {answerHistory.length > 0
+                                            ? Math.floor(
+                                                  answerHistory.reduce(
+                                                      (sum, h) => sum + h.timeElapsed,
+                                                      0
+                                                  ) / answerHistory.length
+                                              )
+                                            : 0}
+                                        s
+                                    </div>
+                                    <div className="text-sm text-gray-600 mt-1">
+                                        Tempo medio
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div className="match-viewer__history-title">{item.example.title}</div>
-                <div className="match-viewer__pattern-list">
-                  {item.example.solutionPatterns.map((pattern, i) => (
-                    <span key={i} className="match-viewer__pattern-tag">
-                      {pattern}
-                    </span>
-                  ))}
+            ) : (
+                <div className="text-center py-20">
+                    <div className="text-6xl text-yellow-primary mb-4">
+                        <AimOutlined />
+                    </div>
+                    <p className="text-xl text-gray-400">
+                        In attesa del prossimo esempio...
+                    </p>
                 </div>
-                {item.winnerTeam && (
-                  <div className="match-viewer__history-winner">
-                    <div
-                      className="match-viewer__winner-color"
-                      style={{ backgroundColor: item.winnerTeam.color }}
-                    />
-                    <span>Vinto da {item.winnerTeam.name}</span>
-                  </div>
+            )}
+
+            {/* Storico */}
+            <div className="bg-beige-card rounded-xl p-6 border-2 border-navy-light">
+                <h2 className="text-xl font-semibold text-navy-dark m-0 mb-4 flex items-center gap-2">
+                    <HistoryOutlined /> Storico Risposte
+                </h2>
+                {answerHistory.length > 0 ? (
+                    <div className="space-y-4">
+                        {[...answerHistory].reverse().map((item, index) => (
+                            <div
+                                key={index}
+                                className="p-4 bg-white rounded-lg border-l-4"
+                                style={{
+                                    borderLeftColor: item.winnerTeam?.color || "#666",
+                                }}
+                            >
+                                <div className="flex justify-between items-center mb-2">
+                                    <span className="font-semibold text-navy-dark">
+                                        Round {item.roundNumber}
+                                    </span>
+                                    <span className="text-sm text-gray-600 font-mono">
+                                        {formatTime(item.timeElapsed)}
+                                    </span>
+                                </div>
+                                <div className="text-lg font-semibold text-navy-dark mb-2">
+                                    {item.example.title}
+                                </div>
+                                <div className="flex flex-wrap gap-2 mb-2">
+                                    {item.example.solutionPatterns.map((pattern, i) => (
+                                        <span
+                                            key={i}
+                                            className="bg-pink-accent text-white px-2 py-1 rounded text-xs font-semibold"
+                                        >
+                                            {pattern}
+                                        </span>
+                                    ))}
+                                </div>
+                                {item.winnerTeam && (
+                                    <div className="flex items-center gap-2 mt-3 pt-3 border-t border-gray-200">
+                                        <div
+                                            className="w-3 h-3 rounded-full"
+                                            style={{
+                                                backgroundColor: item.winnerTeam.color,
+                                            }}
+                                        />
+                                        <span className="text-sm text-gray-700">
+                                            Vinto da {item.winnerTeam.name}
+                                        </span>
+                                    </div>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+                ) : (
+                    <div className="text-center py-8 text-gray-400">
+                        Nessuna risposta registrata ancora
+                    </div>
                 )}
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div style={{ textAlign: 'center', padding: '2rem', color: '#9ca3af' }}>
-            Nessuna risposta registrata ancora
-          </div>
-        )}
-      </div>
-    </div>
-  );
+            </div>
+        </div>
+    );
 }

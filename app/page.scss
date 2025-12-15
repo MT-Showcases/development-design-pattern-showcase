@@ -8,38 +8,45 @@
 
 @use 'sass:color';
 @use '@/styles' as *;
+@use '@/styles/functions' as fn;
 
 .home {
   &__main {
     min-height: 100vh;
-    padding: $spacing-12 $spacing-6;
     background-color: $navy-dark;
   }
 
   &__reset-button {
-    position: fixed;
-    bottom: $spacing-8;
-    right: $spacing-8;
-    padding: $spacing-3 $spacing-6;
-    font-size: $font-sm;
-    font-weight: $weight-semibold;
-    color: $white;
-    background-color: $error;
-    border: none;
-    border-radius: $radius-base;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: $shadow-lg;
+    position: fixed !important;
+    bottom: $spacing-8 !important;
+    right: $spacing-8 !important;
+    padding: $spacing-3 $spacing-6 !important;
+    font-size: $font-base !important;
+    font-weight: $weight-bold !important;
+    color: $white !important;
+    background-color: $pink-accent !important;
+    border: fn.rem(2) solid $pink-accent !important;
+    border-radius: $radius-lg !important;
+    box-shadow: $shadow-lg !important;
     z-index: $z-50;
+    transition: all 0.2s ease !important;
 
     &:hover {
-      background-color: color.adjust($error, $lightness: -10%);
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba($error, 0.4);
+      background-color: color.adjust($pink-accent-hex, $lightness: -10%) !important;
+      border-color: color.adjust($pink-accent-hex, $lightness: -10%) !important;
+      transform: translateY(fn.rem(-2)) !important;
+      box-shadow: 0 fn.rem(6) fn.rem(20) rgba($pink-accent-hex, 0.4) !important;
     }
 
     &:active {
-      transform: translateY(0);
+      transform: translateY(0) !important;
+    }
+
+    @include respond-below(md) {
+      bottom: $spacing-4 !important;
+      right: $spacing-4 !important;
+      padding: $spacing-2 $spacing-4 !important;
+      font-size: $font-sm !important;
     }
   }
 }

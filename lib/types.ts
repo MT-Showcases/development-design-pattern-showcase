@@ -19,13 +19,21 @@
 
 export type Category = "creational" | "structural" | "behavioral";
 
+export interface SolutionStep {
+  title: string; // e.g. "Definizione prodotti"
+  description: string; // short explanation
+  code: string; // code snippet for this step
+}
+
 export interface PatternExample {
   id: string; // unique ID, e.g. "creational-01"
   title: string; // short title, e.g. "Pizzeria online - scelta impasto"
   category: Category;
   code: string; // JavaScript code snippet
   solutionPatterns: string[]; // array of pattern names, e.g. ["Factory Method", "Singleton"]
-  solutionExplanation: string; // short explanation in Italian
+  solutionExplanation: string; // overall explanation in Italian
+  solutionSteps: SolutionStep[]; // step-by-step breakdown with code
+  solutionAdvantages: string[]; // list of advantages
 }
 
 export interface Team {

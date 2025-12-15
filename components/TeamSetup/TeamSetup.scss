@@ -23,13 +23,7 @@
 .team-setup {
   min-height: 100vh;
   background-color: $navy-dark;
-  max-width: fn.rem(700);
   margin: 0 auto;
-  padding: $spacing-8;
-
-  @include respond-below(md) {
-    padding: $spacing-4;
-  }
 
   &__header {
     text-align: center;

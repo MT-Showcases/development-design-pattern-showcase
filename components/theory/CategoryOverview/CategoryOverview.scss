@@ -38,6 +38,11 @@
   &__icon {
     font-size: fn.rem(64);
     margin-bottom: fn.rem(24);
+    color: $yellow-primary;
+
+    :global(.anticon) {
+      color: $yellow-primary;
+    }
   }
 
   &__title {

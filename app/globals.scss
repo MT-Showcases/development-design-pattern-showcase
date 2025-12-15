@@ -1,8 +1,37 @@
 @use '../styles' as styles;
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@theme {
+  /* Navy palette */
+  --color-navy-dark: #0a1929;
+  --color-navy-medium: #1a2942;
+  --color-navy-light: #2a3952;
+  
+  /* Yellow palette */
+  --color-yellow-primary: #ffc107;
+  --color-yellow-dark: #d39e00;
+  --color-yellow-light: #ffcd39;
+  
+  /* Pink palette */
+  --color-pink-accent: #ff1744;
+  --color-pink-dark: #d50000;
+  --color-pink-light: #ff5252;
+  
+  /* Beige palette */
+  --color-beige-card: #f5e6d3;
+  --color-beige-dark: #e6d7c4;
+  --color-beige-light: #fff5e6;
+  
+  /* Semantic colors */
+  --color-success: #10b981;
+  --color-success-dark: #059669;
+  --color-success-light: #34d399;
+  
+  --color-info: #3b82f6;
+  --color-info-dark: #2563eb;
+  --color-info-light: #60a5fa;
+}
 
 /* === DESIGN PATTERN SHOWCASE - GLOBAL STYLES === */
 /* Based on course slides: Navy + Yellow + Pink/Red accent */
@@ -14,7 +43,7 @@
  * - Responsive: Mobile-first with breakpoint mixins from styles/_mixins.scss
  */
 
-/* CSS Custom Properties per Tailwind v4 */
+/* CSS Custom Properties for Tailwind v4 */
 @layer base {
   :root {
     /* Primary Colors (from slides) */
@@ -39,6 +68,16 @@
     --error: #{styles.$error};
     --warning: #{styles.$warning};
     --info: #{styles.$info};
+
+    /* Layout - Sticky positioning offsets */
+    --navbar-height: 48px;
+    --breadcrumb-height: 56px;
+    --sticky-top-offset: var(--navbar-height); // Default: navbar only
+  }
+
+  /* Modifier for pages with breadcrumb */
+  .has-breadcrumb {
+    --sticky-top-offset: calc(var(--navbar-height) + var(--breadcrumb-height)); // 104px
   }
 
   * {
@@ -57,7 +96,7 @@
   }
 
   body {
-    font-family: #{styles.$font-primary};
+    font-family: var(--font-inter), -apple-system, BlinkMacSystemFont, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }

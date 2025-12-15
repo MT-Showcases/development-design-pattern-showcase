@@ -72,7 +72,10 @@ const gameSlice = createSlice({
     setCurrentExample: (state, action: PayloadAction<PatternExample | null>) => {
       state.currentExample = action.payload;
       if (action.payload) {
-        state.usedExampleIds.push(action.payload.id);
+        // Add to usedExampleIds only if not already present (avoid duplicates on hydrate)
+        if (!state.usedExampleIds.includes(action.payload.id)) {
+          state.usedExampleIds.push(action.payload.id);
+        }
         state.roundStartTime = Date.now();
         state.solutionRevealed = false;
         state.isPaused = false;
