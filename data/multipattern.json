@@ -4,7 +4,10 @@
     "title": "User authentication service",
     "category": "multipattern",
     "code": "// Servizio di autenticazione\nclass AuthService {\n  constructor() {\n    if (AuthService.instance) {\n      return AuthService.instance;\n    }\n    this.users = new Map();\n    AuthService.instance = this;\n  }\n\n  register(email, password) {\n    const user = this.createUser(email, password);\n    this.users.set(email, user);\n    return user;\n  }\n\n  createUser(email, password) {\n    if (email.includes('@admin')) {\n      return { email, password, role: 'admin', permissions: ['all'] };\n    }\n    return { email, password, role: 'user', permissions: ['read'] };\n  }\n\n  getUser(email) {\n    return this.users.get(email);\n  }\n}\n\nconst auth1 = new AuthService();\nauth1.register('user@test.com', 'pass123');\nconst auth2 = new AuthService();\nconsole.log(auth1 === auth2); // true",
-    "solutionPatterns": ["Singleton", "Factory Method"],
+    "solutionPatterns": [
+      "Singleton",
+      "Factory Method"
+    ],
     "solutionExplanation": "Combina <strong>Singleton</strong> (unica istanza di AuthService condivisa) e <strong>Factory Method</strong> (createUser decide il tipo di utente in base all'email). Garantisce un unico punto di gestione autenticazione con creazione flessibile di utenti admin o normali.",
     "solutionSteps": [
       {
@@ -34,7 +37,10 @@
     "title": "Push notification system",
     "category": "multipattern",
     "code": "// Centro notifiche\nclass NotificationHub {\n  constructor() {\n    this.subscribers = [];\n  }\n\n  subscribe(handler) {\n    this.subscribers.push(handler);\n  }\n\n  notify(event) {\n    this.subscribers.forEach(sub => sub.handle(event));\n  }\n}\n\n// Handler con strategia\nclass NotificationHandler {\n  constructor(strategy) {\n    this.strategy = strategy;\n  }\n\n  handle(event) {\n    this.strategy.send(event);\n  }\n\n  setStrategy(strategy) {\n    this.strategy = strategy;\n  }\n}\n\n// Strategie di invio\nclass EmailChannel {\n  send(event) {\n    console.log('📧 Email:', event.message);\n  }\n}\n\nclass SMSChannel {\n  send(event) {\n    console.log('📱 SMS:', event.message);\n  }\n}\n\nconst hub = new NotificationHub();\nconst handler1 = new NotificationHandler(new EmailChannel());\nconst handler2 = new NotificationHandler(new SMSChannel());\nhub.subscribe(handler1);\nhub.subscribe(handler2);\nhub.notify({ message: 'Nuovo ordine!' });",
-    "solutionPatterns": ["Observer", "Strategy"],
+    "solutionPatterns": [
+      "Observer",
+      "Strategy"
+    ],
     "solutionExplanation": "Integra <strong>Observer</strong> (NotificationHub notifica tutti i subscriber quando arriva un evento) e <strong>Strategy</strong> (ogni NotificationHandler usa una strategia intercambiabile - email o SMS). Permette broadcast multi-canale con metodi di invio flessibili.",
     "solutionSteps": [
       {
@@ -64,7 +70,10 @@
     "title": "Text editor con history",
     "category": "multipattern",
     "code": "// Editor\nclass TextEditor {\n  constructor() {\n    this.content = '';\n    this.history = [];\n  }\n\n  write(text) {\n    const command = new WriteOperation(this, text);\n    command.execute();\n    this.history.push(command);\n  }\n\n  undo() {\n    const command = this.history.pop();\n    if (command) command.undo();\n  }\n\n  getContent() {\n    return this.content;\n  }\n\n  saveSnapshot() {\n    return new EditorSnapshot(this.content);\n  }\n\n  restore(snapshot) {\n    this.content = snapshot.getContent();\n  }\n}\n\n// Command\nclass WriteOperation {\n  constructor(editor, text) {\n    this.editor = editor;\n    this.text = text;\n    this.snapshot = null;\n  }\n\n  execute() {\n    this.snapshot = this.editor.saveSnapshot();\n    this.editor.content += this.text;\n  }\n\n  undo() {\n    this.editor.restore(this.snapshot);\n  }\n}\n\n// Memento\nclass EditorSnapshot {\n  constructor(content) {\n    this.content = content;\n  }\n\n  getContent() {\n    return this.content;\n  }\n}\n\nconst editor = new TextEditor();\neditor.write('Hello ');\neditor.write('World');\nconsole.log(editor.getContent()); // 'Hello World'\neditor.undo();\nconsole.log(editor.getContent()); // 'Hello '",
-    "solutionPatterns": ["Command", "Memento"],
+    "solutionPatterns": [
+      "Command",
+      "Memento"
+    ],
     "solutionExplanation": "Combina <strong>Command</strong> (WriteOperation incapsula operazioni di scrittura con execute/undo) e <strong>Memento</strong> (EditorSnapshot salva e ripristina stato dell'editor). Command gestisce esecuzione mentre Memento preserva stati storici per undo.",
     "solutionSteps": [
       {
@@ -94,7 +103,10 @@
     "title": "Smart database query system",
     "category": "multipattern",
     "code": "// Database reale\nclass DatabaseService {\n  query(sql) {\n    console.log('🔍 Query DB:', sql);\n    return { data: `Result for ${sql}` };\n  }\n}\n\n// Proxy con cache\nclass QueryCache {\n  constructor() {\n    this.db = new DatabaseService();\n    this.cache = new Map();\n  }\n\n  query(sql) {\n    if (this.cache.has(sql)) {\n      console.log('💾 Cache hit');\n      return this.cache.get(sql);\n    }\n    \n    const result = this.db.query(sql);\n    this.cache.set(sql, result);\n    return result;\n  }\n\n  clearCache() {\n    this.cache.clear();\n  }\n}\n\n// Builder per query\nclass QueryBuilder {\n  constructor(cache) {\n    this.cache = cache;\n    this.sql = '';\n  }\n\n  select(fields) {\n    this.sql = `SELECT ${fields}`;\n    return this;\n  }\n\n  from(table) {\n    this.sql += ` FROM ${table}`;\n    return this;\n  }\n\n  where(condition) {\n    this.sql += ` WHERE ${condition}`;\n    return this;\n  }\n\n  execute() {\n    return this.cache.query(this.sql);\n  }\n}\n\nconst cache = new QueryCache();\nconst query = new QueryBuilder(cache);\nquery.select('*').from('users').where('id=1').execute();\nquery.select('*').from('users').where('id=1').execute(); // Cache hit",
-    "solutionPatterns": ["Proxy", "Builder"],
+    "solutionPatterns": [
+      "Proxy",
+      "Builder"
+    ],
     "solutionExplanation": "Integra <strong>Proxy</strong> (QueryCache intercetta query aggiungendo layer di cache) e <strong>Builder</strong> (QueryBuilder costruisce SQL passo dopo passo con interfaccia fluida). Ottimizza performance con cache trasparente e query leggibili.",
     "solutionSteps": [
       {
@@ -124,7 +136,10 @@
     "title": "Advanced logging framework",
     "category": "multipattern",
     "code": "// Logger base\nclass Logger {\n  log(message) {\n    console.log(message);\n  }\n}\n\n// Decorator timestamp\nclass TimestampLogger {\n  constructor(logger) {\n    this.logger = logger;\n  }\n\n  log(message) {\n    const timestamp = new Date().toISOString();\n    this.logger.log(`[${timestamp}] ${message}`);\n  }\n}\n\n// Decorator livello\nclass LevelLogger {\n  constructor(logger, level) {\n    this.logger = logger;\n    this.level = level;\n  }\n\n  log(message) {\n    this.logger.log(`[${this.level}] ${message}`);\n  }\n}\n\n// Composite per multi-output\nclass MultiLogger {\n  constructor() {\n    this.loggers = [];\n  }\n\n  add(logger) {\n    this.loggers.push(logger);\n  }\n\n  log(message) {\n    this.loggers.forEach(logger => logger.log(message));\n  }\n}\n\nconst fileLogger = new LevelLogger(new TimestampLogger(new Logger()), 'INFO');\nconst consoleLogger = new LevelLogger(new Logger(), 'DEBUG');\n\nconst multi = new MultiLogger();\nmulti.add(fileLogger);\nmulti.add(consoleLogger);\nmulti.log('App started');",
-    "solutionPatterns": ["Decorator", "Composite"],
+    "solutionPatterns": [
+      "Decorator",
+      "Composite"
+    ],
     "solutionExplanation": "Combina <strong>Decorator</strong> (TimestampLogger e LevelLogger aggiungono funzionalità senza modificare Logger base) e <strong>Composite</strong> (MultiLogger gestisce multipli logger come uno solo). Permette logging flessibile con output gerarchici e decorazioni multiple.",
     "solutionSteps": [
       {
@@ -154,7 +169,11 @@
     "title": "E-commerce shopping cart",
     "category": "multipattern",
     "code": "// Carrello con stati e notifiche\nclass ShoppingCart {\n  constructor() {\n    this.items = [];\n    this.observers = [];\n    this.state = new EmptyCart(this);\n  }\n\n  addItem(item) {\n    this.items.push(item);\n    this.state.addItem();\n    this.notifyObservers();\n  }\n\n  setState(state) {\n    this.state = state;\n  }\n\n  subscribe(observer) {\n    this.observers.push(observer);\n  }\n\n  notifyObservers() {\n    this.observers.forEach(obs => obs.update(this));\n  }\n\n  checkout(paymentStrategy) {\n    this.state.checkout(paymentStrategy);\n  }\n}\n\n// Stati\nclass EmptyCart {\n  constructor(cart) { this.cart = cart; }\n  addItem() { this.cart.setState(new ActiveCart(this.cart)); }\n  checkout() { console.log('❌ Carrello vuoto'); }\n}\n\nclass ActiveCart {\n  constructor(cart) { this.cart = cart; }\n  addItem() {}\n  checkout(strategy) {\n    const total = this.cart.items.reduce((sum, item) => sum + item.price, 0);\n    strategy.pay(total);\n    this.cart.setState(new PaidCart(this.cart));\n  }\n}\n\nclass PaidCart {\n  constructor(cart) { this.cart = cart; }\n  addItem() { console.log('❌ Ordine già confermato'); }\n  checkout() { console.log('❌ Già pagato'); }\n}\n\n// Strategie pagamento\nclass CreditCard {\n  pay(amount) { console.log(`💳 Pagato €${amount}`); }\n}\n\n// Observer\nclass CartDisplay {\n  update(cart) { console.log(`🛒 ${cart.items.length} items`); }\n}\n\nconst cart = new ShoppingCart();\ncart.subscribe(new CartDisplay());\ncart.addItem({ name: 'Book', price: 15 });\ncart.checkout(new CreditCard());",
-    "solutionPatterns": ["Observer", "State", "Strategy"],
+    "solutionPatterns": [
+      "Observer",
+      "State",
+      "Strategy"
+    ],
     "solutionExplanation": "Integra <strong>Observer</strong> (notifica CartDisplay quando cambia carrello), <strong>State</strong> (gestisce transizioni Empty→Active→Paid) e <strong>Strategy</strong> (metodo pagamento intercambiabile). Sistema completo con gestione stati, notifiche UI e pagamenti flessibili.",
     "solutionSteps": [
       {
@@ -184,7 +203,11 @@
     "title": "UI component framework",
     "category": "multipattern",
     "code": "// Componente base\nclass Component {\n  render() {}\n}\n\nclass Button extends Component {\n  constructor(text) {\n    super();\n    this.text = text;\n  }\n  render() { return `<button>${this.text}</button>`; }\n}\n\n// Composite container\nclass Container extends Component {\n  constructor() {\n    super();\n    this.children = [];\n  }\n  add(component) { this.children.push(component); }\n  render() {\n    return `<div>${this.children.map(c => c.render()).join('')}</div>`;\n  }\n}\n\n// Decorator tema\nclass ThemedComponent extends Component {\n  constructor(component, theme) {\n    super();\n    this.component = component;\n    this.theme = theme;\n  }\n  render() {\n    return `<div class=\"${this.theme}\">${this.component.render()}</div>`;\n  }\n}\n\n// Proxy lazy loading\nclass LazyComponent extends Component {\n  constructor(componentFn) {\n    super();\n    this.componentFn = componentFn;\n    this.component = null;\n  }\n  render() {\n    if (!this.component) {\n      console.log('⏳ Caricamento lazy...');\n      this.component = this.componentFn();\n    }\n    return this.component.render();\n  }\n}\n\nconst page = new Container();\npage.add(new ThemedComponent(new Button('Click'), 'dark'));\npage.add(new LazyComponent(() => new Button('Lazy')));\nconsole.log(page.render());",
-    "solutionPatterns": ["Composite", "Decorator", "Proxy"],
+    "solutionPatterns": [
+      "Composite",
+      "Decorator",
+      "Proxy"
+    ],
     "solutionExplanation": "Combina <strong>Composite</strong> (Container gestisce albero di componenti), <strong>Decorator</strong> (ThemedComponent aggiunge stili senza modificare componente) e <strong>Proxy</strong> (LazyComponent carica on-demand). Pattern fondamentali di framework UI moderni come React.",
     "solutionSteps": [
       {
@@ -214,7 +237,11 @@
     "title": "Application configuration manager",
     "category": "multipattern",
     "code": "// Configurazione singleton\nclass Config {\n  constructor() {\n    if (Config.instance) {\n      return Config.instance;\n    }\n    this.settings = {};\n    this.prototypes = {};\n    Config.instance = this;\n  }\n\n  set(key, value) {\n    this.settings[key] = value;\n  }\n\n  get(key) {\n    return this.settings[key];\n  }\n\n  registerPrototype(name, obj) {\n    this.prototypes[name] = obj;\n  }\n\n  create(name) {\n    const proto = this.prototypes[name];\n    if (!proto) return null;\n    return { ...proto };\n  }\n}\n\n// Builder per configurazione\nclass ConfigBuilder {\n  constructor() {\n    this.config = new Config();\n  }\n\n  setDatabase(db) {\n    this.config.set('database', db);\n    return this;\n  }\n\n  setPort(port) {\n    this.config.set('port', port);\n    return this;\n  }\n\n  setCache(cache) {\n    this.config.set('cache', cache);\n    return this;\n  }\n\n  build() {\n    return this.config;\n  }\n}\n\nconst config = new ConfigBuilder()\n  .setDatabase('mongodb://localhost')\n  .setPort(3000)\n  .setCache(true)\n  .build();\n\nconfig.registerPrototype('user', { role: 'guest', permissions: [] });\nconst user1 = config.create('user');\nconst user2 = config.create('user');",
-    "solutionPatterns": ["Singleton", "Builder", "Prototype"],
+    "solutionPatterns": [
+      "Singleton",
+      "Builder",
+      "Prototype"
+    ],
     "solutionExplanation": "Integra <strong>Singleton</strong> (una sola istanza Config condivisa), <strong>Builder</strong> (ConfigBuilder costruisce configurazione passo dopo passo con interfaccia fluida) e <strong>Prototype</strong> (clonazione template di oggetti registrati). Sistema completo per configurazione centralizzata e flessibile.",
     "solutionSteps": [
       {
@@ -244,7 +271,10 @@
     "title": "Data processing pipeline",
     "category": "multipattern",
     "code": "// Processore con chain\nclass DataProcessor {\n  constructor() {\n    this.chain = null;\n  }\n\n  setChain(handler) {\n    this.chain = handler;\n  }\n\n  process(data) {\n    if (this.chain) {\n      return this.chain.handle(data);\n    }\n    return data;\n  }\n}\n\n// Handler base\nclass Handler {\n  constructor() {\n    this.next = null;\n  }\n\n  setNext(handler) {\n    this.next = handler;\n    return handler;\n  }\n\n  handle(data) {\n    if (this.next) {\n      return this.next.handle(data);\n    }\n    return data;\n  }\n}\n\n// Validation handler\nclass ValidationHandler extends Handler {\n  handle(data) {\n    console.log('✓ Validazione');\n    if (!data || data.length === 0) throw new Error('Invalid data');\n    return super.handle(data);\n  }\n}\n\n// Transform con strategy\nclass TransformHandler extends Handler {\n  constructor(strategy) {\n    super();\n    this.strategy = strategy;\n  }\n\n  handle(data) {\n    console.log('⚙️ Trasformazione');\n    const transformed = this.strategy.transform(data);\n    return super.handle(transformed);\n  }\n}\n\n// Strategie\nclass UppercaseStrategy {\n  transform(data) { return data.toUpperCase(); }\n}\n\nclass ReverseStrategy {\n  transform(data) { return data.split('').reverse().join(''); }\n}\n\nconst processor = new DataProcessor();\nconst validation = new ValidationHandler();\nconst transform = new TransformHandler(new UppercaseStrategy());\n\nvalidation.setNext(transform);\nprocessor.setChain(validation);\n\nconsole.log(processor.process('hello')); // HELLO",
-    "solutionPatterns": ["Chain of Responsibility", "Strategy"],
+    "solutionPatterns": [
+      "Chain of Responsibility",
+      "Strategy"
+    ],
     "solutionExplanation": "Combina <strong>Chain of Responsibility</strong> (catena di handler processa dati sequenzialmente) e <strong>Strategy</strong> (algoritmi di trasformazione intercambiabili). Crea pipeline flessibile per elaborazione dati multi-step con validazione e trasformazioni customizzabili.",
     "solutionSteps": [
       {
@@ -274,7 +304,10 @@
     "title": "Business reporting system",
     "category": "multipattern",
     "code": "// Template per report\nclass ReportGenerator {\n  generateReport() {\n    this.collectData();\n    this.formatData();\n    this.addHeader();\n    this.addFooter();\n    if (this.includeCharts()) {\n      this.generateCharts();\n    }\n    return this.export();\n  }\n\n  collectData() { console.log('📊 Raccolta dati'); }\n  formatData() {}\n  addHeader() {}\n  addFooter() {}\n  includeCharts() { return false; }\n  generateCharts() {}\n  export() {}\n}\n\n// Report concreti\nclass PDFReport extends ReportGenerator {\n  formatData() { console.log('📄 Formattazione PDF'); }\n  export() { return 'report.pdf'; }\n}\n\nclass ExcelReport extends ReportGenerator {\n  formatData() { console.log('📗 Formattazione Excel'); }\n  includeCharts() { return true; }\n  generateCharts() { console.log('📈 Grafici Excel'); }\n  export() { return 'report.xlsx'; }\n}\n\n// Facade per sistema complesso\nclass ReportingSystem {\n  constructor() {\n    this.database = { query: () => ['data1', 'data2'] };\n    this.emailService = { send: (file) => console.log(`📧 Invio ${file}`) };\n    this.storage = { save: (file) => console.log(`💾 Salvataggio ${file}`) };\n  }\n\n  generateAndSendReport(type, recipient) {\n    let report;\n    if (type === 'pdf') {\n      report = new PDFReport();\n    } else {\n      report = new ExcelReport();\n    }\n\n    const file = report.generateReport();\n    this.storage.save(file);\n    this.emailService.send(file);\n    return file;\n  }\n}\n\nconst system = new ReportingSystem();\nsystem.generateAndSendReport('excel', 'manager@company.com');",
-    "solutionPatterns": ["Template Method", "Facade"],
+    "solutionPatterns": [
+      "Template Method",
+      "Facade"
+    ],
     "solutionExplanation": "Unisce <strong>Template Method</strong> (ReportGenerator definisce algoritmo con step customizzabili - collectData, formatData, export) e <strong>Facade</strong> (ReportingSystem semplifica interazione con database, storage, email). Genera report con struttura fissa ma dettagli variabili, nascondendo complessità dietro interfaccia semplice.",
     "solutionSteps": [
       {
