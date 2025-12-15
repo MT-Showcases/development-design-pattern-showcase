@@ -17,7 +17,10 @@
  * - Use union types for category enums instead of string
  */
 
-export type Category = "creational" | "structural" | "behavioral";
+export type Category = "creational" | "structural" | "behavioral" | "antipattern";
+
+// Alias for routing and components (same as Category but more semantic)
+export type CategoryKey = Category;
 
 export interface SolutionStep {
   title: string; // e.g. "Definizione prodotti"

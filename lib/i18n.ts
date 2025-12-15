@@ -21,6 +21,18 @@ export const CATEGORY_TRANSLATIONS: Record<Category, string> = {
   creational: "Creazionali",
   structural: "Strutturali",
   behavioral: "Comportamentali",
+  antipattern: "Anti-Pattern",
+};
+
+/**
+ * Map category to Ant Design tag color
+ * Antipattern uses red/pink, others use blue
+ */
+export const CATEGORY_COLORS: Record<Category, string> = {
+  creational: "blue",
+  structural: "blue",
+  behavioral: "blue",
+  antipattern: "red",
 };
 
 /**
@@ -30,4 +42,13 @@ export const CATEGORY_TRANSLATIONS: Record<Category, string> = {
  */
 export function translateCategory(category: Category): string {
   return CATEGORY_TRANSLATIONS[category];
+}
+
+/**
+ * Get the color for a category tag
+ * @param category - The category key
+ * @returns The Ant Design color name (e.g., "red" for antipattern)
+ */
+export function getCategoryColor(category: Category): string {
+  return CATEGORY_COLORS[category];
 }

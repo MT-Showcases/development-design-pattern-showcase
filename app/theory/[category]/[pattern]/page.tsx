@@ -15,8 +15,7 @@
 import { notFound } from 'next/navigation';
 import { getPatternsByCategory, getPatternById } from '@/lib/patternTheory';
 import PatternLayout from '@/components/theory/PatternLayout/PatternLayout';
-
-type CategoryKey = 'creational' | 'structural' | 'behavioral';
+import type { CategoryKey } from '@/lib/types';
 
 interface PageProps {
   params: Promise<{
@@ -27,7 +26,7 @@ interface PageProps {
 
 // Generate static pages for all patterns at build time
 export function generateStaticParams() {
-  const categories: CategoryKey[] = ['creational', 'structural', 'behavioral'];
+  const categories: CategoryKey[] = ['creational', 'structural', 'behavioral', 'antipattern'];
   const paths: { category: string; pattern: string }[] = [];
 
   categories.forEach((category) => {
@@ -65,7 +64,7 @@ export default async function PatternPage({ params }: PageProps) {
   const categoryKey = category as CategoryKey;
   
   // Validate category exists
-  if (!['creational', 'structural', 'behavioral'].includes(categoryKey)) {
+  if (!['creational', 'structural', 'behavioral', 'antipattern'].includes(categoryKey)) {
     notFound();
   }
 

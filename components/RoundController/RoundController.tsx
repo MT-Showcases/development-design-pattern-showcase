@@ -35,6 +35,7 @@ import {
     BlockOutlined,
     ThunderboltOutlined,
     AppstoreOutlined,
+    WarningOutlined,
 } from "@ant-design/icons";
 import "./RoundController.scss";
 import { useAppDispatch, useAppSelector } from "@/lib/store/hooks";
@@ -199,6 +200,12 @@ export default function RoundController({ teams, onUpdateTeams }: RoundControlle
                                     label="Comportamentali"
                                     selected={selectedCategory === "behavioral"}
                                     onClick={() => handleCategorySelect("behavioral")}
+                                />
+                                <CategoryButton
+                                    icon={<WarningOutlined />}
+                                    label="Anti-Pattern"
+                                    selected={selectedCategory === "antipattern"}
+                                    onClick={() => handleCategorySelect("antipattern")}
                                 />
                                 <CategoryButton
                                     icon={<AppstoreOutlined />}

@@ -15,8 +15,7 @@
 import { notFound } from 'next/navigation';
 import { PATTERN_CATEGORIES, getPatternsByCategory } from '@/lib/patternTheory';
 import CategoryOverview from '@/components/theory/CategoryOverview/CategoryOverview';
-
-type CategoryKey = 'creational' | 'structural' | 'behavioral';
+import type { CategoryKey } from '@/lib/types';
 
 interface PageProps {
   params: Promise<{
@@ -30,6 +29,7 @@ export function generateStaticParams() {
     { category: 'creational' },
     { category: 'structural' },
     { category: 'behavioral' },
+    { category: 'antipattern' },
   ];
 }
 
@@ -56,7 +56,7 @@ export default async function CategoryPage({ params }: PageProps) {
   const categoryKey = category as CategoryKey;
   
   // Validate category exists
-  if (!['creational', 'structural', 'behavioral'].includes(categoryKey)) {
+  if (!['creational', 'structural', 'behavioral', 'antipattern'].includes(categoryKey)) {
     notFound();
   }
 

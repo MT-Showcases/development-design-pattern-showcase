@@ -1,0 +1,126 @@
+[
+  {
+    "id": "antipattern-01",
+    "title": "Sistema di gestione progetti complesso",
+    "category": "antipattern",
+    "code": "class GestioneProgetto {\n  constructor() {\n    this.utenti = [];\n    this.database = null;\n    this.grafica = null;\n    this.logica = null;\n  }\n\n  login(user, pass) { /* ... */ }\n  \n  salvaDatabase(dati) { /* ... */ }\n  \n  disegnaGrafica() { /* ... */ }\n  \n  inviaNotifiche(msg) { /* ... */ }\n  \n  validaInput(data) { /* ... */ }\n  \n  processaFile(file) { /* ... */ }\n}\n\nconst progetto = new GestioneProgetto();\nprogetto.login('admin', 'pass');\nprogetto.salvaDatabase({ id: 1 });\nprogetto.disegnaGrafica();\nprogetto.inviaNotifiche('Done!');",
+    "solutionPatterns": ["God Object"],
+    "solutionExplanation": "Il <strong>God Object</strong> è un anti-pattern in cui una singola classe diventa responsabile di troppi compiti diversi. Questa classe \"onnipotente\" gestisce login, database, grafica, logica e notifiche, violando il Single Responsibility Principle. Il risultato è codice difficile da testare, mantenere e riutilizzare.",
+    "solutionSteps": [
+      {
+        "title": "Responsabilità multiple",
+        "description": "Una sola classe gestisce autenticazione, persistenza, UI e comunicazione",
+        "code": "class GestioneProgetto {\n  login(user, pass) { /* ... */ }\n  salvaDatabase(dati) { /* ... */ }\n  disegnaGrafica() { /* ... */ }\n  inviaNotifiche(msg) { /* ... */ }\n}"
+      },
+      {
+        "title": "Accoppiamento forte",
+        "description": "Ogni modifica richiede di toccare questa classe gigante",
+        "code": "// Aggiungere una feature richiede modificare GestioneProgetto\n// anche se non correlata alle altre funzionalità\nprogetto.validaInput(data);\nprogetto.processaFile(file);"
+      },
+      {
+        "title": "Soluzione corretta",
+        "description": "Separare le responsabilità in classi dedicate",
+        "code": "class Auth { login(user, pass) { /* ... */ } }\nclass Database { salva(dati) { /* ... */ } }\nclass UI { disegna() { /* ... */ } }\nclass Notifiche { invia(msg) { /* ... */ } }\n\nconst auth = new Auth();\nconst db = new Database();\nconst ui = new UI();"
+      }
+    ],
+    "solutionAdvantages": [
+      "Codice modulare e testabile",
+      "Manutenibilità migliorata",
+      "Riutilizzo dei componenti",
+      "Debugging semplificato"
+    ]
+  },
+  {
+    "id": "antipattern-02",
+    "title": "Calcolo prezzo con sconti e tasse",
+    "category": "antipattern",
+    "code": "function calcolaPrezzo(tipo, sconto, tasse) {\n  if (tipo === 'A') {\n    if (sconto > 0) {\n      if (tasse) {\n        return 100 - sconto + 30;\n      } else {\n        return 100 - sconto;\n      }\n    } else {\n      if (tasse) {\n        return 100 + 30;\n      } else {\n        return 100;\n      }\n    }\n  } else {\n    if (sconto > 0) {\n      if (tasse) {\n        return 200 - sconto + 30;\n      } else {\n        return 200 - sconto;\n      }\n    } else {\n      return 200;\n    }\n  }\n}\n\nconst prezzo = calcolaPrezzo('A', 10, true);",
+    "solutionPatterns": ["Spaghetti Code"],
+    "solutionExplanation": "Lo <strong>Spaghetti Code</strong> è un anti-pattern caratterizzato da codice intrecciato, con condizioni annidate e logica difficile da seguire. Questo esempio mostra if annidati che rendono impossibile capire il flusso logico senza tracciare ogni branch. Il codice è fragile e difficile da modificare senza introdurre bug.",
+    "solutionSteps": [
+      {
+        "title": "Annidamento eccessivo",
+        "description": "Tante condizioni annidate rendono il codice illeggibile",
+        "code": "if (tipo === 'A') {\n  if (sconto > 0) {\n    if (tasse) {\n      return 100 - sconto + 30;\n    } else {\n      return 100 - sconto;\n    }\n  }\n}"
+      },
+      {
+        "title": "Duplicazione logica",
+        "description": "Stesso calcolo ripetuto in ogni branch",
+        "code": "// Stesso pattern +30 ripetuto ovunque\nif (tasse) {\n  return 100 - sconto + 30;\n} else {\n  return 100 - sconto;\n}"
+      },
+      {
+        "title": "Soluzione corretta",
+        "description": "Estrarre la logica in funzioni separate e semplificare",
+        "code": "function prezzoBase(tipo) {\n  return tipo === 'A' ? 100 : 200;\n}\n\nfunction calcolaPrezzo(tipo, sconto, tasse) {\n  let prezzo = prezzoBase(tipo);\n  if (sconto > 0) prezzo -= sconto;\n  if (tasse) prezzo += 30;\n  return prezzo;\n}"
+      }
+    ],
+    "solutionAdvantages": [
+      "Codice lineare e comprensibile",
+      "Facile aggiungere nuovi tipi",
+      "Testabilità migliorata",
+      "Manutenzione semplificata"
+    ]
+  },
+  {
+    "id": "antipattern-03",
+    "title": "Formatter per testi con Singleton",
+    "category": "antipattern",
+    "code": "class Formatter {\n  constructor() {\n    if (Formatter.instance) {\n      return Formatter.instance;\n    }\n    Formatter.instance = this;\n  }\n  \n  format(text) {\n    return text.toUpperCase();\n  }\n}\n\nconst toUpper = new Formatter();\nconsole.log(toUpper.format('ciao'));\n\nconst toLower = new Formatter(); // Voglio lowercase ma ottengo uppercase!\nconsole.log(toLower.format('HELLO')); // HELLO invece di hello",
+    "solutionPatterns": ["Golden Hammer"],
+    "solutionExplanation": "Il <strong>Golden Hammer</strong> è un anti-pattern che consiste nell'applicare sempre la stessa soluzione (Singleton) anche quando non è appropriata. In questo caso, si usa Singleton per un formatter, impedendo di avere istanze diverse con comportamenti diversi (uppercase/lowercase). Non ogni componente deve essere un Singleton.",
+    "solutionSteps": [
+      {
+        "title": "Singleton inutile",
+        "description": "Si usa Singleton anche quando serve flessibilità",
+        "code": "class Formatter {\n  constructor() {\n    if (Formatter.instance) return Formatter.instance;\n    Formatter.instance = this;\n  }\n  format(text) { return text.toUpperCase(); }\n}"
+      },
+      {
+        "title": "Mancanza flessibilità",
+        "description": "Impossibile avere formatter diversi contemporaneamente",
+        "code": "const toUpper = new Formatter();\nconst toLower = new Formatter(); // Stesso oggetto!\nconsole.log(toUpper === toLower); // true"
+      },
+      {
+        "title": "Soluzione corretta",
+        "description": "Usare semplici funzioni o classi normali",
+        "code": "const toUpper = s => s.toUpperCase();\nconst toLower = s => s.toLowerCase();\n\nconsole.log(toUpper('ciao')); // CIAO\nconsole.log(toLower('HELLO')); // hello"
+      }
+    ],
+    "solutionAdvantages": [
+      "Usa il pattern giusto per il contesto",
+      "Codice flessibile e componibile",
+      "Evita over-engineering",
+      "Testabilità migliorata"
+    ]
+  },
+  {
+    "id": "antipattern-04",
+    "title": "Configurazione globale condivisa",
+    "category": "antipattern",
+    "code": "class Config {\n  constructor() {\n    if (Config.instance) return Config.instance;\n    this.apiUrl = 'https://example.com';\n    Config.instance = this;\n  }\n  \n  getInstance() {\n    return this;\n  }\n}\n\n// Ovunque nel codice\nconst config1 = new Config();\nconst config2 = new Config();\n\n// Modifica globale inaspettata!\nconfig1.apiUrl = 'https://dev.example.com';\n\n// Altri moduli vedono il cambio\nfunction fetchDati() {\n  const cfg = new Config();\n  return fetch(cfg.apiUrl + '/dati'); // Usa dev invece di prod!\n}",
+    "solutionPatterns": ["Singleton Abusato"],
+    "solutionExplanation": "Il <strong>Singleton Abusato</strong> è un anti-pattern dove si usa Singleton per oggetti che dovrebbero essere isolati o configurabili. Una Config globale accessibile ovunque crea dipendenze nascoste, rende difficile il testing (non si può mockare facilmente), e introduce bug difficili da tracciare quando un modulo modifica lo stato condiviso.",
+    "solutionSteps": [
+      {
+        "title": "Stato globale mutabile",
+        "description": "Qualsiasi modulo può modificare la config condivisa",
+        "code": "const config1 = new Config();\nconfig1.apiUrl = 'https://dev.example.com';\n\n// Altro modulo vede il cambio\nconst config2 = new Config();\nconsole.log(config2.apiUrl); // dev invece di prod!"
+      },
+      {
+        "title": "Testing impossibile",
+        "description": "Non si può testare con config diverse per ogni test",
+        "code": "// Test 1 modifica Config globale\nconst cfg = new Config();\ncfg.apiUrl = 'mock';\n\n// Test 2 vede la modifica del Test 1!\n// I test non sono isolati"
+      },
+      {
+        "title": "Soluzione corretta",
+        "description": "Passare config come parametro (Dependency Injection)",
+        "code": "function fetchDati(apiUrl) {\n  return fetch(apiUrl + '/dati');\n}\n\n// Test isolati e semplici\nfetchDati('https://example.com'); // Produzione\nfetchDati('https://mock.com'); // Test"
+      }
+    ],
+    "solutionAdvantages": [
+      "Testing isolato e deterministico",
+      "Dipendenze esplicite",
+      "Nessun stato globale nascosto",
+      "Configurazioni multiple possibili"
+    ]
+  }
+]

@@ -22,6 +22,7 @@ import creationalData from "@/data/creational.json";
 import structuralData from "@/data/structural.json";
 import behavioralData from "@/data/behavioral.json";
 import multipatternData from "@/data/multipattern.json";
+import antipatternData from "@/data/antipattern.json";
 
 /**
  * Combina tutti gli esempi da tutti i file JSON
@@ -32,6 +33,7 @@ function getAllExamples(): PatternExample[] {
     ...(structuralData as PatternExample[]),
     ...(behavioralData as PatternExample[]),
     ...(multipatternData as PatternExample[]),
+    ...(antipatternData as PatternExample[]),
   ];
 }
 

@@ -21,6 +21,7 @@ import { Card, Typography, Row, Col } from 'antd';
 import Link from 'next/link';
 import { ArrowRightOutlined } from '@ant-design/icons';
 import type { PatternTheory } from '@/lib/patternTheory';
+import type { CategoryKey } from '@/lib/types';
 import { PATTERN_CATEGORIES } from '@/lib/patternTheory';
 import './CategoryOverview.scss';
 
@@ -31,7 +32,7 @@ type PatternCategory = typeof PATTERN_CATEGORIES[keyof typeof PATTERN_CATEGORIES
 interface CategoryOverviewProps {
   category: PatternCategory;
   patterns: PatternTheory[];
-  categoryKey: 'creational' | 'structural' | 'behavioral';
+  categoryKey: CategoryKey;
 }
 
 export default function CategoryOverview({ category, patterns, categoryKey }: CategoryOverviewProps) {

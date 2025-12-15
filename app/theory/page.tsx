@@ -67,6 +67,30 @@ export default function TheoryPage() {
                         color="#ffc107"
                     />
                 </div>
+
+                {/* Anti-Patterns Section */}
+                <div className="theory-page__header" style={{ marginTop: '4rem' }}>
+                    <Title 
+                        level={1} 
+                        className="theory-page__title"
+                    >
+                        Anti-Pattern
+                    </Title>
+                    <Paragraph className="theory-page__subtitle">
+                        Cosa NON fare • Errori comuni da evitare
+                    </Paragraph>
+                </div>
+
+                <div className="theory-page__grid">
+                    <CategoryCard
+                        name="Anti-Pattern"
+                        description={PATTERN_CATEGORIES.antipattern.description}
+                        icon={PATTERN_CATEGORIES.antipattern.icon}
+                        patternCount={PATTERN_CATEGORIES.antipattern.patterns.length}
+                        href="/theory/antipattern"
+                        color="#ff1744"
+                    />
+                </div>
             </div>
         </div>
     );

@@ -18,12 +18,12 @@
  */
 
 import React from "react";
-import { BuildOutlined, ToolOutlined, ThunderboltOutlined } from "@ant-design/icons";
+import { BuildOutlined, ToolOutlined, ThunderboltOutlined, WarningOutlined } from "@ant-design/icons";
 
 export interface PatternTheory {
     id: string;
     name: string;
-    category: "creational" | "structural" | "behavioral";
+    category: "creational" | "structural" | "behavioral" | "antipattern";
     intent: string;
     problem: string;
     solution: string;
@@ -90,6 +90,18 @@ export const PATTERN_CATEGORIES = {
             "strategy",
             "template-method",
             "visitor",
+        ],
+    },
+    antipattern: {
+        name: "Anti-Pattern",
+        description:
+            "Soluzioni comuni che sembrano intelligenti ma che nel tempo creano più problemi di quanti ne risolvano. Imparare a riconoscerli è fondamentale per scrivere codice di qualità.",
+        icon: React.createElement(WarningOutlined),
+        patterns: [
+            "god-object",
+            "spaghetti-code",
+            "golden-hammer",
+            "singleton-abusato",
         ],
     },
 };
@@ -4359,11 +4371,545 @@ console.log(\`Result: \${expr.interpret(context)}\`);`,
         ],
         relatedPatterns: ["Composite", "Flyweight", "Iterator", "Visitor"],
     },
+
+    // ==================== ANTI-PATTERNS ====================
+    "god-object": {
+        id: "god-object",
+        name: "God Object",
+        category: "antipattern",
+        intent: "Un anti-pattern dove una singola classe diventa responsabile di troppi compiti diversi, violando il Single Responsibility Principle.",
+        problem:
+            "Quando una classe accumula troppe responsabilità (autenticazione, database, UI, logica business, notifiche), diventa un punto centrale che conosce e fa tutto. Questo rende il codice fragile, difficile da testare, impossibile da riutilizzare e un incubo da manutenere.",
+        solution:
+            "Separare le responsabilità in classi dedicate seguendo il Single Responsibility Principle. Ogni classe dovrebbe avere un solo motivo per cambiare. Usare pattern come Service Layer, Repository, Facade per organizzare il codice.",
+        structure:
+            "Una God Class che contiene decine di metodi non correlati. La soluzione prevede la creazione di classi specializzate (AuthService, Database, UIRenderer, NotificationService) ciascuna con una singola responsabilità.",
+        participants: [
+            "God Class - la classe problematica che fa tutto",
+            "Classi specializzate - AuthService, Database, UIRenderer, ciascuna con una responsabilità",
+        ],
+        codeExamples: [
+            {
+                title: "PROBLEMA: God Object - Una classe che fa tutto",
+                description:
+                    "Questa classe gestisce autenticazione, database, grafica, logica e notifiche. Impossibile da testare o riutilizzare.",
+                type: "problem",
+                code: `class GestioneProgetto {
+  constructor() {
+    this.utenti = [];
+    this.database = null;
+    this.grafica = null;
+  }
+
+  // ❌ Troppi compiti diversi in una sola classe!
+  login(user, pass) { /* autenticazione */ }
+  salvaDatabase(dati) { /* persistenza */ }
+  disegnaGrafica() { /* rendering UI */ }
+  inviaNotifiche(msg) { /* comunicazione */ }
+  validaInput(data) { /* validazione */ }
+  processaFile(file) { /* elaborazione file */ }
+  calcolaStatistiche() { /* analytics */ }
+  generaReport() { /* reporting */ }
+}
+
+// Ogni modifica rischia di rompere tutto
+const progetto = new GestioneProgetto();
+progetto.login('user', 'pass');
+progetto.salvaDatabase({ id: 1 });
+progetto.disegnaGrafica();`,
+                language: "javascript",
+            },
+            {
+                title: "SOLUZIONE: Separazione delle responsabilità",
+                description:
+                    "Ogni classe ha una singola responsabilità. Codice testabile, riutilizzabile e manutenibile.",
+                type: "solution",
+                code: `// ✅ Una classe = una responsabilità
+class AuthService {
+  login(user, pass) {
+    // Solo autenticazione
+    return this.validateCredentials(user, pass);
+  }
+  
+  validateCredentials(user, pass) {
+    // Logica di validazione
+  }
+}
+
+class Database {
+  salva(dati) {
+    // Solo persistenza
+    this.connection.insert(dati);
+  }
+  
+  trova(id) {
+    return this.connection.findById(id);
+  }
+}
+
+class UIRenderer {
+  disegna(componente) {
+    // Solo rendering
+    return this.render(componente);
+  }
+}
+
+class NotificationService {
+  invia(msg, destinatari) {
+    // Solo notifiche
+    destinatari.forEach(d => this.sendEmail(d, msg));
+  }
+}
+
+// Composizione pulita
+const auth = new AuthService();
+const db = new Database();
+const ui = new UIRenderer();
+const notifier = new NotificationService();
+
+// Ogni servizio è indipendente e testabile
+auth.login('user', 'pass');
+db.salva({ id: 1 });
+ui.disegna(myComponent);
+notifier.invia('Salvataggio OK', ['admin@example.com']);`,
+                language: "javascript",
+            },
+        ],
+        realWorldExamples: [
+            "Classe Application che gestisce routing, database, sessioni, rendering e logging",
+            "Manager class che coordina troppi componenti diversi",
+            "Utility class con metodi non correlati (DateUtils che include anche StringUtils)",
+            "Controller monolitico che gestisce business logic, validazione e database",
+        ],
+        whenToUse: [
+            "È un anti-pattern da evitare sempre",
+        ],
+        whenNotToUse: [
+            "Refactora in classi specializzate",
+            "Separa responsabilità seguendo Single Responsibility Principle",
+            "Usa Service Layer, Repository, Facade patterns",
+        ],
+        relatedPatterns: ["Facade", "Service Layer", "Repository"],
+    },
+
+    "spaghetti-code": {
+        id: "spaghetti-code",
+        name: "Spaghetti Code",
+        category: "antipattern",
+        intent: "Codice intrecciato con condizioni annidate profonde, logica duplicata e flusso difficile da seguire.",
+        problem:
+            "Quando il codice ha if/else annidati a più livelli, duplicazioni di logica e mancanza di struttura. Il flusso logico diventa impossibile da seguire senza tracciare ogni singolo branch. Aggiungere nuove funzionalità o fixare bug diventa estremamente rischioso.",
+        solution:
+            "Estrarre la logica in funzioni separate con nomi descrittivi. Eliminare le duplicazioni. Usare early returns per ridurre l'annidamento. Applicare pattern come Strategy o Template Method per variazioni di comportamento.",
+        structure:
+            "Codice con if annidati profondamente sostituito da funzioni helper, early returns e logica lineare facile da seguire.",
+        participants: [
+            "Funzioni helper - calcolano valori intermedi",
+            "Funzione principale - orchestra le chiamate in modo lineare",
+            "Strategy pattern - per gestire variazioni di comportamento",
+        ],
+        codeExamples: [
+            {
+                title: "PROBLEMA: Spaghetti Code - Annidamenti profondi",
+                description:
+                    "Condizioni annidate e logica duplicata rendono il codice illeggibile e fragile.",
+                type: "problem",
+                code: `// ❌ Impossibile capire cosa fa senza tracciare ogni branch
+function calcolaPrezzo(tipo, sconto, tasse, cliente, quantita) {
+  if (tipo === 'A') {
+    if (sconto > 0) {
+      if (tasse) {
+        if (cliente === 'premium') {
+          if (quantita > 10) {
+            return (100 - sconto + 30) * 0.9;
+          } else {
+            return 100 - sconto + 30;
+          }
+        } else {
+          return 100 - sconto + 30;
+        }
+      } else {
+        if (cliente === 'premium') {
+          return (100 - sconto) * 0.9;
+        } else {
+          return 100 - sconto;
+        }
+      }
+    } else {
+      if (tasse) {
+        return 100 + 30;
+      } else {
+        return 100;
+      }
+    }
+  } else if (tipo === 'B') {
+    // Stessa logica duplicata per tipo B...
+    if (sconto > 0) {
+      if (tasse) {
+        return 200 - sconto + 30;
+      } else {
+        return 200 - sconto;
+      }
+    } else {
+      return 200;
+    }
+  }
+}`,
+                language: "javascript",
+            },
+            {
+                title: "SOLUZIONE: Codice lineare e funzioni helper",
+                description:
+                    "Logica estratta in funzioni separate. Facile da leggere, testare e modificare.",
+                type: "solution",
+                code: `// ✅ Logica chiara e lineare
+function prezzoBase(tipo) {
+  const prezzi = { A: 100, B: 200, C: 300 };
+  return prezzi[tipo] || 0;
+}
+
+function applicaSconto(prezzo, sconto) {
+  return sconto > 0 ? prezzo - sconto : prezzo;
+}
+
+function applicaTasse(prezzo, tasse) {
+  return tasse ? prezzo + 30 : prezzo;
+}
+
+function applicaScontoPremium(prezzo, cliente) {
+  return cliente === 'premium' ? prezzo * 0.9 : prezzo;
+}
+
+function applicaScontoQuantita(prezzo, quantita) {
+  if (quantita > 100) return prezzo * 0.8;
+  if (quantita > 50) return prezzo * 0.85;
+  if (quantita > 10) return prezzo * 0.9;
+  return prezzo;
+}
+
+// Funzione principale - orchestra in modo lineare
+function calcolaPrezzo(tipo, sconto, tasse, cliente, quantita) {
+  let prezzo = prezzoBase(tipo);
+  prezzo = applicaSconto(prezzo, sconto);
+  prezzo = applicaTasse(prezzo, tasse);
+  prezzo = applicaScontoPremium(prezzo, cliente);
+  prezzo = applicaScontoQuantita(prezzo, quantita);
+  return prezzo;
+}
+
+// Facile da testare ogni funzione separatamente
+console.log(calcolaPrezzo('A', 10, true, 'premium', 15)); // Chiaro!`,
+                language: "javascript",
+            },
+        ],
+        realWorldExamples: [
+            "Funzioni con if/else annidati a 5+ livelli",
+            "Switch case giganti con logica duplicata",
+            "Callback hell nelle API asincrone",
+            "Condizioni complesse senza nomi descrittivi",
+        ],
+        whenToUse: [
+            "Porta a bug e manutenzione difficile",
+        ],
+        whenNotToUse: [
+            "Refactora con funzioni helper",
+            "Usa early returns per ridurre annidamento",
+            "Applica Strategy pattern per variazioni",
+            "Estrai logica complessa in metodi con nomi descrittivi",
+        ],
+        relatedPatterns: ["Strategy", "Template Method", "Guard Clauses"],
+    },
+
+    "golden-hammer": {
+        id: "golden-hammer",
+        name: "Golden Hammer",
+        category: "antipattern",
+        intent: "Applicare sempre la stessa soluzione (pattern, tecnologia, approccio) anche quando non è appropriata per il contesto.",
+        problem:
+            "Quando si conosce bene un pattern (es. Singleton) e si inizia a usarlo ovunque, anche dove non serve. 'Se tutto ciò che hai è un martello, ogni problema sembra un chiodo'. Questo porta a over-engineering, rigidità e problemi di testing.",
+        solution:
+            "Analizzare ogni problema individualmente. Scegliere il pattern/approccio più semplice che risolve il problema specifico. A volte la soluzione migliore è una semplice funzione, non un pattern complesso.",
+        structure:
+            "Invece di applicare Singleton a ogni classe, usare semplici funzioni, classi normali o dependency injection quando appropriato.",
+        participants: [
+            "Context Analysis - analizza il problema specifico",
+            "Pattern Selection - sceglie l'approccio più semplice",
+            "Simple Solutions - preferisce semplicità a complessità",
+        ],
+        codeExamples: [
+            {
+                title: "PROBLEMA: Golden Hammer - Singleton ovunque",
+                description:
+                    "Applicare Singleton anche quando serve flessibilità e testabilità.",
+                type: "problem",
+                code: `// ❌ Singleton usato inutilmente
+class Formatter {
+  constructor() {
+    if (Formatter.instance) {
+      return Formatter.instance;
+    }
+    Formatter.instance = this;
+  }
+  
+  format(text) {
+    return text.toUpperCase();
+  }
+}
+
+// Problema: voglio formatter diversi!
+const toUpper = new Formatter();
+console.log(toUpper.format('ciao')); // CIAO
+
+const toLower = new Formatter(); // Voglio lowercase ma...
+console.log(toLower.format('HELLO')); // HELLO (è lo stesso oggetto!)
+console.log(toUpper === toLower); // true - non posso avere comportamenti diversi!
+
+// ❌ Singleton applicato a validatori
+class EmailValidator {
+  constructor() {
+    if (EmailValidator.instance) return EmailValidator.instance;
+    EmailValidator.instance = this;
+  }
+  validate(email) { /* ... */ }
+}
+
+// ❌ Singleton per ogni utility!
+class StringUtils {
+  constructor() {
+    if (StringUtils.instance) return StringUtils.instance;
+    StringUtils.instance = this;
+  }
+  capitalize(s) { /* ... */ }
+}`,
+                language: "javascript",
+            },
+            {
+                title: "SOLUZIONE: Usa il tool giusto per ogni problema",
+                description:
+                    "Funzioni semplici quando basta, classi normali quando serve stato, Singleton solo quando davvero necessario.",
+                type: "solution",
+                code: `// ✅ Funzioni semplici - perfette per formatter
+const toUpperCase = (text) => text.toUpperCase();
+const toLowerCase = (text) => text.toLowerCase();
+const capitalize = (text) => text.charAt(0).toUpperCase() + text.slice(1);
+
+console.log(toUpperCase('ciao')); // CIAO
+console.log(toLowerCase('HELLO')); // hello
+console.log(capitalize('design patterns')); // Design patterns
+
+// ✅ Classi normali quando serve stato configurabile
+class Validator {
+  constructor(rules) {
+    this.rules = rules; // Ogni istanza ha proprie regole
+  }
+  
+  validate(data) {
+    return this.rules.every(rule => rule(data));
+  }
+}
+
+const emailValidator = new Validator([
+  (email) => email.includes('@'),
+  (email) => email.length > 5,
+]);
+
+const passwordValidator = new Validator([
+  (pass) => pass.length >= 8,
+  (pass) => /[A-Z]/.test(pass),
+]);
+
+// ✅ Singleton SOLO quando davvero serve (es. connessione DB)
+class DatabaseConnection {
+  constructor() {
+    if (DatabaseConnection.instance) {
+      return DatabaseConnection.instance;
+    }
+    // Connessione costosa - ha senso averne una sola
+    this.pool = this.createConnectionPool();
+    DatabaseConnection.instance = this;
+  }
+  
+  createConnectionPool() {
+    // Inizializzazione costosa
+  }
+}
+
+// Usa l'approccio più semplice che funziona!`,
+                language: "javascript",
+            },
+        ],
+        realWorldExamples: [
+            "Usare Singleton per ogni classe invece di dependency injection",
+            "Applicare microservices anche a progetti piccoli",
+            "Usare sempre Redux anche per stato locale semplice",
+            "Over-engineering con pattern complessi dove basterebbe codice procedurale",
+        ],
+        whenToUse: [
+            "Valuta ogni problema individualmente",
+        ],
+        whenNotToUse: [
+            "Scegli il tool giusto per il problema",
+            "Preferisci semplicità a complessità",
+            "Usa pattern solo quando risolvono un problema reale",
+            "YAGNI - You Aren't Gonna Need It",
+        ],
+        relatedPatterns: ["KISS Principle", "YAGNI", "Dependency Injection"],
+    },
+
+    "singleton-abusato": {
+        id: "singleton-abusato",
+        name: "Singleton Abusato",
+        category: "antipattern",
+        intent: "Usare Singleton per oggetti che dovrebbero essere isolati, configurabili o testabili separatamente.",
+        problem:
+            "Un Singleton globale crea dipendenze nascoste, rende il testing difficile (impossibile mockare o isolare), introduce accoppiamento forte e bug difficili da tracciare quando un modulo modifica lo stato condiviso. Viola il principio di dependency injection.",
+        solution:
+            "Passare dipendenze come parametri (Dependency Injection). Usare configurazioni immutabili. Preferire scope locale a stato globale. Singleton dovrebbe essere usato solo per risorse davvero condivise (connection pool, logger).",
+        structure:
+            "Invece di Config globale singleton, passare config come parametro alle funzioni. Permette testing con diverse configurazioni e elimina stato globale mutabile.",
+        participants: [
+            "Dependency Injection - passa config come parametro",
+            "Immutable Config - configurazioni non modificabili",
+            "Factory/Builder - crea istanze con config specifiche",
+        ],
+        codeExamples: [
+            {
+                title: "PROBLEMA: Singleton Abusato - Config globale mutabile",
+                description:
+                    "Config singleton crea dipendenze nascoste e rende il testing impossibile.",
+                type: "problem",
+                code: `// ❌ Singleton globale = problemi ovunque
+class Config {
+  constructor() {
+    if (Config.instance) return Config.instance;
+    this.apiUrl = 'https://example.com';
+    this.timeout = 5000;
+    Config.instance = this;
+  }
+  
+  getInstance() {
+    return this;
+  }
+}
+
+// Modulo A
+function fetchUtenti() {
+  const cfg = new Config(); // Dipendenza nascosta!
+  return fetch(cfg.apiUrl + '/users');
+}
+
+// Modulo B modifica la config globale
+function setupDev() {
+  const cfg = new Config();
+  cfg.apiUrl = 'https://dev.example.com'; // ⚠️ Modifica globale!
+}
+
+// Modulo C vede il cambio inaspettato
+function fetchProdotti() {
+  const cfg = new Config();
+  // Usa dev invece di prod perché B ha modificato Config!
+  return fetch(cfg.apiUrl + '/products'); 
+}
+
+// ❌ Testing impossibile
+test('fetchUtenti', () => {
+  // Non posso mockare Config facilmente
+  // Test 1 modifica Config e Test 2 vede il cambio!
+  const cfg = new Config();
+  cfg.apiUrl = 'https://mock.com';
+  // Altri test vedranno questa modifica
+});`,
+                language: "javascript",
+            },
+            {
+                title: "SOLUZIONE: Dependency Injection e config immutabile",
+                description:
+                    "Passare config come parametro. Testing isolato e dipendenze esplicite.",
+                type: "solution",
+                code: `// ✅ Config immutabile (nessuna modifica globale)
+const prodConfig = Object.freeze({
+  apiUrl: 'https://example.com',
+  timeout: 5000,
+});
+
+const devConfig = Object.freeze({
+  apiUrl: 'https://dev.example.com',
+  timeout: 10000,
+});
+
+const mockConfig = Object.freeze({
+  apiUrl: 'https://mock.com',
+  timeout: 1000,
+});
+
+// ✅ Dependency Injection - dipendenze esplicite
+function fetchUtenti(config) {
+  return fetch(config.apiUrl + '/users', {
+    timeout: config.timeout,
+  });
+}
+
+function fetchProdotti(config) {
+  return fetch(config.apiUrl + '/products', {
+    timeout: config.timeout,
+  });
+}
+
+// ✅ Ogni chiamata può usare config diversa
+fetchUtenti(prodConfig); // Produzione
+fetchUtenti(devConfig);  // Development
+fetchProdotti(prodConfig);
+
+// ✅ Testing pulito e isolato
+test('fetchUtenti production', () => {
+  const result = fetchUtenti(prodConfig);
+  expect(result.url).toBe('https://example.com/users');
+});
+
+test('fetchUtenti mock', () => {
+  // Test completamente isolato
+  const result = fetchUtenti(mockConfig);
+  expect(result.url).toBe('https://mock.com/users');
+});
+
+// ✅ Factory per creare client con config
+class ApiClient {
+  constructor(config) {
+    this.config = config; // Config iniettata
+  }
+  
+  fetchUsers() {
+    return fetch(this.config.apiUrl + '/users');
+  }
+}
+
+const prodClient = new ApiClient(prodConfig);
+const devClient = new ApiClient(devConfig);`,
+                language: "javascript",
+            },
+        ],
+        realWorldExamples: [
+            "Config globale modificabile da qualsiasi modulo",
+            "Service Locator pattern (dipendenze nascoste)",
+            "Cache singleton senza possibilità di isolamento nei test",
+            "Feature flags globali invece di parametri espliciti",
+        ],
+        whenToUse: [
+            "Per config, preferenze utente, feature flags",
+        ],
+        whenNotToUse: [
+            "Usa Dependency Injection per config",
+            "Passa parametri esplicitamente",
+            "Config immutabili (Object.freeze)",
+            "Singleton OK solo per: logger, connection pool, thread pool",
+        ],
+        relatedPatterns: ["Dependency Injection", "Factory", "Service Locator (anti-pattern)"],
+    },
 };
 
 // Funzioni helper
 export function getPatternsByCategory(
-    category: "creational" | "structural" | "behavioral"
+    category: "creational" | "structural" | "behavioral" | "antipattern"
 ): PatternTheory[] {
     return Object.values(patterns).filter((p) => p.category === category);
 }
