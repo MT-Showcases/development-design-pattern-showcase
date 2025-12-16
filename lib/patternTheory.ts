@@ -18,12 +18,50 @@
  */
 
 import React from "react";
-import { BuildOutlined, ToolOutlined, ThunderboltOutlined, WarningOutlined } from "@ant-design/icons";
+import {
+    BuildOutlined,
+    ToolOutlined,
+    ThunderboltOutlined,
+    WarningOutlined,
+    DatabaseOutlined,
+    AppstoreAddOutlined,
+    BlockOutlined,
+    CopyOutlined,
+    ApiOutlined,
+    FunctionOutlined,
+    BranchesOutlined,
+    ApartmentOutlined,
+    BgColorsOutlined,
+    EyeOutlined,
+    GatewayOutlined,
+    CloudOutlined,
+    BellOutlined,
+    SwapOutlined,
+    ThunderboltFilled,
+    NodeIndexOutlined,
+    FileSearchOutlined,
+    LinkOutlined,
+    StepForwardOutlined,
+    TeamOutlined,
+    SaveOutlined,
+    CodeOutlined,
+    TranslationOutlined,
+    ClusterOutlined,
+    PartitionOutlined,
+    FormOutlined,
+    LayoutOutlined,
+    ShareAltOutlined,
+    SafetyOutlined,
+    RadarChartOutlined,
+    HistoryOutlined,
+    ScanOutlined,
+} from "@ant-design/icons";
 
 export interface PatternTheory {
     id: string;
     name: string;
     category: "creational" | "structural" | "behavioral" | "antipattern";
+    icon?: React.ReactElement; // Optional icon for the pattern
     intent: string;
     problem: string;
     solution: string;
@@ -97,12 +135,7 @@ export const PATTERN_CATEGORIES = {
         description:
             "Soluzioni comuni che sembrano intelligenti ma che nel tempo creano più problemi di quanti ne risolvano. Imparare a riconoscerli è fondamentale per scrivere codice di qualità.",
         icon: React.createElement(WarningOutlined),
-        patterns: [
-            "god-object",
-            "spaghetti-code",
-            "golden-hammer",
-            "singleton-abusato",
-        ],
+        patterns: ["god-object", "spaghetti-code", "golden-hammer", "singleton-abusato"],
     },
 };
 
@@ -113,6 +146,7 @@ export const patterns: Record<string, PatternTheory> = {
         id: "singleton",
         name: "Singleton",
         category: "creational",
+        icon: React.createElement(DatabaseOutlined),
         intent: "Garantire che una classe abbia una sola istanza e fornire un punto di accesso globale ad essa.",
         problem:
             "A volte è necessario che una classe abbia esattamente una sola istanza. Ad esempio, ci dovrebbe essere un solo oggetto per gestire la connessione al database, un solo logger di sistema, o un solo gestore di configurazione.",
@@ -435,6 +469,7 @@ console.log('Are they the same?', sLogger1 === sLogger2); // true
         id: "factory-method",
         name: "Factory Method",
         category: "creational",
+        icon: React.createElement(FunctionOutlined),
         intent: "Definire un'interfaccia per creare un oggetto, ma lasciare che le sottoclassi decidano quale classe istanziare.",
         problem:
             "Il codice diventa dipendente da classi concrete specifiche quando crea oggetti direttamente. Questo rende difficile estendere il sistema con nuovi tipi senza modificare il codice esistente.",
@@ -832,6 +867,7 @@ cloudFactory.writeLog('System started'); // Nuovo tipo senza modifiche!`,
         id: "abstract-factory",
         name: "Abstract Factory",
         category: "creational",
+        icon: React.createElement(ClusterOutlined),
         intent: "Fornire un'interfaccia per creare famiglie di oggetti correlati senza specificare le loro classi concrete.",
         problem:
             "Quando devi creare famiglie di oggetti correlati che devono essere usati insieme (es. UI components per temi diversi), ma vuoi mantenere il codice indipendente dalle classi concrete.",
@@ -960,6 +996,7 @@ renderUI(factory);`,
         id: "builder",
         name: "Builder",
         category: "creational",
+        icon: React.createElement(BlockOutlined),
         intent: "Separare la costruzione di un oggetto complesso dalla sua rappresentazione, permettendo allo stesso processo di costruzione di creare diverse rappresentazioni.",
         problem:
             "Creare oggetti complessi con molti parametri opzionali può portare a costruttori telescopici (costruttori con troppi parametri) o a oggetti parzialmente inizializzati.",
@@ -1163,6 +1200,7 @@ console.log(burger.describe());`,
         id: "prototype",
         name: "Prototype",
         category: "creational",
+        icon: React.createElement(CopyOutlined),
         intent: "Specificare i tipi di oggetti da creare usando un'istanza prototipale e creare nuovi oggetti copiando questo prototipo.",
         problem:
             "Creare nuovi oggetti identici o simili a oggetti esistenti può essere costoso. Inoltre, il codice non dovrebbe dipendere dalle classi concrete degli oggetti da copiare.",
@@ -1308,6 +1346,7 @@ console.log(car2.wheels); // 6`,
         id: "adapter",
         name: "Adapter",
         category: "structural",
+        icon: React.createElement(ApiOutlined),
         intent: "Convertire l'interfaccia di una classe in un'altra interfaccia che i client si aspettano. Adapter permette a classi di lavorare insieme che altrimenti non potrebbero a causa di interfacce incompatibili.",
         problem:
             "Hai bisogno di usare una classe esistente, ma la sua interfaccia non è compatibile con il resto del tuo codice.",
@@ -1503,6 +1542,7 @@ app.saveData(adapter, [{ id: 2, name: 'Bob' }]);`,
         id: "bridge",
         name: "Bridge",
         category: "structural",
+        icon: React.createElement(PartitionOutlined),
         intent: "Separare un'astrazione dalla sua implementazione in modo che possano variare indipendentemente.",
         problem:
             "Quando hai una gerarchia di classi che cresce in due dimensioni indipendenti (es. forme e colori), finisci con una esplosione di sottoclassi.",
@@ -1679,6 +1719,7 @@ radioRemote.mute();`,
         id: "composite",
         name: "Composite",
         category: "structural",
+        icon: React.createElement(ApartmentOutlined),
         intent: "Comporre oggetti in strutture ad albero per rappresentare gerarchie parte-tutto. Composite permette ai client di trattare uniformemente oggetti singoli e composizioni di oggetti.",
         problem:
             "Quando hai una struttura ad albero di oggetti e vuoi che i client trattino foglie e compositi allo stesso modo.",
@@ -1915,6 +1956,7 @@ mainPanel.render();`,
         id: "decorator",
         name: "Decorator",
         category: "structural",
+        icon: React.createElement(FormOutlined),
         intent: "Aggiungere responsabilità aggiuntive a un oggetto dinamicamente. I decorator forniscono un'alternativa flessibile all'ereditarietà per estendere funzionalità.",
         problem:
             "Estendere funzionalità tramite ereditarietà è statico e si applica a tutta la classe. Inoltre, avere molte combinazioni di funzionalità porta a una esplosione di sottoclassi.",
@@ -2150,6 +2192,7 @@ console.log(\`Final result: "\${result}"\`);`,
         id: "facade",
         name: "Facade",
         category: "structural",
+        icon: React.createElement(LayoutOutlined),
         intent: "Fornire un'interfaccia unificata a un insieme di interfacce in un sottosistema. Facade definisce un'interfaccia di livello superiore che rende il sottosistema più facile da usare.",
         problem:
             "Quando lavori con librerie complesse o sottosistemi con molte classi interdipendenti, il codice client diventa complicato e fortemente accoppiato.",
@@ -2312,6 +2355,7 @@ homeTheater.endMovie();`,
         id: "flyweight",
         name: "Flyweight",
         category: "structural",
+        icon: React.createElement(ShareAltOutlined),
         intent: "Usare condivisione per supportare efficientemente un grande numero di oggetti a grana fine.",
         problem:
             "Creare un grande numero di oggetti simili consuma troppa memoria. Molti oggetti contengono dati duplicati.",
@@ -2453,6 +2497,7 @@ forest.getMemoryUsage();
         id: "proxy",
         name: "Proxy",
         category: "structural",
+        icon: React.createElement(SafetyOutlined),
         intent: "Fornire un surrogato o segnaposto per un altro oggetto per controllarne l'accesso.",
         problem:
             "Vuoi aggiungere controllo di accesso, lazy loading, caching, o logging a un oggetto senza modificare il suo codice.",
@@ -2665,6 +2710,7 @@ auditorProxy.withdraw(50);  // Negato`,
         id: "observer",
         name: "Observer",
         category: "behavioral",
+        icon: React.createElement(RadarChartOutlined),
         intent: "Definire una dipendenza uno-a-molti tra oggetti in modo che quando un oggetto cambia stato, tutti i suoi dipendenti vengono notificati e aggiornati automaticamente.",
         problem:
             "Quando un oggetto deve notificare altri oggetti senza conoscere chi sono o quanti sono, creando un accoppiamento stretto.",
@@ -2866,6 +2912,7 @@ apple.setPrice(130); // All hold`,
         id: "strategy",
         name: "Strategy",
         category: "behavioral",
+        icon: React.createElement(BranchesOutlined),
         intent: "Definire una famiglia di algoritmi, incapsularli e renderli intercambiabili. Strategy permette all'algoritmo di variare indipendentemente dai client che lo usano.",
         problem:
             "Quando hai molteplici algoritmi correlati e vuoi passare da uno all'altro a runtime senza condizionali complessi.",
@@ -3006,6 +3053,7 @@ cart.checkout();`,
         id: "command",
         name: "Command",
         category: "behavioral",
+        icon: React.createElement(ThunderboltFilled),
         intent: "Incapsulare una richiesta come oggetto, permettendo di parametrizzare client con diverse richieste, accodare richieste, e supportare operazioni annullabili.",
         problem:
             "Quando vuoi disaccoppiare l'oggetto che invoca l'operazione da quello che sa come eseguirla, o quando serve undo/redo.",
@@ -3183,6 +3231,7 @@ editor.showContent();`,
         id: "state",
         name: "State",
         category: "behavioral",
+        icon: React.createElement(NodeIndexOutlined),
         intent: "Permettere a un oggetto di alterare il suo comportamento quando il suo stato interno cambia. L'oggetto sembrerà cambiare classe.",
         problem:
             "Quando un oggetto ha molti stati e il comportamento cambia in base allo stato, finisci con condizionali complessi ovunque.",
@@ -3324,6 +3373,7 @@ machine.insertMoney();    // Error: dispensing`,
         id: "template-method",
         name: "Template Method",
         category: "behavioral",
+        icon: React.createElement(FileSearchOutlined),
         intent: "Definire lo scheletro di un algoritmo in un metodo, delegando alcuni passi alle sottoclassi. Template Method permette alle sottoclassi di ridefinire certi passi di un algoritmo senza cambiarne la struttura.",
         problem:
             "Quando hai algoritmi simili con passi comuni ma alcune variazioni nei dettagli.",
@@ -3475,13 +3525,14 @@ xmlMiner.mine('data.xml'); // Uses default analysis`,
             "Quando serve più flessibilità di quella offerta da ereditarietà",
             "Quando preferisci composizione a ereditarietà",
         ],
-        relatedPatterns: ["Strategy", "Factory Method", "Hook Method"],
+        relatedPatterns: ["Strategy", "Factory Method", "Command"],
     },
 
     "chain-of-responsibility": {
         id: "chain-of-responsibility",
         name: "Chain of Responsibility",
         category: "behavioral",
+        icon: React.createElement(LinkOutlined),
         intent: "Evitare di accoppiare il mittente di una richiesta al suo ricevitore dando a più oggetti la possibilità di gestire la richiesta. Concatenare gli oggetti riceventi e passare la richiesta lungo la catena finché un oggetto la gestisce.",
         problem:
             "Quando hai molteplici handler per una richiesta e non sai in anticipo quale la gestirà.",
@@ -3617,6 +3668,7 @@ tickets.forEach(ticket => {
         id: "iterator",
         name: "Iterator",
         category: "behavioral",
+        icon: React.createElement(StepForwardOutlined),
         intent: "Fornire un modo per accedere sequenzialmente agli elementi di un oggetto aggregato senza esporre la sua rappresentazione sottostante.",
         problem:
             "Quando vuoi attraversare una collezione senza esporre la sua struttura interna.",
@@ -3772,6 +3824,7 @@ for (const book of library.books) {
         id: "mediator",
         name: "Mediator",
         category: "behavioral",
+        icon: React.createElement(TeamOutlined),
         intent: "Definire un oggetto che incapsula come un insieme di oggetti interagisce. Mediator promuove loose coupling evitando che gli oggetti si riferiscano esplicitamente l'un l'altro.",
         problem:
             "Quando hai molti oggetti che comunicano tra loro, creando dipendenze complesse difficili da capire e mantenere.",
@@ -3880,6 +3933,7 @@ charlie.send('Anyone up for lunch?');`,
         id: "memento",
         name: "Memento",
         category: "behavioral",
+        icon: React.createElement(HistoryOutlined),
         intent: "Catturare e esternalizzare lo stato interno di un oggetto senza violare l'incapsulamento, in modo che l'oggetto possa essere ripristinato a questo stato successivamente.",
         problem:
             "Quando serve salvare e ripristinare lo stato di un oggetto senza esporre i dettagli della sua implementazione.",
@@ -4030,6 +4084,7 @@ game.display();`,
         id: "visitor",
         name: "Visitor",
         category: "behavioral",
+        icon: React.createElement(ScanOutlined),
         intent: "Rappresentare un'operazione da eseguire sugli elementi di una struttura di oggetti. Visitor permette di definire una nuova operazione senza cambiare le classi degli elementi su cui opera.",
         problem:
             "Quando vuoi aggiungere operazioni a una gerarchia di classi senza modificare le classi stesse.",
@@ -4203,6 +4258,7 @@ console.log(doc.export(xmlVisitor));`,
         id: "interpreter",
         name: "Interpreter",
         category: "behavioral",
+        icon: React.createElement(TranslationOutlined),
         intent: "Dato un linguaggio, definire una rappresentazione per la sua grammatica insieme a un interprete che usa la rappresentazione per interpretare frasi nel linguaggio.",
         problem:
             "Quando hai un linguaggio semplice da interpretare e puoi rappresentare le frasi come alberi sintattici.",
@@ -4481,9 +4537,7 @@ notifier.invia('Salvataggio OK', ['admin@example.com']);`,
             "Utility class con metodi non correlati (DateUtils che include anche StringUtils)",
             "Controller monolitico che gestisce business logic, validazione e database",
         ],
-        whenToUse: [
-            "È un anti-pattern da evitare sempre",
-        ],
+        whenToUse: ["È un anti-pattern da evitare sempre"],
         whenNotToUse: [
             "Refactora in classi specializzate",
             "Separa responsabilità seguendo Single Responsibility Principle",
@@ -4608,9 +4662,7 @@ console.log(calcolaPrezzo('A', 10, true, 'premium', 15)); // Chiaro!`,
             "Callback hell nelle API asincrone",
             "Condizioni complesse senza nomi descrittivi",
         ],
-        whenToUse: [
-            "Porta a bug e manutenzione difficile",
-        ],
+        whenToUse: ["Porta a bug e manutenzione difficile"],
         whenNotToUse: [
             "Refactora con funzioni helper",
             "Usa early returns per ridurre annidamento",
@@ -4744,9 +4796,7 @@ class DatabaseConnection {
             "Usare sempre Redux anche per stato locale semplice",
             "Over-engineering con pattern complessi dove basterebbe codice procedurale",
         ],
-        whenToUse: [
-            "Valuta ogni problema individualmente",
-        ],
+        whenToUse: ["Valuta ogni problema individualmente"],
         whenNotToUse: [
             "Scegli il tool giusto per il problema",
             "Preferisci semplicità a complessità",
@@ -4894,30 +4944,17 @@ const devClient = new ApiClient(devConfig);`,
             "Cache singleton senza possibilità di isolamento nei test",
             "Feature flags globali invece di parametri espliciti",
         ],
-        whenToUse: [
-            "Per config, preferenze utente, feature flags",
-        ],
+        whenToUse: ["Per config, preferenze utente, feature flags"],
         whenNotToUse: [
             "Usa Dependency Injection per config",
             "Passa parametri esplicitamente",
             "Config immutabili (Object.freeze)",
             "Singleton OK solo per: logger, connection pool, thread pool",
         ],
-        relatedPatterns: ["Dependency Injection", "Factory", "Service Locator (anti-pattern)"],
+        relatedPatterns: [
+            "Dependency Injection",
+            "Factory",
+            "Service Locator (anti-pattern)",
+        ],
     },
 };
-
-// Funzioni helper
-export function getPatternsByCategory(
-    category: "creational" | "structural" | "behavioral" | "antipattern"
-): PatternTheory[] {
-    return Object.values(patterns).filter((p) => p.category === category);
-}
-
-export function getPatternById(id: string): PatternTheory | undefined {
-    return patterns[id];
-}
-
-export function getAllPatterns(): PatternTheory[] {
-    return Object.values(patterns);
-}

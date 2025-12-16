@@ -36,6 +36,7 @@ import {
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { PATTERN_CATEGORIES } from "@/lib/patternTheory";
+import { getPatternById } from "@/lib/utils/patternHelpers";
 import { useState, useEffect } from "react";
 import "./Navbar.scss";
 
@@ -89,17 +90,21 @@ export default function Navbar() {
                     </Link>
                 ),
             },
-            ...category.patterns.map((patternId) => ({
-                key: `pattern-${patternId}`,
-                label: (
-                    <Link href={`/theory/${key}/${patternId}`}>
-                        {patternId
-                            .split("-")
-                            .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-                            .join(" ")}
-                    </Link>
-                ),
-            })),
+            ...category.patterns.map((patternId) => {
+                const pattern = getPatternById(patternId);
+                return {
+                    key: `pattern-${patternId}`,
+                    label: (
+                        <Link href={`/theory/${key}/${patternId}`}>
+                            {pattern?.icon && <span style={{ marginRight: 8 }}>{pattern.icon}</span>}
+                            {patternId
+                                .split("-")
+                                .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+                                .join(" ")}
+                        </Link>
+                    ),
+                };
+            }),
         ],
     }));
 
@@ -142,17 +147,21 @@ export default function Navbar() {
                     </Link>
                 ),
             },
-            ...category.patterns.map((patternId) => ({
-                key: `pattern-${patternId}`,
-                label: (
-                    <Link href={`/theory/${mobileSubmenuView}/${patternId}`}>
-                        {patternId
-                            .split("-")
-                            .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-                            .join(" ")}
-                    </Link>
-                ),
-            })),
+            ...category.patterns.map((patternId) => {
+                const pattern = getPatternById(patternId);
+                return {
+                    key: `pattern-${patternId}`,
+                    label: (
+                        <Link href={`/theory/${mobileSubmenuView}/${patternId}`}>
+                            {pattern?.icon && <span style={{ marginRight: 8 }}>{pattern.icon}</span>}
+                            {patternId
+                                .split("-")
+                                .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+                                .join(" ")}
+                        </Link>
+                    ),
+                };
+            }),
         ];
     };
 

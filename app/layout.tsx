@@ -21,9 +21,11 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.scss";
 import ReduxProvider from "./ReduxProvider";
+import ClientLayoutWrapper from "./ClientLayoutWrapper";
 import { ConfigProvider, App } from "antd";
 import Navbar from "@/components/Navbar/Navbar";
 import Breadcrumb from "@/components/Breadcrumb/Breadcrumb";
+import { PatternModalProvider } from "@/components/PatternModal/PatternModal";
 
 const inter = Inter({
     subsets: ["latin"],
@@ -116,11 +118,15 @@ export default function RootLayout({
                     }}
                 >
                     <ReduxProvider>
-                        <App>
-                            <Navbar />
-                            <Breadcrumb />
-                            <main className="max-w-[1440px] mx-auto p-4 md:p-6 lg:p-8">{children}</main>
-                        </App>
+                        <PatternModalProvider>
+                            <ClientLayoutWrapper>
+                                <App>
+                                    <Navbar />
+                                    <Breadcrumb />
+                                    <main className="max-w-[1440px] mx-auto p-4 md:p-6 lg:p-8">{children}</main>
+                                </App>
+                            </ClientLayoutWrapper>
+                        </PatternModalProvider>
                     </ReduxProvider>
                 </ConfigProvider>
             </body>

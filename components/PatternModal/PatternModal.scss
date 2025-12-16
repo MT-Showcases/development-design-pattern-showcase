@@ -1,0 +1,67 @@
+/**
+ * PatternModal Styles
+ * Global modal for pattern theory pages
+ */
+
+@use '@/styles' as *;
+@use '@/styles/functions' as fn;
+
+// PATTERN: Global Ant Design Modal override
+// PURPOSE: Style modal to match app theme (navy-dark + yellow accents)
+
+:global(.pattern-modal) {
+  // Modal content
+  :global(.ant-modal-content) {
+    background-color: $navy-dark;
+    border: 2px solid $yellow-primary;
+    border-radius: fn.rem(12);
+    padding: 0;
+    overflow: hidden;
+  }
+
+  // Close button
+  :global(.ant-modal-close) {
+    color: $white;
+    
+    &:hover {
+      color: $yellow-primary;
+      background-color: rgba($yellow-primary, 0.1);
+    }
+  }
+
+  // Modal body (iframe container)
+  :global(.ant-modal-body) {
+    padding: 0;
+    height: 90vh;
+    max-height: fn.rem(1000);
+  }
+}
+
+// Iframe styles
+.pattern-modal {
+  &__iframe {
+    width: 100%;
+    height: 92dvh;
+    border: none;
+    display: block;
+    background-color: $navy-dark;
+    border-radius: $radius-md;
+  }
+}
+
+// Mobile adjustments
+@media (max-width: 768px) {
+  :global(.pattern-modal) {
+    max-width: 100vw !important;
+    margin: 0 !important;
+    top: 0 !important;
+
+    :global(.ant-modal-content) {
+      border-radius: 0;
+    }
+
+    :global(.ant-modal-body) {
+      height: 100vh;
+    }
+  }
+}

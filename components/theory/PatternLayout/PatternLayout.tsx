@@ -37,6 +37,7 @@ import {
 import Link from "next/link";
 import CodeBlock from "../../CodeBlock/CodeBlock";
 import type { PatternTheory } from "@/lib/patternTheory";
+import { patternNameToSlug, getCategoryFromPatternId } from "@/lib/utils/patternHelpers";
 import "./PatternLayout.scss";
 
 interface PatternLayoutProps {
@@ -78,7 +79,10 @@ export default function PatternLayout({ pattern }: PatternLayoutProps) {
                         >
                             {pattern.category.toUpperCase()}
                         </Tag>
-                        <h1 className="pattern-layout__header-title">{pattern.name}</h1>
+                        <h1 className="pattern-layout__header-title flex items-center gap-3">
+                            {pattern.icon && <span>{pattern.icon}</span>}
+                            {pattern.name}
+                        </h1>
                         <p className="pattern-layout__header-intent">{pattern.intent}</p>
                     </Space>
                 </Card>
@@ -319,10 +323,10 @@ export default function PatternLayout({ pattern }: PatternLayoutProps) {
                     >
                         <div className="pattern-layout__related-tags">
                             {pattern.relatedPatterns.map((related) => {
-                                // Convert pattern name to URL slug (e.g., "Factory Method" -> "factory-method")
-                                const slug = related.toLowerCase().replace(/\s+/g, "-");
-                                // Determine category based on pattern name (you can expand this logic)
-                                const category = pattern.category; // Use same category for now
+                                // Convert pattern name to URL slug
+                                const slug = patternNameToSlug(related);
+                                // Get the actual category from pattern data
+                                const category = getCategoryFromPatternId(slug) || pattern.category;
 
                                 return (
                                     <Link

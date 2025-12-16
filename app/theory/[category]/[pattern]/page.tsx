@@ -13,7 +13,7 @@
  */
 
 import { notFound } from 'next/navigation';
-import { getPatternsByCategory, getPatternById } from '@/lib/patternTheory';
+import { getPatternsByCategory, getPatternById } from '@/lib/utils/patternHelpers';
 import PatternLayout from '@/components/theory/PatternLayout/PatternLayout';
 import type { CategoryKey } from '@/lib/types';
 

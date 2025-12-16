@@ -29,6 +29,18 @@
         }
     }
 
+    // Clickable pattern Tags with hover effect
+    :global(.ant-tag.cursor-pointer) {
+        cursor: pointer;
+        transition: all 0.3s ease;
+
+        &:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+            border-color: $yellow-primary;
+        }
+    }
+
     &__card {
         background: $white;
         border-radius: $radius-lg;

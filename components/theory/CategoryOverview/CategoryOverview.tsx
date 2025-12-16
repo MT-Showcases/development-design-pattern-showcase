@@ -59,7 +59,8 @@ export default function CategoryOverview({ category, patterns, categoryKey }: Ca
                 <Card hoverable>
                   <Card.Meta
                     title={
-                      <span className="category-overview__card-title">
+                      <span className="category-overview__card-title flex items-center gap-2">
+                        {pattern.icon && <span>{pattern.icon}</span>}
                         {pattern.name}
                       </span>
                     }

@@ -23,6 +23,8 @@
 
 import type { PatternExample } from "@/lib/types";
 import { translateCategory, getCategoryColor } from "@/lib/i18n";
+import { getPatternById, getCategoryFromPatternId } from "@/lib/utils/patternHelpers";
+import { usePatternModal } from "@/components/PatternModal/PatternModal";
 import CodeBlock from "../CodeBlock/CodeBlock";
 import { Card, Button, Tag, Alert, Space, Typography } from "antd";
 import { EyeOutlined } from "@ant-design/icons";
@@ -39,6 +41,9 @@ export default function ExampleViewer({
     solutionRevealed,
     onRevealSolution,
 }: ExampleViewerProps) {
+    // PATTERN: Context API hook for global modal
+    const { openModal } = usePatternModal();
+
     // PATTERN: Progressive Disclosure - Show solution only when requested
     return (
         <div className="example-viewer__container">
@@ -78,11 +83,26 @@ export default function ExampleViewer({
                             {/* Pattern Tags */}
                             <div>
                                 <strong className="mr-2">Pattern:</strong>
-                                {example.solutionPatterns.map((pattern, index) => (
-                                    <Tag color="green" key={index}>
-                                        {pattern}
-                                    </Tag>
-                                ))}
+                                {example.solutionPatterns.map((pattern, index) => {
+                                    const patternData = getPatternById(pattern.toLowerCase().replace(/\s+/g, '-'));
+                                    const category = getCategoryFromPatternId(pattern.toLowerCase().replace(/\s+/g, '-'));
+                                    
+                                    return (
+                                        <Tag 
+                                            color="green" 
+                                            key={index}
+                                            className="cursor-pointer"
+                                            onClick={() => {
+                                                if (category && patternData) {
+                                                    openModal(category, patternData.id);
+                                                }
+                                            }}
+                                        >
+                                            {patternData?.icon && <span style={{ marginRight: 6 }}>{patternData.icon}</span>}
+                                            {pattern}
+                                        </Tag>
+                                    );
+                                })}
                             </div>
 
                             {/* Overall Explanation */}
