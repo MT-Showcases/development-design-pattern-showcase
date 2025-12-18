@@ -1,36 +1,37 @@
-@use '../styles' as styles;
+@use "../styles" as styles;
+@use "../styles/functions" as fn;
 
 @import "tailwindcss";
 
 @theme {
-  /* Navy palette */
-  --color-navy-dark: #0a1929;
-  --color-navy-medium: #1a2942;
-  --color-navy-light: #2a3952;
-  
-  /* Yellow palette */
-  --color-yellow-primary: #ffc107;
-  --color-yellow-dark: #d39e00;
-  --color-yellow-light: #ffcd39;
-  
-  /* Pink palette */
-  --color-pink-accent: #ff1744;
-  --color-pink-dark: #d50000;
-  --color-pink-light: #ff5252;
-  
-  /* Beige palette */
-  --color-beige-card: #f5e6d3;
-  --color-beige-dark: #e6d7c4;
-  --color-beige-light: #fff5e6;
-  
-  /* Semantic colors */
-  --color-success: #10b981;
-  --color-success-dark: #059669;
-  --color-success-light: #34d399;
-  
-  --color-info: #3b82f6;
-  --color-info-dark: #2563eb;
-  --color-info-light: #60a5fa;
+    // Navy palette
+    --color-navy-dark: #0a1929;
+    --color-navy-medium: #1a2942;
+    --color-navy-light: #2a3952;
+
+    // Yellow palette
+    --color-yellow-primary: #ffc107;
+    --color-yellow-dark: #d39e00;
+    --color-yellow-light: #ffcd39;
+
+    // Pink palette
+    --color-pink-accent: #ff1744;
+    --color-pink-dark: #d50000;
+    --color-pink-light: #ff5252;
+
+    // Beige palette
+    --color-beige-card: #f5e6d3;
+    --color-beige-dark: #e6d7c4;
+    --color-beige-light: #fff5e6;
+
+    // Semantic colors
+    --color-success: #10b981;
+    --color-success-dark: #059669;
+    --color-success-light: #34d399;
+
+    --color-info: #3b82f6;
+    --color-info-dark: #2563eb;
+    --color-info-light: #60a5fa;
 }
 
 /* === DESIGN PATTERN SHOWCASE - GLOBAL STYLES === */
@@ -45,97 +46,140 @@
 
 /* CSS Custom Properties for Tailwind v4 */
 @layer base {
-  :root {
-    /* Primary Colors (from slides) */
-    --navy-dark: #{styles.$navy-dark};
-    --navy-medium: #{styles.$navy-medium};
-    --navy-light: #{styles.$navy-light};
-    
-    --yellow-primary: #{styles.$yellow-primary};
-    --yellow-dark: #{styles.$yellow-dark};
-    --yellow-light: #{styles.$yellow-light};
-    
-    --pink-accent: #{styles.$pink-accent};
-    --pink-dark: #{styles.$pink-dark};
-    --pink-light: #{styles.$pink-light};
-    
-    --beige-card: #{styles.$beige-card};
-    --beige-dark: #{styles.$beige-dark};
-    --beige-light: #{styles.$beige-light};
-    
-    /* Semantic Colors */
-    --success: #{styles.$success};
-    --error: #{styles.$error};
-    --warning: #{styles.$warning};
-    --info: #{styles.$info};
+    :root {
+        // Primary Colors (from slides)
+        --navy-dark: #{styles.$navy-dark};
+        --navy-medium: #{styles.$navy-medium};
+        --navy-light: #{styles.$navy-light};
 
-    /* Layout - Sticky positioning offsets */
-    --navbar-height: 48px;
-    --breadcrumb-height: 58px;
-    --sticky-top-offset: var(--navbar-height); // Default: navbar only
-  }
+        --yellow-primary: #{styles.$yellow-primary};
+        --yellow-dark: #{styles.$yellow-dark};
+        --yellow-light: #{styles.$yellow-light};
 
-  /* Modifier for pages with breadcrumb */
-  .has-breadcrumb {
-    --sticky-top-offset: calc(var(--navbar-height) + var(--breadcrumb-height)); // 104px
-  }
+        --pink-accent: #{styles.$pink-accent};
+        --pink-dark: #{styles.$pink-dark};
+        --pink-light: #{styles.$pink-light};
 
-  * {
-    box-sizing: border-box;
-    padding: 0;
-    margin: 0;
-  }
+        --beige-card: #{styles.$beige-card};
+        --beige-dark: #{styles.$beige-dark};
+        --beige-light: #{styles.$beige-light};
 
-  html,
-  body {
-    height: 100%;
-    max-width: 100vw;
-    overflow-x: hidden;
-    background-color: var(--navy-dark);
-    color: var(--white, #ffffff);
-  }
+        // Semantic Colors
+        --success: #{styles.$success};
+        --error: #{styles.$error};
+        --warning: #{styles.$warning};
+        --info: #{styles.$info};
 
-  body {
-    font-family: var(--font-inter), -apple-system, BlinkMacSystemFont, sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-  }
+        // Layout - Sticky positioning offsets
+        --navbar-height: 48px;
+        --breadcrumb-height: 58px;
+        --sticky-top-offset: var(--navbar-height); // Default: navbar only
+    }
 
-  main {
-    background-color: var(--navy-dark);
-    min-height: calc(100vh - 60px); /* Subtract navbar height */
-  }
+    // Modifier for pages with breadcrumb
+    .has-breadcrumb {
+        --sticky-top-offset: calc(
+            var(--navbar-height) + var(--breadcrumb-height)
+        ); // 104px
+    }
 
-  code {
-    font-family: #{styles.$font-mono};
-  }
+    * {
+        box-sizing: border-box;
+        padding: 0;
+        margin: 0;
+    }
 
-  button,
-  input {
-    font-family: inherit;
-  }
+    html,
+    body {
+        height: 100%;
+        max-width: 100vw;
+        overflow-x: hidden;
+        background-color: var(--navy-dark);
+        color: var(--white, #ffffff);
+    }
+
+    body {
+        font-family: var(--font-inter), -apple-system, BlinkMacSystemFont, sans-serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+
+    main {
+        background-color: var(--navy-dark);
+        min-height: calc(100vh - 60px); // Subtract navbar height
+    }
+
+    code {
+        font-family: #{styles.$font-mono};
+    }
+
+    button,
+    input {
+        font-family: inherit;
+    }
 }
 
 /* === TAILWIND CUSTOM UTILITIES === */
 @layer utilities {
-  /* Color utilities */
-  .text-navy { color: var(--navy-dark); }
-  .text-yellow { color: var(--yellow-primary); }
-  .text-pink { color: var(--pink-accent); }
-  
-  .bg-navy { background-color: var(--navy-dark); }
-  .bg-navy-medium { background-color: var(--navy-medium); }
-  .bg-yellow { background-color: var(--yellow-primary); }
-  .bg-pink { background-color: var(--pink-accent); }
-  .bg-beige { background-color: var(--beige-card); }
-  
-  /* Hover utilities */
-  .hover-yellow:hover { color: var(--yellow-primary); }
-  .hover-pink:hover { color: var(--pink-accent); }
-  .hover-bg-yellow:hover { background-color: var(--yellow-primary); }
-  .hover-bg-pink:hover { background-color: var(--pink-accent); }
-  
-  /* Border utilities */
-  .border-yellow { border-color: var(--yellow-primary); }
-  .border-pink { border-color: var(--pink-accent); }
+    // Color utilities
+    .text-navy {
+        color: var(--navy-dark);
+    }
+    .text-yellow {
+        color: var(--yellow-primary);
+    }
+    .text-pink {
+        color: var(--pink-accent);
+    }
+
+    .bg-navy {
+        background-color: var(--navy-dark);
+    }
+    .bg-navy-medium {
+        background-color: var(--navy-medium);
+    }
+    .bg-yellow {
+        background-color: var(--yellow-primary);
+    }
+    .bg-pink {
+        background-color: var(--pink-accent);
+    }
+    .bg-beige {
+        background-color: var(--beige-card);
+    }
+
+    // Hover utilities
+    .hover-yellow:hover {
+        color: var(--yellow-primary);
+    }
+    .hover-pink:hover {
+        color: var(--pink-accent);
+    }
+    .hover-bg-yellow:hover {
+        background-color: var(--yellow-primary);
+    }
+    .hover-bg-pink:hover {
+        background-color: var(--pink-accent);
+    }
+
+    // Border utilities
+    .border-yellow {
+        border-color: var(--yellow-primary);
+    }
+    .border-pink {
+        border-color: var(--pink-accent);
+    }
+}
+
+/* === ANT DESIGN OVERRIDES === */
+// Mobile-first: half padding on mobile, full on desktop
+.ant-card {
+    &,
+    &-body {
+        padding: fn.rem(12) !important; // Mobile: 12px (half of 24px)
+
+        @include styles.respond-above(md) {
+            padding: fn.rem(24) !important; // Desktop: 24px (default)
+        }
+    }
 }

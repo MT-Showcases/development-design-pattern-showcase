@@ -87,7 +87,7 @@ export default function CodeBlock({
 
     return (
         <>
-            <Card className="code-block__card" styles={{ body: { padding: 0 } }}>
+            <Card className="code-block__card">
                 <div className="code-block__header">
                     <span className="code-block__language">{language.toUpperCase()}</span>
                     <Space size="small">

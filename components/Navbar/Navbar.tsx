@@ -30,6 +30,7 @@ import {
     BuildOutlined,
     ToolOutlined,
     ThunderboltOutlined,
+    WarningOutlined,
     AppstoreOutlined,
     ArrowLeftOutlined,
 } from "@ant-design/icons";
@@ -65,6 +66,7 @@ export default function Navbar() {
         creational: <BuildOutlined />,
         structural: <ToolOutlined />,
         behavioral: <ThunderboltOutlined />,
+        antipattern: <WarningOutlined />,
     };
 
     // Generate menu items from pattern categories

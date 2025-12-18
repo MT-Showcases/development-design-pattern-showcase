@@ -27,29 +27,46 @@
 
   &__header {
     text-align: center;
-    margin-bottom: $spacing-8;
+    // Mobile-first: smaller margin
+    margin-bottom: $spacing-4;
 
-    @include respond-below(md) {
+    @include respond-above(md) {
       margin-bottom: $spacing-6;
+    }
+
+    @include respond-above(lg) {
+      margin-bottom: $spacing-8;
     }
 
     &-title {
       color: $yellow-primary !important;
-      font-size: fn.rem(42) !important;
+      // Mobile-first: smaller title
+      font-size: fn.rem(28) !important;
       font-weight: 700 !important;
-      margin-bottom: fn.rem(16) !important;
+      margin-bottom: fn.rem(12) !important;
 
-      @include respond-below(md) {
-        font-size: fn.rem(32) !important;
+      @include respond-above(md) {
+        font-size: fn.rem(36) !important;
+        margin-bottom: fn.rem(14) !important;
+      }
+
+      @include respond-above(lg) {
+        font-size: fn.rem(42) !important;
+        margin-bottom: fn.rem(16) !important;
       }
     }
 
     &-subtitle {
       color: $white !important;
-      font-size: fn.rem(18) !important;
+      // Mobile-first: smaller subtitle
+      font-size: fn.rem(15) !important;
 
-      @include respond-below(md) {
+      @include respond-above(md) {
         font-size: fn.rem(16) !important;
+      }
+
+      @include respond-above(lg) {
+        font-size: fn.rem(18) !important;
       }
     }
   }

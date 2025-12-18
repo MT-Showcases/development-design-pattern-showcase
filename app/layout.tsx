@@ -123,7 +123,7 @@ export default function RootLayout({
                                 <App>
                                     <Navbar />
                                     <Breadcrumb />
-                                    <main className="max-w-[1440px] mx-auto p-4 md:p-6 lg:p-8">{children}</main>
+                                    <main className="max-w-[1440px] mx-auto p-3 sm:p-4 md:p-6 lg:p-8">{children}</main>
                                 </App>
                             </ClientLayoutWrapper>
                         </PatternModalProvider>

@@ -14,9 +14,18 @@
 .pattern-layout {
     min-height: 100vh;
     background-color: $navy-dark;
-    padding: $spacing-12 $spacing-6;
+    // Mobile-first: smaller padding
+    padding: $spacing-4 $spacing-3;
+
+    @include respond-above(sm) {
+        padding: $spacing-6 $spacing-4;
+    }
 
     @include respond-above(md) {
+        padding: $spacing-8 $spacing-6;
+    }
+
+    @include respond-above(lg) {
         padding: $spacing-12 $spacing-8;
     }
 
@@ -29,7 +38,16 @@
     &__header {
         @include card-base;
         background-color: $white;
-        margin-bottom: $spacing-8;
+        // Mobile-first: smaller margin
+        margin-bottom: $spacing-4;
+
+        @include respond-above(md) {
+            margin-bottom: $spacing-6;
+        }
+
+        @include respond-above(lg) {
+            margin-bottom: $spacing-8;
+        }
 
         &-tag {
             background-color: $yellow-primary;
@@ -43,10 +61,19 @@
 
         &-title {
             color: $navy-dark;
-            font-size: 42px;
+            // Mobile-first: smaller title
+            font-size: 28px;
             font-weight: $weight-bold;
             margin-bottom: $spacing-2;
             margin-top: 0;
+
+            @include respond-above(md) {
+                font-size: 36px;
+            }
+
+            @include respond-above(lg) {
+                font-size: 42px;
+            }
         }
 
         &-intent {
@@ -58,9 +85,18 @@
 
     // Collapse sections
     &__collapse {
-        margin-bottom: $spacing-8;
+        // Mobile-first: smaller margin
+        margin-bottom: $spacing-4;
         background-color: $navy-medium;
         border-color: $yellow-primary;
+
+        @include respond-above(md) {
+            margin-bottom: $spacing-6;
+        }
+
+        @include respond-above(lg) {
+            margin-bottom: $spacing-8;
+        }
 
         .ant-collapse-header {
             color: $white !important;

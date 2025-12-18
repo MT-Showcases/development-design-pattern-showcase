@@ -18,10 +18,11 @@
 
   &__reset-button {
     position: fixed !important;
-    bottom: $spacing-8 !important;
-    right: $spacing-8 !important;
-    padding: $spacing-3 $spacing-6 !important;
-    font-size: $font-base !important;
+    // Mobile-first: smaller positioning and padding
+    bottom: $spacing-4 !important;
+    right: $spacing-4 !important;
+    padding: $spacing-2 $spacing-4 !important;
+    font-size: $font-sm !important;
     font-weight: $weight-bold !important;
     color: $white !important;
     background-color: $pink-accent !important;
@@ -30,6 +31,19 @@
     box-shadow: $shadow-lg !important;
     z-index: $z-50;
     transition: all 0.2s ease !important;
+
+    @include respond-above(md) {
+      bottom: $spacing-6 !important;
+      right: $spacing-6 !important;
+      padding: fn.rem(10) $spacing-5 !important;
+      font-size: $font-base !important;
+    }
+
+    @include respond-above(lg) {
+      bottom: $spacing-8 !important;
+      right: $spacing-8 !important;
+      padding: $spacing-3 $spacing-6 !important;
+    }
 
     &:hover {
       background-color: color.adjust($pink-accent-hex, $lightness: -10%) !important;
@@ -40,13 +54,6 @@
 
     &:active {
       transform: translateY(0) !important;
-    }
-
-    @include respond-below(md) {
-      bottom: $spacing-4 !important;
-      right: $spacing-4 !important;
-      padding: $spacing-2 $spacing-4 !important;
-      font-size: $font-sm !important;
     }
   }
 }

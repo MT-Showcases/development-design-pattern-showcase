@@ -21,11 +21,12 @@
 
 .example-viewer {
     &__container {
-        max-width: fn.rem(900);
+        // Mobile-first: full width on mobile
+        max-width: 100%;
         margin: 0 auto;
 
-        @include respond-below(md) {
-            max-width: 100%;
+        @include respond-above(md) {
+            max-width: fn.rem(900);
         }
     }
 

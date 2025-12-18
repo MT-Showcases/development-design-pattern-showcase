@@ -15,10 +15,15 @@
 .category-overview {
   min-height: 100vh;
   background-color: $navy-dark;
-  padding: fn.rem(48) fn.rem(24);
+  // Mobile-first: smaller padding
+  padding: fn.rem(16) fn.rem(12);
 
-  @include respond-below(md) {
-    padding: fn.rem(32) fn.rem(16);
+  @include respond-above(md) {
+    padding: fn.rem(32) fn.rem(24);
+  }
+
+  @include respond-above(lg) {
+    padding: fn.rem(48) fn.rem(24);
   }
 
   &__container {
@@ -28,17 +33,33 @@
 
   &__header {
     text-align: center;
-    margin-bottom: fn.rem(64);
+    // Mobile-first: smaller margin
+    margin-bottom: fn.rem(24);
 
-    @include respond-below(md) {
+    @include respond-above(md) {
       margin-bottom: fn.rem(40);
+    }
+
+    @include respond-above(lg) {
+      margin-bottom: fn.rem(64);
     }
   }
 
   &__icon {
-    font-size: fn.rem(64);
-    margin-bottom: fn.rem(24);
+    // Mobile-first: smaller icon
+    font-size: fn.rem(48);
+    margin-bottom: fn.rem(16);
     color: $yellow-primary;
+
+    @include respond-above(md) {
+      font-size: fn.rem(56);
+      margin-bottom: fn.rem(20);
+    }
+
+    @include respond-above(lg) {
+      font-size: fn.rem(64);
+      margin-bottom: fn.rem(24);
+    }
 
     :global(.anticon) {
       color: $yellow-primary;
@@ -47,22 +68,36 @@
 
   &__title {
     color: $yellow-primary !important;
-    font-size: fn.rem(42) !important;
+    // Mobile-first: smaller font
+    font-size: fn.rem(28) !important;
     font-weight: 700 !important;
-    margin-bottom: fn.rem(16) !important;
+    margin-bottom: fn.rem(12) !important;
 
-    @include respond-below(md) {
-      font-size: fn.rem(32) !important;
+    @include respond-above(md) {
+      font-size: fn.rem(36) !important;
+      margin-bottom: fn.rem(14) !important;
+    }
+
+    @include respond-above(lg) {
+      font-size: fn.rem(42) !important;
+      margin-bottom: fn.rem(16) !important;
     }
   }
 
   &__description {
-    font-size: fn.rem(18) !important;
+    // Mobile-first: smaller font
+    font-size: fn.rem(15) !important;
     color: $white !important;
-    line-height: 1.8;
+    line-height: 1.6;
 
-    @include respond-below(md) {
+    @include respond-above(md) {
       font-size: fn.rem(16) !important;
+      line-height: 1.7;
+    }
+
+    @include respond-above(lg) {
+      font-size: fn.rem(18) !important;
+      line-height: 1.8;
     }
   }
 

@@ -24,6 +24,12 @@
     &__card {
         background-color: $navy-medium;
         border: fn.rem(1) solid $yellow-primary;
+
+        // Override global Card padding - CodeBlock needs no padding
+        &.ant-card,
+        .ant-card-body {
+            padding: 0 !important;
+        }
     }
 
     &__header {
@@ -33,20 +39,42 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: $spacing-4;
-        padding-bottom: $spacing-3;
+        // Mobile-first: smaller padding
+        padding: $spacing-2 $spacing-3;
+        padding-bottom: $spacing-2;
         border-bottom: fn.rem(1) solid $navy-light;
         border-radius: $radius-base;
         background-color: $navy-medium;
         backdrop-filter: blur(fn.rem(10));
+
+        @include respond-above(sm) {
+            padding: $spacing-3;
+            padding-bottom: $spacing-2;
+        }
+
+        @include respond-above(md) {
+            padding: $spacing-4;
+            padding-bottom: $spacing-3;
+        }
     }
 
     &__language {
         color: $yellow-primary;
         text-transform: uppercase;
         font-weight: 600;
-        font-size: fn.rem(12);
-        letter-spacing: fn.rem(1);
+        // Mobile-first: smaller text
+        font-size: fn.rem(10);
+        letter-spacing: fn.rem(0.5);
+
+        @include respond-above(sm) {
+            font-size: fn.rem(11);
+            letter-spacing: fn.rem(0.8);
+        }
+
+        @include respond-above(md) {
+            font-size: fn.rem(12);
+            letter-spacing: fn.rem(1);
+        }
     }
 
     &__editor {
