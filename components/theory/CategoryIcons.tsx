@@ -7,7 +7,7 @@
  * - Centralize icon styling for theory pages
  */
 
-import { BuildOutlined, ToolOutlined, ThunderboltOutlined, WarningOutlined } from '@ant-design/icons';
+import { BuildOutlined, ToolOutlined, ThunderboltOutlined, WarningOutlined, BookOutlined } from '@ant-design/icons';
 
 export const CreationalIcon = () => (
   <BuildOutlined style={{ fontSize: '64px' }} />
@@ -23,4 +23,8 @@ export const BehavioralIcon = () => (
 
 export const AntipatternIcon = () => (
   <WarningOutlined style={{ fontSize: '64px' }} />
+);
+
+export const PrinciplesIcon = () => (
+  <BookOutlined style={{ fontSize: '64px' }} />
 );

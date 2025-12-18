@@ -17,7 +17,7 @@
  * - Use union types for category enums instead of string
  */
 
-export type Category = "creational" | "structural" | "behavioral" | "antipattern";
+export type Category = "creational" | "structural" | "behavioral" | "antipattern" | "principles";
 
 // Alias for routing and components (same as Category but more semantic)
 export type CategoryKey = Category;

@@ -31,6 +31,7 @@ export function generateStaticParams() {
     { category: 'structural' },
     { category: 'behavioral' },
     { category: 'antipattern' },
+    { category: 'principles' },
   ];
 }
 
@@ -57,7 +58,7 @@ export default async function CategoryPage({ params }: PageProps) {
   const categoryKey = category as CategoryKey;
   
   // Validate category exists
-  if (!['creational', 'structural', 'behavioral', 'antipattern'].includes(categoryKey)) {
+  if (!['creational', 'structural', 'behavioral', 'antipattern', 'principles'].includes(categoryKey)) {
     notFound();
   }
 

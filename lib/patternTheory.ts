@@ -23,6 +23,7 @@ import {
     ToolOutlined,
     ThunderboltOutlined,
     WarningOutlined,
+    BookOutlined,
     DatabaseOutlined,
     AppstoreAddOutlined,
     BlockOutlined,
@@ -83,6 +84,13 @@ export interface CodeExample {
 }
 
 export const PATTERN_CATEGORIES = {
+    principles: {
+        name: "Principi di Progettazione",
+        description:
+            "I Design Pattern non nascono dal nulla: si fondano su principi che aiutano a scrivere codice pulito e riutilizzabile. I principi SOLID (DRY, KISS, YAGNI) sono le fondamenta su cui costruire software di qualità.",
+        icon: React.createElement(BookOutlined),
+        patterns: ["dry", "kiss", "yagni", "solid-srp", "solid-ocp", "solid-lsp", "solid-isp", "solid-dip"],
+    },
     creational: {
         name: "Creational Patterns",
         description:
@@ -4960,5 +4968,907 @@ const devClient = new ApiClient(devConfig);`,
             "Factory",
             "Service Locator (anti-pattern)",
         ],
+    },
+
+    // ==================== DESIGN PRINCIPLES ====================
+    "dry": {
+        id: "dry",
+        name: "DRY (Don't Repeat Yourself)",
+        category: "principles",
+        icon: React.createElement(CopyOutlined),
+        intent: "Evita duplicazioni: il codice dev'essere scritto una volta sola. Ogni concetto deve avere una singola rappresentazione autorevole nel sistema.",
+        problem:
+            "Quando la stessa logica è duplicata in più punti, ogni modifica richiede cambiamenti multipli. Questo porta a inconsistenze, bug difficili da tracciare e manutenzione costosa. Il codice duplicato viola il principio di singola fonte di verità.",
+        solution:
+            "Estrarre la logica comune in funzioni, classi o moduli riutilizzabili. Utilizzare astrazione per rappresentare concetti ripetuti. Ogni pezzo di conoscenza deve esistere in un unico posto del sistema.",
+        structure:
+            "Funzioni helper, classi utility, moduli condivisi. Invece di copiare codice, importare e riutilizzare da una fonte unica.",
+        participants: [
+            "Funzione/Classe riutilizzabile - implementazione unica",
+            "Client multipli - riutilizzano la logica condivisa",
+        ],
+        codeExamples: [
+            {
+                title: "PROBLEMA: Codice duplicato",
+                description:
+                    "La stessa validazione email è ripetuta in 3 posti diversi. Difficile da manutenere.",
+                type: "problem",
+                code: `// ❌ Violazione DRY - logica duplicata
+function registraUtente(email, password) {
+  // Validazione email duplicata #1
+  if (!email.includes('@') || email.length < 5) {
+    throw new Error('Email non valida');
+  }
+  // ... registrazione
+}
+
+function aggiornaEmail(userId, newEmail) {
+  // Validazione email duplicata #2
+  if (!newEmail.includes('@') || newEmail.length < 5) {
+    throw new Error('Email non valida');
+  }
+  // ... aggiornamento
+}
+
+function inviaNewsletter(emails) {
+  emails.forEach(email => {
+    // Validazione email duplicata #3
+    if (!email.includes('@') || email.length < 5) {
+      console.log('Email non valida, skip');
+      return;
+    }
+    // ... invio
+  });
+}
+
+// Problema: se cambia la logica di validazione,
+// devo modificare 3 posti diversi!`,
+                language: "javascript",
+            },
+            {
+                title: "SOLUZIONE: Logica centralizzata (DRY)",
+                description:
+                    "Validazione email in una funzione riutilizzabile. Modifica in un solo posto.",
+                type: "solution",
+                code: `// ✅ DRY - logica in un solo posto
+function isValidEmail(email) {
+  return email.includes('@') && email.length >= 5;
+}
+
+function registraUtente(email, password) {
+  if (!isValidEmail(email)) {
+    throw new Error('Email non valida');
+  }
+  // ... registrazione
+}
+
+function aggiornaEmail(userId, newEmail) {
+  if (!isValidEmail(newEmail)) {
+    throw new Error('Email non valida');
+  }
+  // ... aggiornamento
+}
+
+function inviaNewsletter(emails) {
+  emails.forEach(email => {
+    if (!isValidEmail(email)) {
+      console.log('Email non valida, skip');
+      return;
+    }
+    // ... invio
+  });
+}
+
+// Modifiche alla validazione? Un solo posto da aggiornare!`,
+                language: "javascript",
+            },
+        ],
+        realWorldExamples: [
+            "Utility functions per validazioni (email, password, numeri)",
+            "Formatter centralizzati per date, valute, numeri",
+            "Configurazioni condivise invece di hardcoded values",
+            "Template/componenti UI riutilizzabili",
+        ],
+        whenToUse: [
+            "Quando trovi logica duplicata in 2+ posti",
+            "Per validazioni, formatting, calcoli ricorrenti",
+            "Costanti e configurazioni usate in più moduli",
+        ],
+        whenNotToUse: [
+            "Astrazione prematura (YAGNI - aspetta la terza duplicazione)",
+            "Logica simile ma con contesti diversi (falsa duplicazione)",
+        ],
+        relatedPatterns: ["Template Method", "Strategy", "Utility Classes"],
+    },
+
+    "kiss": {
+        id: "kiss",
+        name: "KISS (Keep It Simple, Stupid)",
+        category: "principles",
+        icon: React.createElement(CodeOutlined),
+        intent: "Le soluzioni semplici sono spesso le migliori. Evita complessità inutili e over-engineering.",
+        problem:
+            "Codice troppo complesso è difficile da capire, testare e manutenere. Over-engineering con pattern non necessari porta a sprechi di tempo e introduce bug.",
+        solution:
+            "Scrivere codice chiaro e diretto. Usare pattern e astrazioni solo quando risolvono problemi reali. Preferire funzioni semplici a architetture elaborate.",
+        structure:
+            "Funzioni lineari con nomi descrittivi, logica diretta senza indirezioni inutili, pattern applicati solo dove necessario.",
+        participants: [
+            "Soluzione semplice - codice lineare e chiaro",
+            "Astrazione minima - solo quando serve davvero",
+        ],
+        codeExamples: [
+            {
+                title: "PROBLEMA: Over-engineering",
+                description:
+                    "Pattern complessi per un problema semplice. Difficile da capire e manutenere.",
+                type: "problem",
+                code: `// ❌ Violazione KISS - troppo complesso per il compito
+class StringFormatterFactory {
+  createFormatter(type) {
+    switch(type) {
+      case 'uppercase':
+        return new UppercaseFormatter();
+      case 'lowercase':
+        return new LowercaseFormatter();
+      default:
+        return new NoOpFormatter();
+    }
+  }
+}
+
+class UppercaseFormatter {
+  format(str) { return str.toUpperCase(); }
+}
+
+class LowercaseFormatter {
+  format(str) { return str.toLowerCase(); }
+}
+
+class NoOpFormatter {
+  format(str) { return str; }
+}
+
+// Uso complicato per un task semplice
+const factory = new StringFormatterFactory();
+const formatter = factory.createFormatter('uppercase');
+const result = formatter.format('ciao'); // CIAO
+
+// Troppo codice per formattare una stringa!`,
+                language: "javascript",
+            },
+            {
+                title: "SOLUZIONE: Codice semplice e diretto (KISS)",
+                description:
+                    "Funzioni semplici che fanno il lavoro. Chiaro, testabile, manutenibile.",
+                type: "solution",
+                code: `// ✅ KISS - soluzione semplice
+function toUpperCase(str) {
+  return str.toUpperCase();
+}
+
+function toLowerCase(str) {
+  return str.toLowerCase();
+}
+
+// Uso semplice e chiaro
+const result = toUpperCase('ciao'); // CIAO
+
+// Oppure con un oggetto se serve raggruppare
+const formatters = {
+  uppercase: (str) => str.toUpperCase(),
+  lowercase: (str) => str.toLowerCase(),
+  capitalize: (str) => str.charAt(0).toUpperCase() + str.slice(1),
+};
+
+// Uso ancora semplice
+formatters.uppercase('ciao'); // CIAO
+
+// Facile da capire, testare e modificare!`,
+                language: "javascript",
+            },
+        ],
+        realWorldExamples: [
+            "Funzioni pure invece di classi quando non serve stato",
+            "Array methods invece di loop complessi",
+            "Oggetti semplici invece di pattern Builder per 2-3 proprietà",
+            "Codice procedurale quando pattern non aggiunge valore",
+        ],
+        whenToUse: [
+            "Sempre come approccio di default",
+            "Quando la soluzione semplice risolve il problema",
+            "Prima di applicare pattern complessi, chiediti: serve davvero?",
+        ],
+        whenNotToUse: [
+            "Non sacrificare estensibilità quando sai che arriverà",
+            "Pattern complessi OK se risolvono problemi reali",
+        ],
+        relatedPatterns: ["YAGNI", "Functional Programming"],
+    },
+
+    "yagni": {
+        id: "yagni",
+        name: "YAGNI (You Aren't Gonna Need It)",
+        category: "principles",
+        icon: React.createElement(SafetyOutlined),
+        intent: "Non aggiungere funzionalità che non servono ancora. Implementa solo ciò che è necessario adesso.",
+        problem:
+            "Implementare features \"per il futuro\" porta a codice morto, complessità inutile e tempo sprecato. Il 80% delle features anticipate non vengono mai usate.",
+        solution:
+            "Implementare solo i requisiti attuali. Quando (e se) arriverà il bisogno, aggiungerai la feature. Codice più semplice oggi, features reali domani.",
+        structure:
+            "Implementazione minimale che soddisfa i requisiti attuali. Refactoring incrementale quando arrivano nuovi requisiti reali.",
+        participants: [
+            "Implementazione minima - solo features richieste ora",
+            "Refactoring futuro - quando serve davvero",
+        ],
+        codeExamples: [
+            {
+                title: "PROBLEMA: Features premature",
+                description:
+                    "Implementare funzionalità che potrebbero servire in futuro. Codice complesso inutilmente.",
+                type: "problem",
+                code: `// ❌ Violazione YAGNI - features che non servono ora
+class UserManager {
+  constructor() {
+    this.users = [];
+    this.groups = []; // Non serve ora
+    this.permissions = {}; // Non serve ora
+    this.notifications = []; // Non serve ora
+  }
+  
+  addUser(user) {
+    this.users.push(user);
+  }
+  
+  // Features "per il futuro" che nessuno ha chiesto
+  addUserToGroup(userId, groupId) {
+    // Implementazione complessa non usata
+  }
+  
+  setPermissions(userId, perms) {
+    // Feature ipotetica mai richiesta
+  }
+  
+  sendNotification(userId, msg) {
+    // "Potrebbe servire" - ma non ora
+  }
+  
+  exportToXML() {
+    // "Forse in futuro vogliamo XML"
+  }
+  
+  importFromCSV(file) {
+    // "Magari serve import CSV"
+  }
+}
+
+// Complessità inutile - usi solo addUser()!`,
+                language: "javascript",
+            },
+            {
+                title: "SOLUZIONE: Implementa solo ciò che serve (YAGNI)",
+                description:
+                    "Codice minimo per i requisiti attuali. Aggiungerai features quando servono davvero.",
+                type: "solution",
+                code: `// ✅ YAGNI - solo ciò che serve adesso
+class UserManager {
+  constructor() {
+    this.users = [];
+  }
+  
+  addUser(user) {
+    this.users.push(user);
+  }
+  
+  getUser(id) {
+    return this.users.find(u => u.id === id);
+  }
+}
+
+// Semplice, chiaro, fa esattamente ciò che serve
+
+// Quando (e SE) arriverà il requisito per gruppi:
+// ALLORA aggiungi:
+// this.groups = [];
+// addUserToGroup(userId, groupId) { ... }
+
+// Vantaggi:
+// - Codice più semplice oggi
+// - Meno bug (meno codice = meno bug)
+// - Features reali, non ipotetiche
+// - Implementazione basata su requisiti veri, non assunzioni`,
+                language: "javascript",
+            },
+        ],
+        realWorldExamples: [
+            "Non creare campi DB per features non ancora richieste",
+            "Non implementare export PDF se nessuno lo usa",
+            "Non aggiungere cache se l'app è veloce",
+            "Non fare microservices se un monolite basta",
+        ],
+        whenToUse: [
+            "Sempre: implementa solo requisiti attuali",
+            "Quando qualcuno dice: potrebbe servire in futuro",
+            "Prima di aggiungere complessità: serve ORA?",
+        ],
+        whenNotToUse: [
+            "Quando il requisito è certo (es. compliance legale in arrivo)",
+            "Quando il refactoring futuro sarebbe molto costoso",
+        ],
+        relatedPatterns: ["KISS", "Agile Development", "Incremental Design"],
+    },
+
+    "solid-srp": {
+        id: "solid-srp",
+        name: "S - Single Responsibility Principle",
+        category: "principles",
+        icon: React.createElement(FileSearchOutlined),
+        intent: "Ogni modulo o funzione dovrebbe avere una sola responsabilità ben definita. Una classe dovrebbe avere un solo motivo per cambiare.",
+        problem:
+            "Classi che fanno troppe cose (God Object) sono difficili da testare, manutenere e riutilizzare. Ogni modifica rischia di rompere funzionalità non correlate.",
+        solution:
+            "Separare responsabilità in classi/moduli distinti. Ogni componente si occupa di una sola cosa e la fa bene.",
+        structure:
+            "Classi piccole e focalizzate. Ogni classe gestisce un singolo aspetto (persistenza, validazione, rendering, logica business).",
+        participants: [
+            "Classe focalizzata - una sola responsabilità",
+            "Client - compone classi specializzate",
+        ],
+        codeExamples: [
+            {
+                title: "PROBLEMA: Violazione SRP",
+                description:
+                    "Classe con multiple responsabilità: validazione, persistenza, rendering. Difficile da testare.",
+                type: "problem",
+                code: `// ❌ Violazione SRP - troppe responsabilità
+class User {
+  constructor(name, email) {
+    this.name = name;
+    this.email = email;
+  }
+  
+  // Responsabilità 1: Validazione
+  validate() {
+    if (!this.email.includes('@')) {
+      throw new Error('Email non valida');
+    }
+  }
+  
+  // Responsabilità 2: Persistenza
+  save() {
+    const db = new Database();
+    db.insert('users', this);
+  }
+  
+  // Responsabilità 3: Rendering
+  renderHTML() {
+    return \`<div>\${this.name} - \${this.email}</div>\`;
+  }
+  
+  // Responsabilità 4: Notifiche
+  sendWelcomeEmail() {
+    const mailer = new Mailer();
+    mailer.send(this.email, 'Benvenuto!');
+  }
+}
+
+// Problema: ogni cambio (es. switch da DB a API)
+// richiede modifica di User. Testing difficile.`,
+                language: "javascript",
+            },
+            {
+                title: "SOLUZIONE: Single Responsibility (SRP)",
+                description:
+                    "Ogni classe ha una sola responsabilità. Testabile, riutilizzabile, manutenibile.",
+                type: "solution",
+                code: `// ✅ SRP - responsabilità separate
+
+// Responsabilità 1: Modello dati
+class User {
+  constructor(name, email) {
+    this.name = name;
+    this.email = email;
+  }
+}
+
+// Responsabilità 2: Validazione
+class UserValidator {
+  validate(user) {
+    if (!user.email.includes('@')) {
+      throw new Error('Email non valida');
+    }
+    return true;
+  }
+}
+
+// Responsabilità 3: Persistenza
+class UserRepository {
+  constructor(database) {
+    this.db = database;
+  }
+  
+  save(user) {
+    this.db.insert('users', user);
+  }
+}
+
+// Uso: composizione di responsabilità
+const user = new User('Mario', 'mario@example.com');
+const validator = new UserValidator();
+const repo = new UserRepository(db);
+
+validator.validate(user);
+repo.save(user);`,
+                language: "javascript",
+            },
+        ],
+        realWorldExamples: [
+            "Repository pattern (separazione persistenza da logica)",
+            "Service layer (business logic separata da controller)",
+            "Validator classes (validazione isolata)",
+            "React components (presentational vs container)",
+        ],
+        whenToUse: [
+            "Sempre: ogni classe dovrebbe avere un solo scopo",
+            "Quando una classe cambia per motivi diversi",
+            "Per migliorare testabilità e riutilizzo",
+        ],
+        whenNotToUse: [
+            "Non frammentare troppo se la complessità non lo richiede",
+        ],
+        relatedPatterns: ["Repository", "Service Layer", "Facade"],
+    },
+
+    "solid-ocp": {
+        id: "solid-ocp",
+        name: "O - Open/Closed Principle",
+        category: "principles",
+        icon: React.createElement(SafetyOutlined),
+        intent: "Il codice dovrebbe essere aperto all'estensione ma chiuso alla modifica. Aggiungi nuove funzionalità senza modificare codice esistente.",
+        problem:
+            "Modificare codice esistente per aggiungere features rischia di introdurre bug. Ogni modifica richiede re-testing completo.",
+        solution:
+            "Usare astrazioni (interfacce, classi astratte) per permettere estensioni tramite nuove implementazioni. Polimorfismo invece di if/else.",
+        structure:
+            "Interfacce o classi base che definiscono contratti. Nuove features = nuove classi che implementano l'interfaccia.",
+        participants: [
+            "Interfaccia/Classe astratta - contratto stabile",
+            "Implementazioni concrete - estensioni senza modifiche",
+        ],
+        codeExamples: [
+            {
+                title: "PROBLEMA: Violazione OCP",
+                description:
+                    "Ogni nuovo tipo di sconto richiede modifica del codice esistente. Rischio di bug.",
+                type: "problem",
+                code: `// ❌ Violazione OCP - modifica per ogni estensione
+class PriceCalculator {
+  calculateDiscount(type, price) {
+    // Ogni nuovo tipo richiede modifica qui!
+    if (type === 'seasonal') {
+      return price * 0.9;
+    } else if (type === 'student') {
+      return price * 0.8;
+    } else if (type === 'vip') {
+      return price * 0.7;
+    }
+    // Nuovo tipo "black-friday"? Devi modificare questa funzione!
+    return price;
+  }
+}
+
+// Problema: testing ripetuto, rischio regressioni`,
+                language: "javascript",
+            },
+            {
+                title: "SOLUZIONE: Open/Closed (OCP)",
+                description:
+                    "Nuovi sconti = nuove classi. Codice esistente non toccato. Estensibile senza modifiche.",
+                type: "solution",
+                code: `// ✅ OCP - aperto a estensione, chiuso a modifica
+
+// Contratto stabile (chiuso a modifica)
+class DiscountStrategy {
+  calculate(price) {
+    throw new Error('Deve essere implementato');
+  }
+}
+
+// Estensioni (aperte)
+class SeasonalDiscount extends DiscountStrategy {
+  calculate(price) {
+    return price * 0.9;
+  }
+}
+
+class BlackFridayDiscount extends DiscountStrategy {
+  calculate(price) {
+    return price * 0.5;
+  }
+}
+
+// Calculator non cambia mai
+class PriceCalculator {
+  constructor(discountStrategy) {
+    this.discount = discountStrategy;
+  }
+  
+  calculate(price) {
+    return this.discount.calculate(price);
+  }
+}
+
+// Uso
+const calc = new PriceCalculator(new BlackFridayDiscount());
+console.log(calc.calculate(100)); // 50`,
+                language: "javascript",
+            },
+        ],
+        realWorldExamples: [
+            "Strategy pattern per algoritmi intercambiabili",
+            "Plugin systems (VS Code extensions)",
+            "Middleware chains (Express, Redux)",
+            "Event handlers (nuovi listener senza modifiche)",
+        ],
+        whenToUse: [
+            "Quando prevedi variazioni future (tipi di pagamento, sconti, formati)",
+            "Per sostituire if/else chains con polimorfismo",
+            "Plugin e sistemi estensibili",
+        ],
+        whenNotToUse: [
+            "Over-engineering se le variazioni sono improbabili",
+        ],
+        relatedPatterns: ["Strategy", "Template Method", "Factory"],
+    },
+
+    "solid-lsp": {
+        id: "solid-lsp",
+        name: "L - Liskov Substitution Principle",
+        category: "principles",
+        icon: React.createElement(SwapOutlined),
+        intent: "Le sottoclassi devono poter sostituire le superclassi senza rompere il programma. Il comportamento atteso deve essere preservato.",
+        problem:
+            "Sottoclassi che violano contratti della superclasse portano a bug nascosti. Il client si aspetta un comportamento ma ne riceve un altro.",
+        solution:
+            "Le sottoclassi devono rispettare i contratti (pre/post-condizioni) della classe base. Non rafforzare precondizioni, non indebolire postcondizioni.",
+        structure:
+            "Gerarchia di classi dove le sottoclassi sono sostituibili con la classe base senza sorprese.",
+        participants: [
+            "Classe base - definisce contratto",
+            "Sottoclassi - rispettano il contratto",
+        ],
+        codeExamples: [
+            {
+                title: "PROBLEMA: Violazione LSP",
+                description:
+                    "Square viola il contratto di Rectangle. Comportamento inaspettato.",
+                type: "problem",
+                code: `// ❌ Violazione LSP - Square non è sostituibile a Rectangle
+class Rectangle {
+  constructor(width, height) {
+    this.width = width;
+    this.height = height;
+  }
+  
+  setWidth(w) { this.width = w; }
+  setHeight(h) { this.height = h; }
+  
+  area() {
+    return this.width * this.height;
+  }
+}
+
+class Square extends Rectangle {
+  setWidth(w) {
+    this.width = w;
+    this.height = w; // ⚠️ Cambia anche height!
+  }
+  
+  setHeight(h) {
+    this.width = h; // ⚠️ Cambia anche width!
+    this.height = h;
+  }
+}
+
+// Cliente si aspetta comportamento Rectangle
+function testRectangle(rect) {
+  rect.setWidth(5);
+  rect.setHeight(10);
+  console.log(rect.area()); // Aspetta 50
+}
+
+testRectangle(new Rectangle(0, 0)); // 50 ✓
+testRectangle(new Square(0, 0));    // 100 ✗ Rotto!`,
+                language: "javascript",
+            },
+            {
+                title: "SOLUZIONE: Rispetta LSP",
+                description:
+                    "Separate gerarchie o interfacce comuni. Comportamento consistente.",
+                type: "solution",
+                code: `// ✅ LSP - sostituibilità garantita
+
+// Interfaccia comune
+class Shape {
+  area() {
+    throw new Error('Deve essere implementato');
+  }
+}
+
+class Rectangle extends Shape {
+  constructor(width, height) {
+    super();
+    this.width = width;
+    this.height = height;
+  }
+  
+  area() {
+    return this.width * this.height;
+  }
+}
+
+class Square extends Shape {
+  constructor(side) {
+    super();
+    this.side = side;
+  }
+  
+  area() {
+    return this.side * this.side;
+  }
+}
+
+// Cliente usa interfaccia comune
+function printArea(shape) {
+  console.log(\`Area: \${shape.area()}\`);
+}
+
+printArea(new Rectangle(5, 10)); // Area: 50
+printArea(new Square(5));        // Area: 25`,
+                language: "javascript",
+            },
+        ],
+        realWorldExamples: [
+            "Collections (List, Set) sostituibili nelle API",
+            "Stream processing (Reader, Writer con contratti comuni)",
+            "Payment gateways (interfaccia comune, implementazioni diverse)",
+        ],
+        whenToUse: [
+            "Quando crei gerarchie di classi",
+            "Per polimorfismo sicuro",
+            "Testing con mock/stub (devono sostituire oggetti reali)",
+        ],
+        whenNotToUse: [
+            "Composition over inheritance quando appropriato",
+        ],
+        relatedPatterns: ["Template Method", "Strategy"],
+    },
+
+    "solid-isp": {
+        id: "solid-isp",
+        name: "I - Interface Segregation Principle",
+        category: "principles",
+        icon: React.createElement(PartitionOutlined),
+        intent: "Meglio molte interfacce specifiche che una troppo grande e generica. I client non devono dipendere da metodi che non usano.",
+        problem:
+            "Interfacce grandi forzano le classi a implementare metodi inutili. Accoppiamento forte e difficoltà di testing.",
+        solution:
+            "Creare interfacce piccole e focalizzate. Ogni client vede solo i metodi di cui ha bisogno.",
+        structure:
+            "Interfacce segregate per ruoli specifici. Classi implementano solo ciò che serve.",
+        participants: [
+            "Interfacce specifiche - piccole e focalizzate",
+            "Implementazioni - solo metodi necessari",
+        ],
+        codeExamples: [
+            {
+                title: "PROBLEMA: Violazione ISP",
+                description:
+                    "Interfaccia troppo grande. SimplePrinter deve implementare metodi inutili.",
+                type: "problem",
+                code: `// ❌ Violazione ISP - interfaccia troppo grande
+class MultiFunctionDevice {
+  print(doc) {}
+  scan(doc) {}
+  fax(doc) {}
+  staple(doc) {}
+}
+
+// Stampante semplice forzata a implementare tutto!
+class SimplePrinter extends MultiFunctionDevice {
+  print(doc) {
+    console.log('Printing:', doc);
+  }
+  
+  // ⚠️ Non serve, ma devo implementarli!
+  scan(doc) {
+    throw new Error('Non supportato');
+  }
+  
+  fax(doc) {
+    throw new Error('Non supportato');
+  }
+  
+  staple(doc) {
+    throw new Error('Non supportato');
+  }
+}`,
+                language: "javascript",
+            },
+            {
+                title: "SOLUZIONE: Interfacce segregate (ISP)",
+                description:
+                    "Interfacce piccole e specifiche. Implementa solo ciò che serve.",
+                type: "solution",
+                code: `// ✅ ISP - interfacce segregate
+
+// Interfacce specifiche
+class Printer {
+  print(doc) {
+    throw new Error('Implementa print');
+  }
+}
+
+class Scanner {
+  scan(doc) {
+    throw new Error('Implementa scan');
+  }
+}
+
+// Stampante semplice: solo Printer
+class SimplePrinter extends Printer {
+  print(doc) {
+    console.log('Printing:', doc);
+  }
+}
+
+// Multifunzione: combina interfacce
+class MultiFunctionPrinter extends Printer {
+  constructor() {
+    super();
+    this.scanner = new ScannerImpl();
+  }
+  
+  print(doc) {
+    console.log('Printing:', doc);
+  }
+  
+  scan(doc) {
+    return this.scanner.scan(doc);
+  }
+}
+
+// Client dipende solo da Printer
+function printDocument(printer, doc) {
+  printer.print(doc);
+}`,
+                language: "javascript",
+            },
+        ],
+        realWorldExamples: [
+            "React props (componenti ricevono solo props usate)",
+            "API endpoints (REST specifici vs endpoint gigante)",
+            "Database repositories (interfacce per query specifiche)",
+        ],
+        whenToUse: [
+            "Quando interfacce crescono troppo",
+            "Per dependency injection pulita",
+            "Client con esigenze diverse dalla stessa classe",
+        ],
+        whenNotToUse: [
+            "Non frammentare eccessivamente se non porta benefici",
+        ],
+        relatedPatterns: ["Adapter", "Facade"],
+    },
+
+    "solid-dip": {
+        id: "solid-dip",
+        name: "D - Dependency Inversion Principle",
+        category: "principles",
+        icon: React.createElement(ShareAltOutlined),
+        intent: "Dipendi da astrazioni, non da implementazioni concrete. I moduli di alto livello non devono dipendere da quelli di basso livello.",
+        problem:
+            "Dipendenze dirette da classi concrete creano accoppiamento forte. Difficile testare, sostituire implementazioni o estendere.",
+        solution:
+            "Entrambi i livelli dipendono da astrazioni (interfacce). Iniettare dipendenze invece di crearle internamente.",
+        structure:
+            "Interfacce/contratti al centro. Implementazioni concrete iniettate dall'esterno (Dependency Injection).",
+        participants: [
+            "Astrazione - interfaccia/contratto",
+            "Implementazioni concrete - iniettate",
+            "Client - dipende solo dall'astrazione",
+        ],
+        codeExamples: [
+            {
+                title: "PROBLEMA: Violazione DIP",
+                description:
+                    "UserService dipende da MySQL direttamente. Impossibile testare o cambiare DB.",
+                type: "problem",
+                code: `// ❌ Violazione DIP - dipendenza concreta
+class MySQLDatabase {
+  save(data) {
+    console.log('Saving to MySQL:', data);
+  }
+}
+
+class UserService {
+  constructor() {
+    // ⚠️ Dipendenza hardcoded!
+    this.db = new MySQLDatabase();
+  }
+  
+  createUser(user) {
+    this.db.save(user);
+  }
+}
+
+// Problemi:
+// - Non posso testare senza MySQL
+// - Non posso switchare a PostgreSQL
+// - Accoppiamento forte`,
+                language: "javascript",
+            },
+            {
+                title: "SOLUZIONE: Dependency Inversion (DIP)",
+                description:
+                    "UserService dipende da astrazione. Database iniettato. Testabile e flessibile.",
+                type: "solution",
+                code: `// ✅ DIP - dipendenza da astrazione
+
+// Astrazione (interfaccia)
+class Database {
+  save(data) {
+    throw new Error('Implementa save');
+  }
+}
+
+// Implementazioni concrete
+class MySQLDatabase extends Database {
+  save(data) {
+    console.log('Saving to MySQL:', data);
+  }
+}
+
+class MockDatabase extends Database {
+  save(data) {
+    console.log('Mock save:', data);
+  }
+}
+
+// Service dipende da astrazione
+class UserService {
+  constructor(database) {
+    this.db = database; // Dependency Injection!
+  }
+  
+  createUser(user) {
+    this.db.save(user);
+  }
+}
+
+// Uso in produzione
+const service = new UserService(new MySQLDatabase());
+
+// Testing con mock
+const testService = new UserService(new MockDatabase());`,
+                language: "javascript",
+            },
+        ],
+        realWorldExamples: [
+            "Dependency Injection (Spring, Angular, NestJS)",
+            "Repository pattern (interfaccia, impl varie)",
+            "Logger interfaces (Winston, Bunyan intercambiabili)",
+            "Payment gateways (interfaccia comune, provider diversi)",
+        ],
+        whenToUse: [
+            "Sempre per dipendenze esterne (DB, API, file)",
+            "Per testing isolato (mock dependencies)",
+            "Quando vuoi sostituire implementazioni",
+        ],
+        whenNotToUse: [
+            "Dipendenze da librerie standard stabili (Math, Date)",
+        ],
+        relatedPatterns: ["Dependency Injection", "Factory", "Abstract Factory"],
     },
 };

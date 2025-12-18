@@ -26,7 +26,7 @@ interface PageProps {
 
 // Generate static pages for all patterns at build time
 export function generateStaticParams() {
-  const categories: CategoryKey[] = ['creational', 'structural', 'behavioral', 'antipattern'];
+  const categories: CategoryKey[] = ['creational', 'structural', 'behavioral', 'antipattern', 'principles'];
   const paths: { category: string; pattern: string }[] = [];
 
   categories.forEach((category) => {
@@ -64,7 +64,7 @@ export default async function PatternPage({ params }: PageProps) {
   const categoryKey = category as CategoryKey;
   
   // Validate category exists
-  if (!['creational', 'structural', 'behavioral', 'antipattern'].includes(categoryKey)) {
+  if (!['creational', 'structural', 'behavioral', 'antipattern', 'principles'].includes(categoryKey)) {
     notFound();
   }
 

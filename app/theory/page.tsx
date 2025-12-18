@@ -29,7 +29,31 @@ export default function TheoryPage() {
     return (
         <div className="theory-page">
             <div className="theory-page__container">
+                {/* Design Principles Section */}
                 <div className="theory-page__header">
+                    <Title 
+                        level={1} 
+                        className="theory-page__title"
+                    >
+                        Principi di Progettazione
+                    </Title>
+                    <Paragraph className="theory-page__subtitle">
+                        SOLID, DRY, KISS, YAGNI • Le fondamenta del buon codice
+                    </Paragraph>
+                </div>
+
+                <div className="theory-page__grid">
+                    <CategoryCard
+                        name="Principi di Progettazione"
+                        description={PATTERN_CATEGORIES.principles.description}
+                        icon={PATTERN_CATEGORIES.principles.icon}
+                        patternCount={PATTERN_CATEGORIES.principles.patterns.length}
+                        href="/theory/principles"
+                        color="#1890ff"
+                    />
+                </div>
+
+                <div className="theory-page__header" style={{ marginTop: '4rem' }}>
                     <Title 
                         level={1} 
                         className="theory-page__title"

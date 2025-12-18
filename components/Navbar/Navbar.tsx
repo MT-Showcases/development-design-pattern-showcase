@@ -67,6 +67,7 @@ export default function Navbar() {
         structural: <ToolOutlined />,
         behavioral: <ThunderboltOutlined />,
         antipattern: <WarningOutlined />,
+        principles: <BookOutlined />,
     };
 
     // Generate menu items from pattern categories

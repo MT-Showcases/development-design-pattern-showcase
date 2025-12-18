@@ -22,6 +22,7 @@ export const CATEGORY_TRANSLATIONS: Record<Category, string> = {
   structural: "Strutturali",
   behavioral: "Comportamentali",
   antipattern: "Anti-Pattern",
+  principles: "Principi di Progettazione",
 };
 
 /**
@@ -33,6 +34,7 @@ export const CATEGORY_COLORS: Record<Category, string> = {
   structural: "blue",
   behavioral: "blue",
   antipattern: "red",
+  principles: "green",
 };
 
 /**
