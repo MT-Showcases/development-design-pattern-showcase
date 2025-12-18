@@ -144,7 +144,7 @@ export const {
 
 export default gameSlice.reducer;
 
-// Middleware per sincronizzare con localStorage
+// Middleware to sync with localStorage
 export const syncWithLocalStorage = (store: any) => (next: any) => (action: any) => {
   const result = next(action);
   

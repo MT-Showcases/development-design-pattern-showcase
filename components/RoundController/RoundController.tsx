@@ -65,6 +65,9 @@ export default function RoundController({ teams, onUpdateTeams }: RoundControlle
         solutionRevealed,
     } = useAppSelector((state) => state.game);
 
+    // Check if solo mode (single player)
+    const isSoloMode = teams.length === 1 && teams[0].id === 'solo-player';
+
     // PATTERN: Observer Pattern - Sync teams with Redux when props change
     useEffect(() => {
         dispatch(setTeams(teams));
@@ -122,7 +125,9 @@ export default function RoundController({ teams, onUpdateTeams }: RoundControlle
             <Card className="bg-beige-card rounded-lg p-6 md:p-4 mb-8 md:mb-6 border-2 border-navy-light">
                 <div className="flex items-center gap-2 mb-6">
                     <TrophyOutlined className="text-2xl text-yellow-primary" />
-                    <h2 className="m-0 text-navy-dark text-2xl font-bold">Classifica</h2>
+                    <h2 className="m-0 text-navy-dark text-2xl font-bold">
+                        {isSoloMode ? 'Punteggio' : 'Classifica'}
+                    </h2>
                 </div>
                 <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-4 md:grid-cols-1 md:gap-3">
                     {[...teams]
@@ -133,15 +138,17 @@ export default function RoundController({ teams, onUpdateTeams }: RoundControlle
                                 className="flex items-center gap-3 p-4 bg-white rounded-lg border-2 border-navy-light transition-all hover:border-pink-accent hover:-translate-y-0.5"
                             >
                                 <div className="flex items-center gap-2 flex-1">
-                                    <span className="text-yellow-primary min-w-[35px] font-bold">
-                                        #{index + 1}
-                                    </span>
+                                    {!isSoloMode && (
+                                        <span className="text-yellow-primary min-w-[35px] font-bold">
+                                            #{index + 1}
+                                        </span>
+                                    )}
                                     <div
                                         className="w-4 h-4 rounded-full border-2 border-navy-light"
                                         style={{ backgroundColor: team.color }}
                                     />
                                     <span className="font-semibold text-navy-dark">
-                                        {team.name}
+                                        {isSoloMode ? 'Il tuo punteggio' : team.name}
                                     </span>
                                 </div>
                                 <span className="text-yellow-primary font-bold whitespace-nowrap">
@@ -299,38 +306,63 @@ export default function RoundController({ teams, onUpdateTeams }: RoundControlle
                         <div className="mt-8">
                             <Card className="bg-beige-card">
                                 <h3 className="m-0 mb-6 text-center text-navy-dark text-2xl font-bold">
-                                    Assegna Punto
+                                    {isSoloMode ? 'Hai risposto correttamente?' : 'Assegna Punto'}
                                 </h3>
                                 <p className="text-center mb-6 text-gray-600">
-                                    Quale squadra ha risposto correttamente?
+                                    {isSoloMode
+                                        ? 'Segna se hai risposto correttamente:'
+                                        : 'Quale squadra ha risposto correttamente?'}
                                 </p>
-                                <div className="grid grid-cols-[repeat(auto-fit,minmax(180px,1fr))] gap-4 md:grid-cols-1">
-                                    {teams.map((team) => (
-                                        <button
-                                            key={team.id}
-                                            onClick={() => handleAwardPoint(team.id)}
-                                            className="flex items-center gap-2 px-5 py-4 bg-white border-[3px] rounded-lg font-semibold cursor-pointer transition-all text-navy-dark hover:-translate-y-0.5 hover:bg-beige-light"
-                                            style={{ borderColor: team.color }}
+                                
+                                {isSoloMode ? (
+                                    // Solo mode: Simple correct/incorrect buttons
+                                    <div className="grid grid-cols-1 gap-4">
+                                        <Button
+                                            type="primary"
+                                            size="large"
+                                            onClick={() => handleAwardPoint(teams[0].id)}
+                                            className="h-14 text-base font-semibold bg-green-600 hover:bg-green-700 border-0"
                                         >
-                                            <div
-                                                className="w-[18px] h-[18px] rounded-full border-2 border-navy-light"
-                                                style={{ backgroundColor: team.color }}
-                                            />
-                                            <span>{team.name}</span>
-                                            <span className="text-gray-600 ml-auto">
-                                                ({team.score})
-                                            </span>
-                                        </button>
-                                    ))}
-                                    <Button
-                                        type="primary"
-                                        size="large"
-                                        onClick={handleNextRound}
-                                        className="col-span-full"
-                                    >
-                                        Nessuna risposta corretta →
-                                    </Button>
-                                </div>
+                                            ✓ Risposta Corretta
+                                        </Button>
+                                        <Button
+                                            size="large"
+                                            onClick={handleNextRound}
+                                            className="h-14 text-base font-semibold"
+                                        >
+                                            ✗ Risposta Sbagliata - Continua
+                                        </Button>
+                                    </div>
+                                ) : (
+                                    // Team mode: Team selection buttons
+                                    <div className="grid grid-cols-[repeat(auto-fit,minmax(180px,1fr))] gap-4 md:grid-cols-1">
+                                        {teams.map((team) => (
+                                            <button
+                                                key={team.id}
+                                                onClick={() => handleAwardPoint(team.id)}
+                                                className="flex items-center gap-2 px-5 py-4 bg-white border-[3px] rounded-lg font-semibold cursor-pointer transition-all text-navy-dark hover:-translate-y-0.5 hover:bg-beige-light"
+                                                style={{ borderColor: team.color }}
+                                            >
+                                                <div
+                                                    className="w-[18px] h-[18px] rounded-full border-2 border-navy-light"
+                                                    style={{ backgroundColor: team.color }}
+                                                />
+                                                <span>{team.name}</span>
+                                                <span className="text-gray-600 ml-auto">
+                                                    ({team.score})
+                                                </span>
+                                            </button>
+                                        ))}
+                                        <Button
+                                            type="primary"
+                                            size="large"
+                                            onClick={handleNextRound}
+                                            className="col-span-full"
+                                        >
+                                            Nessuna risposta corretta →
+                                        </Button>
+                                    </div>
+                                )}
                             </Card>
                         </div>
                     )}

@@ -51,12 +51,12 @@ export default function RootLayout({
                 <ConfigProvider
                     theme={{
                         token: {
-                            colorPrimary: "#ffc107", // Giallo primario (dalle slide)
-                            colorSuccess: "#10b981", // Verde per risposte corrette
-                            colorError: "#ff4d6d", // Rosa/rosso per errori (dalle slide)
-                            colorWarning: "#ffc107", // Giallo per warning
-                            colorInfo: "#ffc107", // Giallo per info
-                            borderRadius: 12, // Rounded corners come nelle slide
+                            colorPrimary: "#ffc107", // Primary yellow (from slides)
+                            colorSuccess: "#10b981", // Green for correct answers
+                            colorError: "#ff4d6d", // Pink/red for errors (from slides)
+                            colorWarning: "#ffc107", // Yellow for warnings
+                            colorInfo: "#ffc107", // Yellow for info
+                            borderRadius: 12, // Rounded corners as in slides
                             fontFamily: "var(--font-inter), -apple-system, BlinkMacSystemFont, sans-serif",
                             fontSize: 16,
                         },

@@ -53,6 +53,22 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
+        
+        // Mobile: reduce padding
+        @include respond-below(md) {
+            padding: $spacing-2 $spacing-3;
+        }
+    }
+    
+    &__buttons {
+        // Mobile: full width vertical buttons
+        width: 100%;
+        
+        @include respond-above(md) {
+            // Desktop: horizontal buttons with auto width
+            width: auto;
+            flex-direction: row !important;
+        }
     }
 
     &__run-button {

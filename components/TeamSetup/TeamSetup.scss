@@ -82,6 +82,23 @@
     }
   }
 
+  &__mode-card {
+    margin-bottom: $spacing-6;
+    background-color: $beige-card;
+    border: fn.rem(2) solid $navy-light;
+  }
+
+  &__mode-title {
+    font-size: fn.rem(16) !important;
+    color: $navy-dark !important;
+  }
+
+  &__mode-description {
+    display: block;
+    text-align: center;
+    font-size: fn.rem(14) !important;
+  }
+
   &__card-title {
     display: flex;
     align-items: center;

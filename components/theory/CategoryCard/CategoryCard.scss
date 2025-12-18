@@ -125,22 +125,7 @@
         }
     }
 
-    &__title {
-        color: $navy-dark !important;
-        margin-bottom: fn.rem(14) !important;
-        font-weight: 800 !important;
-        text-transform: uppercase;
-        letter-spacing: fn.rem(0.5);
-        font-size: fn.rem(20) !important;
-    }
-
-    &__description {
-        color: $gray-700 !important;
-        line-height: 1.7;
-        margin-bottom: $spacing-5;
-        flex-grow: 1;
-        font-size: fn.rem(15) !important;
-    }
+    // Title and description styles removed - now using global .title-card and .description-card classes
 
     &__cta {
         color: $pink-accent !important;

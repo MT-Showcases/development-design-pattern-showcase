@@ -79,11 +79,11 @@ export default function PatternLayout({ pattern }: PatternLayoutProps) {
                         >
                             {pattern.category.toUpperCase()}
                         </Tag>
-                        <h1 className="pattern-layout__header-title flex items-center gap-3">
+                        <h1 className="title-category flex items-center gap-3 mb-4">
                             {pattern.icon && <span>{pattern.icon}</span>}
                             {pattern.name}
                         </h1>
-                        <p className="pattern-layout__header-intent">{pattern.intent}</p>
+                        <p className="description-category mb-0">{pattern.intent}</p>
                     </Space>
                 </Card>
 

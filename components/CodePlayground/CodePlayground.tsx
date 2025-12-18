@@ -242,7 +242,7 @@ export default function CodePlayground({
             <div className="code-playground">
                 {/* Toolbar */}
                 <div className="code-playground__toolbar">
-                    <Space>
+                    <Space direction="vertical" className="code-playground__buttons">
                         <Button
                             type="primary"
                             icon={<PlayCircleOutlined />}
@@ -251,7 +251,7 @@ export default function CodePlayground({
                                 executeCode(currentCode);
                             }}
                             loading={isRunning}
-                            className="code-playground__run-button"
+                            className="code-playground__run-button w-full"
                         >
                             Esegui Codice
                             {shortcutHint && (
@@ -263,7 +263,7 @@ export default function CodePlayground({
                         <Button
                             icon={<ReloadOutlined />}
                             onClick={handleReset}
-                            className="code-playground__reset-button"
+                            className="code-playground__reset-button w-full"
                         >
                             Reset
                         </Button>
@@ -272,6 +272,7 @@ export default function CodePlayground({
                             onClick={() =>
                                 openChatGPT({ code, language: "javascript", title })
                             }
+                            className="w-full"
                         >
                             Chiedi a ChatGPT
                         </Button>

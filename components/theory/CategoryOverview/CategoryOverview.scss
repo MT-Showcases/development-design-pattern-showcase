@@ -66,40 +66,7 @@
     }
   }
 
-  &__title {
-    color: $yellow-primary !important;
-    // Mobile-first: smaller font
-    font-size: fn.rem(28) !important;
-    font-weight: 700 !important;
-    margin-bottom: fn.rem(12) !important;
-
-    @include respond-above(md) {
-      font-size: fn.rem(36) !important;
-      margin-bottom: fn.rem(14) !important;
-    }
-
-    @include respond-above(lg) {
-      font-size: fn.rem(42) !important;
-      margin-bottom: fn.rem(16) !important;
-    }
-  }
-
-  &__description {
-    // Mobile-first: smaller font
-    font-size: fn.rem(15) !important;
-    color: $white !important;
-    line-height: 1.6;
-
-    @include respond-above(md) {
-      font-size: fn.rem(16) !important;
-      line-height: 1.7;
-    }
-
-    @include respond-above(lg) {
-      font-size: fn.rem(18) !important;
-      line-height: 1.8;
-    }
-  }
+  // Title and description styles removed - now using global .title-category and .description-category classes
 
   &__card {
     display: block;
@@ -123,18 +90,7 @@
     }
   }
 
-  &__card-title {
-    color: $navy-dark !important;
-    font-size: fn.rem(22) !important;
-    font-weight: 600 !important;
-  }
-
-  &__card-description {
-    color: $navy-dark !important;
-    margin-bottom: fn.rem(20) !important;
-    font-size: fn.rem(15) !important;
-    line-height: 1.6;
-  }
+  // Card title and description styles removed - now using global .title-card and .description-card classes
 
   &__card-cta {
     color: $pink-accent !important;

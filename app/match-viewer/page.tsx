@@ -51,7 +51,7 @@ export default function MatchViewer() {
 
     const [elapsedTime, setElapsedTime] = useState(0);
 
-    // Sincronizza con localStorage quando la finestra è in focus
+    // Sync with localStorage when window is in focus
     useEffect(() => {
         const syncFromLocalStorage = () => {
             const savedState = localStorage.getItem("gameState");
@@ -65,10 +65,10 @@ export default function MatchViewer() {
             }
         };
 
-        // Sincronizza all'avvio
+        // Sync on startup
         syncFromLocalStorage();
 
-        // Ascolta i cambiamenti da altre finestre
+        // Listen to changes from other windows
         const handleStorageChange = (e: StorageEvent) => {
             if (e.key === "gameState") {
                 syncFromLocalStorage();
@@ -78,7 +78,7 @@ export default function MatchViewer() {
         window.addEventListener("storage", handleStorageChange);
         window.addEventListener("gameStateChanged", syncFromLocalStorage);
 
-        // Polling fallback per sicurezza (ogni 500ms)
+        // Polling fallback for safety (every 500ms)
         const pollingInterval = setInterval(syncFromLocalStorage, 500);
 
         return () => {
@@ -99,7 +99,7 @@ export default function MatchViewer() {
         return () => clearInterval(interval);
     }, [roundStartTime, isPaused]);
 
-    // Reset timer quando cambia esempio
+    // Reset timer when example changes
     useEffect(() => {
         if (roundStartTime) {
             setElapsedTime(0);

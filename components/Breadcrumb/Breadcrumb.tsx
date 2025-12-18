@@ -70,7 +70,7 @@ export default function Breadcrumb() {
                     segments.length === 1 ? (
                         <span>Teoria Design Patterns</span>
                     ) : (
-                        <Link href="/theory">Teoria Design Patterns</Link>
+                        <Link href="/">Teoria Design Patterns</Link>
                     ),
             });
 

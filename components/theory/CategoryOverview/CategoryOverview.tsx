@@ -41,10 +41,10 @@ export default function CategoryOverview({ category, patterns, categoryKey }: Ca
       <div className="category-overview__container">
         <div className="category-overview__header">
           <div className="category-overview__icon">{category.icon}</div>
-          <Title level={1} className="category-overview__title">
+          <Title level={1} className="title-category !text-yellow-primary mb-3">
             {category.name.toUpperCase()} - PANORAMICA
           </Title>
-          <Paragraph className="category-overview__description">
+          <Paragraph className="description-category !text-white">
             {category.description}
           </Paragraph>
         </div>
@@ -59,14 +59,14 @@ export default function CategoryOverview({ category, patterns, categoryKey }: Ca
                 <Card hoverable>
                   <Card.Meta
                     title={
-                      <span className="category-overview__card-title flex items-center gap-2">
+                      <span className="title-card !text-navy-dark flex items-center gap-2 mb-0">
                         {pattern.icon && <span>{pattern.icon}</span>}
                         {pattern.name}
                       </span>
                     }
                     description={
                       <>
-                        <Paragraph className="category-overview__card-description">
+                        <Paragraph className="description-card !text-gray-700">
                           {pattern.intent}
                         </Paragraph>
                         <div className="category-overview__card-cta">

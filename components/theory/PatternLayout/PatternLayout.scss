@@ -58,29 +58,6 @@
             border: none;
             text-transform: uppercase;
         }
-
-        &-title {
-            color: $navy-dark;
-            // Mobile-first: smaller title
-            font-size: 28px;
-            font-weight: $weight-bold;
-            margin-bottom: $spacing-2;
-            margin-top: 0;
-
-            @include respond-above(md) {
-                font-size: 36px;
-            }
-
-            @include respond-above(lg) {
-                font-size: 42px;
-            }
-        }
-
-        &-intent {
-            font-size: $font-lg;
-            color: $navy-dark;
-            line-height: 1.8;
-        }
     }
 
     // Collapse sections
@@ -202,15 +179,15 @@
     // Example type icons
     &__example-icon {
         font-size: $font-xl;
-        
+
         &--problem {
             color: $error;
         }
-        
+
         &--solution {
             color: $success;
         }
-        
+
         &--example {
             color: $info;
         }

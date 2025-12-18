@@ -171,10 +171,102 @@
     }
 }
 
+/* === TYPOGRAPHY COMPONENTS === */
+// Reusable typography classes with responsive scaling
+// Using direct CSS + !important to override Ant Design Typography
+@layer components {
+    // Main page titles (H1)
+    .title-primary {
+        text-transform: uppercase !important;
+        letter-spacing: 0.1em !important;
+        font-weight: 800 !important;
+        font-size: fn.rem(32) !important;
+
+        @include styles.respond-above(md) {
+            font-size: fn.rem(40) !important;
+        }
+
+        @include styles.respond-above(lg) {
+            font-size: fn.rem(48) !important;
+        }
+    }
+
+    // Section titles (H2)
+    .title-secondary {
+        text-transform: uppercase !important;
+        letter-spacing: 0.05em !important;
+        font-weight: 700 !important;
+        font-size: fn.rem(20) !important;
+
+        @include styles.respond-above(md) {
+            font-size: fn.rem(30) !important;
+        }
+
+        @include styles.respond-above(lg) {
+            font-size: fn.rem(36) !important;
+        }
+    }
+
+    // Category overview title (H1 variant)
+    .title-category {
+        font-weight: 700 !important;
+        font-size: fn.rem(28) !important;
+
+        @include styles.respond-above(md) {
+            font-size: fn.rem(36) !important;
+        }
+
+        @include styles.respond-above(lg) {
+            font-size: fn.rem(42) !important;
+        }
+    }
+
+    // Card titles (H3)
+    .title-card {
+        font-weight: 800 !important;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+        font-size: fn.rem(20) !important;
+        white-space: normal !important; // Allow text to wrap on multiple lines
+    }
+
+    // Main subtitle/description
+    .subtitle {
+        font-weight: 500 !important;
+        font-size: fn.rem(16) !important;
+
+        @include styles.respond-above(md) {
+            font-size: fn.rem(18) !important;
+        }
+    }
+
+    // Category overview description
+    .description-category {
+        font-size: fn.rem(15) !important;
+        line-height: 1.6 !important;
+
+        @include styles.respond-above(md) {
+            font-size: fn.rem(16) !important;
+            line-height: 1.7 !important;
+        }
+
+        @include styles.respond-above(lg) {
+            font-size: fn.rem(18) !important;
+            line-height: 1.8 !important;
+        }
+    }
+
+    // Card description
+    .description-card {
+        line-height: 1.7 !important;
+    }
+}
+
 /* === ANT DESIGN OVERRIDES === */
 // Mobile-first: half padding on mobile, full on desktop
 .ant-card {
     &,
+    &-head,
     &-body {
         padding: fn.rem(12) !important; // Mobile: 12px (half of 24px)
 

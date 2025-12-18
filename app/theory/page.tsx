@@ -1,121 +1,21 @@
 /**
- * COMPONENT TYPE: Container
+ * COMPONENT TYPE: Page
  * SECTION: Theory Pages
  *
  * ROLE:
- * - Overview page for all design pattern categories
- * - Display 3 main categories with pattern count
- * - Navigate to category-specific pages
+ * - Redirect to home page which shows pattern categories
+ * - Legacy route support
  *
  * PATTERNS USED:
- * - Grid layout for category cards
- * - Static rendering (no client state)
+ * - Redirect pattern - Theory content now on home
  *
  * NOTES FOR CONTRIBUTORS:
- * - Entry point for theory section
- * - Shows Creational, Structural, Behavioral categories
+ * - Main content moved to / (home)
+ * - This redirect maintains backward compatibility
  */
 
-"use client";
-
-import { Typography } from "antd";
-import CategoryCard from "@/components/theory/CategoryCard/CategoryCard";
-import { PATTERN_CATEGORIES } from "@/lib/patternTheory";
-import './page.scss';
-
-const { Title, Paragraph } = Typography;
+import { redirect } from "next/navigation";
 
 export default function TheoryPage() {
-    return (
-        <div className="theory-page">
-            <div className="theory-page__container">
-                {/* Design Principles Section */}
-                <div className="theory-page__header">
-                    <Title 
-                        level={1} 
-                        className="theory-page__title"
-                    >
-                        Principi di Progettazione
-                    </Title>
-                    <Paragraph className="theory-page__subtitle">
-                        SOLID, DRY, KISS, YAGNI • Le fondamenta del buon codice
-                    </Paragraph>
-                </div>
-
-                <div className="theory-page__grid">
-                    <CategoryCard
-                        name="Principi di Progettazione"
-                        description={PATTERN_CATEGORIES.principles.description}
-                        icon={PATTERN_CATEGORIES.principles.icon}
-                        patternCount={PATTERN_CATEGORIES.principles.patterns.length}
-                        href="/theory/principles"
-                        color="#1890ff"
-                    />
-                </div>
-
-                <div className="theory-page__header" style={{ marginTop: '4rem' }}>
-                    <Title 
-                        level={1} 
-                        className="theory-page__title"
-                    >
-                        Design Patterns
-                    </Title>
-                    <Paragraph className="theory-page__subtitle">
-                        Gang of Four • 23 Pattern Classici
-                    </Paragraph>
-                </div>
-
-                <div className="theory-page__grid">
-                    <CategoryCard
-                        name="Creational"
-                        description={PATTERN_CATEGORIES.creational.description}
-                        icon={PATTERN_CATEGORIES.creational.icon}
-                        patternCount={PATTERN_CATEGORIES.creational.patterns.length}
-                        href="/theory/creational"
-                        color="#ffc107"
-                    />
-                    <CategoryCard
-                        name="Structural"
-                        description={PATTERN_CATEGORIES.structural.description}
-                        icon={PATTERN_CATEGORIES.structural.icon}
-                        patternCount={PATTERN_CATEGORIES.structural.patterns.length}
-                        href="/theory/structural"
-                        color="#ffc107"
-                    />
-                    <CategoryCard
-                        name="Behavioral"
-                        description={PATTERN_CATEGORIES.behavioral.description}
-                        icon={PATTERN_CATEGORIES.behavioral.icon}
-                        patternCount={PATTERN_CATEGORIES.behavioral.patterns.length}
-                        href="/theory/behavioral"
-                        color="#ffc107"
-                    />
-                </div>
-
-                {/* Anti-Patterns Section */}
-                <div className="theory-page__header" style={{ marginTop: '4rem' }}>
-                    <Title 
-                        level={1} 
-                        className="theory-page__title"
-                    >
-                        Anti-Pattern
-                    </Title>
-                    <Paragraph className="theory-page__subtitle">
-                        Cosa NON fare • Errori comuni da evitare
-                    </Paragraph>
-                </div>
-
-                <div className="theory-page__grid">
-                    <CategoryCard
-                        name="Anti-Pattern"
-                        description={PATTERN_CATEGORIES.antipattern.description}
-                        icon={PATTERN_CATEGORIES.antipattern.icon}
-                        patternCount={PATTERN_CATEGORIES.antipattern.patterns.length}
-                        href="/theory/antipattern"
-                        color="#ff1744"
-                    />
-                </div>
-            </div>
-        </div>
-    );
+    redirect("/");
 }

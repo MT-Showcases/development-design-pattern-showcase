@@ -47,10 +47,10 @@ export default function CategoryCard({
             <div className="category-card__wrapper">
                 <div className="category-card__icon">{icon}</div>
                 <Badge count={patternCount} className="category-card__badge" />
-                <Title level={3} className="category-card__title">
+                <Title level={3} className="title-card !text-navy-dark mb-4">
                     {name}
                 </Title>
-                <Paragraph className="category-card__description">
+                <Paragraph className="description-card !text-gray-700 mb-5">
                     {description}
                 </Paragraph>
                 <div className="category-card__cta">

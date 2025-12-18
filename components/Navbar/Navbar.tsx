@@ -50,14 +50,14 @@ export default function Navbar() {
     useEffect(() => {
         const checkMobile = () => setIsMobile(window.innerWidth < 768);
         checkMobile();
-        window.addEventListener('resize', checkMobile);
-        return () => window.removeEventListener('resize', checkMobile);
+        window.addEventListener("resize", checkMobile);
+        return () => window.removeEventListener("resize", checkMobile);
     }, []);
 
     // Reset submenu view when dropdown closes
     const handleOpenChange = (keys: string[]) => {
         setOpenKeys(keys);
-        if (!keys.includes('theory')) {
+        if (!keys.includes("theory")) {
             setMobileSubmenuView(null);
         }
     };
@@ -74,41 +74,52 @@ export default function Navbar() {
     const theoryMenuItems = Object.entries(PATTERN_CATEGORIES).map(([key, category]) => ({
         key: `theory-${key}`,
         label: isMobile ? (
-            <span onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                setMobileSubmenuView(key);
-            }}>{category.name}</span>
+            <span
+                onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setMobileSubmenuView(key);
+                }}
+            >
+                {category.name}
+            </span>
         ) : (
             category.name
         ),
         icon: categoryIcons[key as keyof typeof categoryIcons],
-        children: isMobile ? undefined : [
-            // "Tutti i pattern" come primo elemento
-            {
-                key: `all-patterns-${key}`,
-                label: (
-                    <Link href={`/theory/${key}`}>
-                        <AppstoreOutlined /> Tutti i pattern
-                    </Link>
-                ),
-            },
-            ...category.patterns.map((patternId) => {
-                const pattern = getPatternById(patternId);
-                return {
-                    key: `pattern-${patternId}`,
-                    label: (
-                        <Link href={`/theory/${key}/${patternId}`}>
-                            {pattern?.icon && <span style={{ marginRight: 8 }}>{pattern.icon}</span>}
-                            {patternId
-                                .split("-")
-                                .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-                                .join(" ")}
-                        </Link>
-                    ),
-                };
-            }),
-        ],
+        children: isMobile
+            ? undefined
+            : [
+                  // "All patterns/principles" as first element
+                  {
+                      key: `all-patterns-${key}`,
+                      label: (
+                          <Link href={`/theory/${key}`}>
+                              <AppstoreOutlined /> Tutti i{" "}
+                              {key === "principles" ? "principi" : "pattern"}
+                          </Link>
+                      ),
+                  },
+                  ...category.patterns.map((patternId) => {
+                      const pattern = getPatternById(patternId);
+                      return {
+                          key: `pattern-${patternId}`,
+                          label: (
+                              <Link href={`/theory/${key}/${patternId}`}>
+                                  {pattern?.icon && (
+                                      <span style={{ marginRight: 8 }}>
+                                          {pattern.icon}
+                                      </span>
+                                  )}
+                                  {patternId
+                                      .split("-")
+                                      .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+                                      .join(" ")}
+                              </Link>
+                          ),
+                      };
+                  }),
+              ],
     }));
 
     // Mobile: show pattern list when category is selected
@@ -118,7 +129,7 @@ export default function Navbar() {
                 {
                     key: "all-categories",
                     label: (
-                        <Link href="/theory">
+                        <Link href="/">
                             <AppstoreOutlined /> Tutte le categorie
                         </Link>
                     ),
@@ -128,16 +139,19 @@ export default function Navbar() {
         }
 
         // Show patterns for selected category
-        const category = PATTERN_CATEGORIES[mobileSubmenuView as keyof typeof PATTERN_CATEGORIES];
+        const category =
+            PATTERN_CATEGORIES[mobileSubmenuView as keyof typeof PATTERN_CATEGORIES];
         return [
             {
                 key: "back",
                 label: (
-                    <span onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        setMobileSubmenuView(null);
-                    }}>
+                    <span
+                        onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            setMobileSubmenuView(null);
+                        }}
+                    >
                         <ArrowLeftOutlined /> Indietro
                     </span>
                 ),
@@ -156,7 +170,9 @@ export default function Navbar() {
                     key: `pattern-${patternId}`,
                     label: (
                         <Link href={`/theory/${mobileSubmenuView}/${patternId}`}>
-                            {pattern?.icon && <span style={{ marginRight: 8 }}>{pattern.icon}</span>}
+                            {pattern?.icon && (
+                                <span style={{ marginRight: 8 }}>{pattern.icon}</span>
+                            )}
                             {patternId
                                 .split("-")
                                 .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
@@ -178,29 +194,20 @@ export default function Navbar() {
             key: "theory",
             icon: <BookOutlined />,
             label: "Teoria",
-            children: isMobile ? getMobileTheoryItems() : [
-                {
-                    key: "all-categories",
-                    label: (
-                        <Link href="/theory">
-                            <AppstoreOutlined /> Tutte le categorie
-                        </Link>
-                    ),
-                },
-                ...theoryMenuItems,
-            ],
+            children: isMobile ? getMobileTheoryItems() : theoryMenuItems,
         },
         {
             key: "quiz",
             icon: <TrophyOutlined />,
-            label: <Link href="/">Quiz Game</Link>,
+            label: <Link href="/game">Quiz Game</Link>,
         },
     ];
 
     // Determine selected key based on pathname
     const getSelectedKey = () => {
         if (pathname === "/") return "home";
-        if (pathname.startsWith("/theory")) {
+        if (pathname === "/game") return "quiz";
+        if (pathname.startsWith("/theory/")) {
             const segments = pathname.split("/");
             if (segments.length === 4) {
                 // /theory/category/pattern
@@ -212,10 +219,6 @@ export default function Navbar() {
                     return `theory-${segments[2]}`;
                 }
                 return `all-patterns-${segments[2]}`;
-            }
-            if (segments.length === 2) {
-                // /theory
-                return "all-categories";
             }
         }
         return "home";

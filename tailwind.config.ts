@@ -9,7 +9,7 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Sincronizzato con design system Navy + Yellow + Beige
+        // Synchronized with Navy + Yellow + Beige design system
         navy: {
           dark: '#0a1929',
           medium: '#1a2942',

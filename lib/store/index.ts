@@ -26,7 +26,7 @@ export const store = configureStore({
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
-      serializableCheck: false, // Disabilita controllo per Date e Set
+      serializableCheck: false, // Disable check for Date and Set
     }).concat(syncWithLocalStorage),
 });
 

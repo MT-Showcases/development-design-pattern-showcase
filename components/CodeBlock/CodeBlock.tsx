@@ -21,7 +21,7 @@
 
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, Button, Space } from "antd";
 import {
     CopyOutlined,
@@ -55,6 +55,37 @@ export default function CodeBlock({
 }: CodeBlockProps) {
     const [copied, setCopied] = useState(false);
     const [playgroundOpen, setPlaygroundOpen] = useState(false);
+    const [stickyTop, setStickyTop] = useState(0);
+
+    // Calculate sticky top position based on navbar + breadcrumb height
+    useEffect(() => {
+        const calculateStickyTop = () => {
+            const navbar = document.querySelector('.navbar');
+            const breadcrumb = document.querySelector('.breadcrumb');
+            
+            let totalHeight = 0;
+            
+            if (navbar) {
+                totalHeight += navbar.getBoundingClientRect().height;
+            }
+            
+            if (breadcrumb) {
+                totalHeight += breadcrumb.getBoundingClientRect().height;
+            }
+            
+            setStickyTop(totalHeight);
+        };
+
+        // Initial calculation
+        calculateStickyTop();
+
+        // Recalculate on resize (mobile orientation change, etc.)
+        window.addEventListener('resize', calculateStickyTop);
+        
+        return () => {
+            window.removeEventListener('resize', calculateStickyTop);
+        };
+    }, []);
 
     // Calculate height based on number of lines
     const lineCount = code.split("\n").length;
@@ -88,15 +119,18 @@ export default function CodeBlock({
     return (
         <>
             <Card className="code-block__card">
-                <div className="code-block__header">
+                <div 
+                    className="code-block__header" 
+                    style={{ top: `${stickyTop}px` }}
+                >
                     <span className="code-block__language">{language.toUpperCase()}</span>
-                    <Space size="small">
+                    <Space size="small" orientation="vertical" className="code-block__buttons">
                         {showPlayground && (
                             <Button
                                 type="default"
                                 icon={<PlayCircleOutlined />}
                                 onClick={handleOpenPlayground}
-                                className="!border-success !text-success hover:!bg-success hover:!text-white transition-colors"
+                                className="!border-success !text-success hover:!bg-success hover:!text-white transition-colors w-full"
                                 title="Prova il codice nel playground"
                             >
                                 Playground
@@ -107,7 +141,7 @@ export default function CodeBlock({
                                 type="default"
                                 icon={<CommentOutlined />}
                                 onClick={handleAskChatGPT}
-                                className="!border-info !text-info hover:!bg-info hover:!text-white transition-colors"
+                                className="!border-info !text-info hover:!bg-info hover:!text-white transition-colors w-full"
                                 title="Chiedi spiegazione a ChatGPT"
                             >
                                 Chiedi a ChatGPT
@@ -118,6 +152,7 @@ export default function CodeBlock({
                                 type="primary"
                                 icon={copied ? <CheckOutlined /> : <CopyOutlined />}
                                 onClick={handleCopy}
+                                className="w-full"
                             >
                                 {copied ? "Copiato!" : "Copia"}
                             </Button>

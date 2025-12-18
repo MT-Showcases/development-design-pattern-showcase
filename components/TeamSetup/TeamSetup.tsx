@@ -25,8 +25,8 @@
 
 import { useState } from "react";
 import type { Team } from "@/lib/types";
-import { Card, Form, Input, Button, Space, Typography, Badge } from "antd";
-import { PlusOutlined, DeleteOutlined, RocketOutlined } from "@ant-design/icons";
+import { Card, Form, Input, Button, Space, Typography, Badge, Segmented } from "antd";
+import { PlusOutlined, DeleteOutlined, RocketOutlined, UserOutlined, TeamOutlined } from "@ant-design/icons";
 import './TeamSetup.scss';
 
 const { Title, Paragraph, Text } = Typography;
@@ -46,9 +46,12 @@ const TEAM_COLORS = [
   "#e91e63", // Rosa
 ];
 
+type GameMode = 'solo' | 'team';
+
 export default function TeamSetup({ onStart }: TeamSetupProps) {
   const [teams, setTeams] = useState<Team[]>([]);
   const [newTeamName, setNewTeamName] = useState("");
+  const [gameMode, setGameMode] = useState<GameMode>('team');
   const [form] = Form.useForm();
 
   // PATTERN: Controlled Component - Form values managed by state
@@ -71,7 +74,17 @@ export default function TeamSetup({ onStart }: TeamSetupProps) {
   };
 
   const handleStart = () => {
-    if (teams.length > 0) {
+    if (gameMode === 'solo') {
+      // Solo mode: create a dummy "Solo" team
+      const soloTeam: Team = {
+        id: 'solo-player',
+        name: 'Solo',
+        score: 0,
+        color: TEAM_COLORS[0],
+      };
+      onStart([soloTeam]);
+    } else if (teams.length > 0) {
+      // Modalità team: usa i team creati
       onStart(teams);
     }
   };
@@ -85,7 +98,40 @@ export default function TeamSetup({ onStart }: TeamSetupProps) {
         </p>
       </div>
 
-      <Card 
+      {/* Game Mode Selector */}
+      <Card className="team-setup__mode-card">
+        <Space orientation="vertical" size="middle" className="w-full">
+          <div>
+            <Text strong className="team-setup__mode-title">Seleziona Modalità</Text>
+          </div>
+          <Segmented
+            options={[
+              {
+                label: 'Solo',
+                value: 'solo',
+                icon: <UserOutlined />,
+              },
+              {
+                label: 'A Squadre',
+                value: 'team',
+                icon: <TeamOutlined />,
+              },
+            ]}
+            value={gameMode}
+            onChange={(value) => setGameMode(value as GameMode)}
+            block
+            size="large"
+          />
+          <Text type="secondary" className="team-setup__mode-description">
+            {gameMode === 'solo' 
+              ? 'Gioca da solo e migliora le tue conoscenze sui design pattern'
+              : 'Crea squadre e compete per vedere chi conosce meglio i design pattern'}
+          </Text>
+        </Space>
+      </Card>
+
+      {gameMode === 'team' && (
+        <Card 
         title={
           <div className="team-setup__card-title">
             <Badge count={teams.length} showZero />
@@ -166,9 +212,10 @@ export default function TeamSetup({ onStart }: TeamSetupProps) {
           )}
         </Space>
       </Card>
+      )}
 
       {/* Start Button */}
-      {teams.length > 0 ? (
+      {(gameMode === 'solo' || teams.length > 0) ? (
         <Button
           type="primary"
           size="large"
@@ -177,7 +224,9 @@ export default function TeamSetup({ onStart }: TeamSetupProps) {
           block
           className="team-setup__start-button"
         >
-          Inizia Esercizio ({teams.length} squadra{teams.length > 1 ? "e" : ""})
+          {gameMode === 'solo' 
+            ? 'Inizia Partita Solo' 
+            : `Inizia Esercizio (${teams.length} squadra${teams.length > 1 ? "e" : ""})`}
         </Button>
       ) : (
         <Card className="team-setup__empty-state">
