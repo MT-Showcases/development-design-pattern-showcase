@@ -18,6 +18,7 @@
  */
 
 import React from "react";
+import type { Category } from "./types";
 import {
     BuildOutlined,
     ToolOutlined,
@@ -61,13 +62,13 @@ import {
 export interface PatternTheory {
     id: string;
     name: string;
-    category: "creational" | "structural" | "behavioral" | "antipattern";
+    category: Category;
     icon?: React.ReactElement; // Optional icon for the pattern
     intent: string;
     problem: string;
     solution: string;
-    structure: string; // Descrizione della struttura
-    participants: string[]; // Classi/componenti coinvolti
+    structure: string;
+    participants: string[];
     codeExamples: CodeExample[];
     realWorldExamples: string[];
     whenToUse: string[];
@@ -89,7 +90,16 @@ export const PATTERN_CATEGORIES = {
         description:
             "I Design Pattern non nascono dal nulla: si fondano su principi che aiutano a scrivere codice pulito e riutilizzabile. I principi SOLID (DRY, KISS, YAGNI) sono le fondamenta su cui costruire software di qualità.",
         icon: React.createElement(BookOutlined),
-        patterns: ["dry", "kiss", "yagni", "solid-srp", "solid-ocp", "solid-lsp", "solid-isp", "solid-dip"],
+        patterns: [
+            "dry",
+            "kiss",
+            "yagni",
+            "solid-srp",
+            "solid-ocp",
+            "solid-lsp",
+            "solid-isp",
+            "solid-dip",
+        ],
     },
     creational: {
         name: "Creational Patterns",
@@ -4971,7 +4981,7 @@ const devClient = new ApiClient(devConfig);`,
     },
 
     // ==================== DESIGN PRINCIPLES ====================
-    "dry": {
+    dry: {
         id: "dry",
         name: "DRY (Don't Repeat Yourself)",
         category: "principles",
@@ -5081,7 +5091,7 @@ function inviaNewsletter(emails) {
         relatedPatterns: ["Template Method", "Strategy", "Utility Classes"],
     },
 
-    "kiss": {
+    kiss: {
         id: "kiss",
         name: "KISS (Keep It Simple, Stupid)",
         category: "principles",
@@ -5186,14 +5196,14 @@ formatters.uppercase('ciao'); // CIAO
         relatedPatterns: ["YAGNI", "Functional Programming"],
     },
 
-    "yagni": {
+    yagni: {
         id: "yagni",
         name: "YAGNI (You Aren't Gonna Need It)",
         category: "principles",
         icon: React.createElement(SafetyOutlined),
         intent: "Non aggiungere funzionalità che non servono ancora. Implementa solo ciò che è necessario adesso.",
         problem:
-            "Implementare features \"per il futuro\" porta a codice morto, complessità inutile e tempo sprecato. Il 80% delle features anticipate non vengono mai usate.",
+            'Implementare features "per il futuro" porta a codice morto, complessità inutile e tempo sprecato. Il 80% delle features anticipate non vengono mai usate.',
         solution:
             "Implementare solo i requisiti attuali. Quando (e se) arriverà il bisogno, aggiungerai la feature. Codice più semplice oggi, features reali domani.",
         structure:
@@ -5414,9 +5424,7 @@ repo.save(user);`,
             "Quando una classe cambia per motivi diversi",
             "Per migliorare testabilità e riutilizzo",
         ],
-        whenNotToUse: [
-            "Non frammentare troppo se la complessità non lo richiede",
-        ],
+        whenNotToUse: ["Non frammentare troppo se la complessità non lo richiede"],
         relatedPatterns: ["Repository", "Service Layer", "Facade"],
     },
 
@@ -5516,9 +5524,7 @@ console.log(calc.calculate(100)); // 50`,
             "Per sostituire if/else chains con polimorfismo",
             "Plugin e sistemi estensibili",
         ],
-        whenNotToUse: [
-            "Over-engineering se le variazioni sono improbabili",
-        ],
+        whenNotToUse: ["Over-engineering se le variazioni sono improbabili"],
         relatedPatterns: ["Strategy", "Template Method", "Factory"],
     },
 
@@ -5639,9 +5645,7 @@ printArea(new Square(5));        // Area: 25`,
             "Per polimorfismo sicuro",
             "Testing con mock/stub (devono sostituire oggetti reali)",
         ],
-        whenNotToUse: [
-            "Composition over inheritance quando appropriato",
-        ],
+        whenNotToUse: ["Composition over inheritance quando appropriato"],
         relatedPatterns: ["Template Method", "Strategy"],
     },
 
@@ -5756,9 +5760,7 @@ function printDocument(printer, doc) {
             "Per dependency injection pulita",
             "Client con esigenze diverse dalla stessa classe",
         ],
-        whenNotToUse: [
-            "Non frammentare eccessivamente se non porta benefici",
-        ],
+        whenNotToUse: ["Non frammentare eccessivamente se non porta benefici"],
         relatedPatterns: ["Adapter", "Facade"],
     },
 
@@ -5866,9 +5868,7 @@ const testService = new UserService(new MockDatabase());`,
             "Per testing isolato (mock dependencies)",
             "Quando vuoi sostituire implementazioni",
         ],
-        whenNotToUse: [
-            "Dipendenze da librerie standard stabili (Math, Date)",
-        ],
+        whenNotToUse: ["Dipendenze da librerie standard stabili (Math, Date)"],
         relatedPatterns: ["Dependency Injection", "Factory", "Abstract Factory"],
     },
 };
